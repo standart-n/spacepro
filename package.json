@@ -1,0 +1,27 @@
+{
+  "name": "spacepro",
+  "version": "0.0.0",
+  "description": "ERP by standart-n",
+  "main": "index.js",
+  "scripts": {
+    "test": "text"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:standart-n/spacepro"
+  },
+  "keywords": [
+    "ERP"
+  ],
+  "author": "aleksnick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/standart-n/spacepro/issues"
+  },
+  "dependencies": {
+    "express": "~3.4.2",
+    "colors": "~0.6.2",
+    "commander": "~2.0.0",
+    "async": "~0.2.9"
+  }
+}
