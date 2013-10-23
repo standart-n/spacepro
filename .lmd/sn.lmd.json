@@ -1,0 +1,51 @@
+{
+	"name": 						"sn build",
+	"root": 						"../",
+	"output": 						"public/js/sn.lmd.js",
+	"modules": {
+		"_": {
+			"path": 				"public/lib/underscore/underscore.min.js",
+			"exports": 				"_"
+		},
+		"underscore": 				"@_",
+		"$": {
+			"path": 				"public/lib/jquery/jquery.min.js",
+			"exports": 				"jQuery"
+		},
+		"jquery": 					"@$",
+		"json2": {
+			"path": 				"public/lib/json2/json2.min.js",
+			"exports": 				"JSON"
+		},
+		"ejs": 						"public/lib/ejs/ejs.min.js",
+		"moment": 					"public/lib/moment/moment.min.js",
+		"moment-ru": 				"public/lib/moment/lang/ru.js",
+		"bootstrap": 				"public/lib/bootstrap/bootstrap.min.js",
+		"Backbone": {
+			"path": 				"public/lib/backbone/backbone.min.js",
+			"require": {
+				"underscore": 		"_",
+				"jQuery": 			"$"
+			},
+			"exports": "Backbone"
+		},
+		"cookie": {
+			"path":					"public/lib/jquery-cookie/jquery.cookie.min.js",
+			"require": {
+				"jQuery": 			"$"        		
+			}
+		},
+		"app": 						"public/js/app.js",
+		"<%= file[0].toUpperCase() %><%= file.slice(1) %>": "public/js/{models,views,controllers,triggers}/**/*.js" 
+	},
+	"main": 						"app",
+	"cache":						false,
+	"ie":							true,
+	"shortcuts": 					true,
+	"pack":		 					false,
+	"lazy":							false,
+	"optimize":		 				false,
+	"log": 							true,
+	"warn": 						true
+
+}

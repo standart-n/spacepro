@@ -13,3 +13,10 @@ results
 
 npm-debug.log
 node_modules
+
+/lib
+/spacepro
+/bower_components
+
+/public/css
+/public/js

@@ -4,6 +4,24 @@ spacepro
 ERP by standart-n
 
 
+#### Требования к серверу
+
+```
+  * GCC 4.2 or newer
+  * Python 2.6 or 2.7
+  * GNU Make 3.81 or newer
+  * libexecinfo (FreeBSD and OpenBSD only)
+  * Node.js 0.10.10 or newer
+  * NPM.js 1.2.25 or newer
+  * MongoDB 2.4.5 or newer
+```
+
+#### Запуск сервера в терминале
+
+```
+	$ spacepro run
+```
+
 
 #### License
 
