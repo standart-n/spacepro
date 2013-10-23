@@ -53,6 +53,13 @@ module.exports = (grunt) ->
 				files:
 					"./<%= pkg.name %>": 'server/app.coffee'
 
+		clean:
+			build: [
+				'public/js/'
+				'public/css/'
+			]
+
+
 		lmd:
 			sn:
 				options:
@@ -68,7 +75,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-recess'
 	grunt.loadNpmTasks 'grunt-lmd'
 	
-	grunt.registerTask 'default', ['client', 'server']
+	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
 	grunt.registerTask 'server', ['coffee:main', 'coffee:server']
 	grunt.registerTask 'client', ['recess:min', 'coffee:client', 'lmd:sn']
