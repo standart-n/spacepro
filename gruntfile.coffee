@@ -8,16 +8,18 @@ module.exports = (grunt) ->
 
 
 		recess:
-			css:
-				options:
-					compile: on
-				files:
-					'./public/css/theme.<%= pkg.version %>.css': './public/less/bootstrap.less'
-			min:
+			style:
 				options:
 					compress: on
-				files:
-					'./public/css/theme.<%= pkg.version %>.min.css': './public/less/bootstrap.less'
+				files: [
+					{
+						expand:			true
+						cwd:			'./public/style/'
+						src:			'./**/_*.less'
+						dest:			'./public/css/'
+						ext:			".<%= pkg.version %>.css"
+					}
+				]
 
 
 		coffee:
@@ -59,24 +61,41 @@ module.exports = (grunt) ->
 				'public/css/'
 			]
 
-
+		copy:
+			views:
+				files: [
+					{
+						expand:		true
+						cwd:		'./server/views'
+						src:		'**/*.jade'
+						dest:		'./lib/views'
+						ext:		'.jade'
+					}
+				]
+		
 		lmd:
 			sn:
 				options:
 					output:		'./public/js/sn.lmd.<%= pkg.version %>.js'
 				build: 			'sn'
 
+			signin:
+				options:
+					output:		'./public/js/signin.lmd.<%= pkg.version %>.js'
+				build: 			'signin'
+
 
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-concat'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-clean'
+	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-jade'
 	grunt.loadNpmTasks 'grunt-recess'
 	grunt.loadNpmTasks 'grunt-lmd'
 	
 	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
-	grunt.registerTask 'server', ['coffee:main', 'coffee:server']
-	grunt.registerTask 'client', ['recess:min', 'coffee:client', 'lmd:sn']
+	grunt.registerTask 'server', ['coffee:main', 'coffee:server', 'copy:views']
+	grunt.registerTask 'client', ['recess:style', 'coffee:client', 'lmd:sn', 'lmd:signin']
 

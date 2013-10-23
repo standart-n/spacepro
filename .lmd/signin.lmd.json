@@ -1,0 +1,10 @@
+{
+	"name": 						"sn build",
+	"root": 						"../",
+	"output": 						"public/js/signin.lmd.js",
+	"extends":						"./sn.lmd.json",
+	"modules": {
+		"app": 						"public/js/app.js"
+	},
+	"main": 						"app"
+}

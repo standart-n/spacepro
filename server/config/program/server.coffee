@@ -17,14 +17,18 @@ module.exports = (program) ->
 	program
 		.option('-p, --port <port>', "port for server", parseInt)
 		.option('-P, --profile <name>', "profile for settings in #{process.env.APP_LIB}")
+		.option('-t, --theme <name>', "theme of design")
 
 
 	program.on 'port', () ->
 		process.env.PORT = 			program.port 		if program.port?
 
+	program.on 'theme', () ->
+		process.env.THEME = 		program.theme 		if program.theme?
+
 	program.on 'profile', () ->
 		process.env.PROFILE = 		program.profile 	if program.profile?
-		process.env.APP_CONF = 		"#{process.env.APP_LIB}/#{process.env.PROFILE}"
+		process.env.APP_CONF = 		"#{process.env.APP_USR}/#{process.env.PROFILE}"
 		process.env.APP_STORE = 	"#{process.env.APP_CONF}/store.json"
 		mkpath.sync(process.env.APP_CONF)
 		store.store(process.env.APP_STORE)

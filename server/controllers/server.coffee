@@ -9,7 +9,7 @@ mkpath = 		require('mkpath')
 async = 		require('async')
 _ = 			require('lodash')
 store = 		require(process.env.APP_DIR + '/lib/controllers/storage')
-
+	
 class Server
 
 	constructor: () ->
@@ -22,6 +22,7 @@ class Server
 
 		defaults =
 			port:					3000
+			theme:					'default'
 			mongodb_connection:		'mongodb://127.0.0.1:27017/spacepro'
 
 		@options = _.extend {}, defaults, special
@@ -38,6 +39,7 @@ class Server
 		async.series [
 
 			(callback) =>	@answer(store, 'port', 					callback)
+			(callback) =>	@answer(store, 'theme', 				callback)
 			(callback) =>	@answer(store, 'firebird_host', 		callback)
 			(callback) =>	@answer(store, 'firebird_path', 		callback)
 			(callback) =>	@answer(store, 'firebird_user', 		callback)
@@ -72,11 +74,12 @@ class Server
 	init: (results) ->
 
 		process.env.PORT = 					results[0]
-		process.env.FIREBIRD_HOST = 		results[1]
-		process.env.FIREBIRD_PATH = 		results[2]
-		process.env.FIREBIRD_USER = 		results[3]
-		process.env.FIREBIRD_PASSWORD = 	results[4]
-		process.env.MONGODB_CONNECTION = 	results[5]
+		process.env.THEME = 				results[1]
+		process.env.FIREBIRD_HOST = 		results[2]
+		process.env.FIREBIRD_PATH = 		results[3]
+		process.env.FIREBIRD_USER = 		results[4]
+		process.env.FIREBIRD_PASSWORD = 	results[5]
+		process.env.MONGODB_CONNECTION = 	results[6]
 
 
 	run: (special, handler) ->

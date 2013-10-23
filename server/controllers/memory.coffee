@@ -1,7 +1,7 @@
 
 mongoose = 			require('mongoose')
 
-Session = 			mongoose.model('Session', require(process.env.APP_DIR + '/lib/views/db/session'))
+Session = 			mongoose.model('Session', require(process.env.APP_DIR + '/lib/models/db/session'))
 
 module.exports = (connect) ->
 

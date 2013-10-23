@@ -2,7 +2,7 @@
 Token = 								require('token')
 mongoose = 								require('mongoose')
 
-User = 									mongoose.model('User', require(global.home + '/lib/views/db/user'))
+User = 									mongoose.model('User', require(global.home + '/lib/models/db/user'))
 
 class Auth
 

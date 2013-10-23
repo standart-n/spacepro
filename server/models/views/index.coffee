@@ -5,6 +5,9 @@ Index = Globals.extend
 
 	initialize: () ->
 		this.globals()
+		this.addStyle()
+
+
 
 
 exports = module.exports = Index

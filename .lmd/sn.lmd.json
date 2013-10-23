@@ -34,9 +34,7 @@
 			"require": {
 				"jQuery": 			"$"        		
 			}
-		},
-		"app": 						"public/js/app.js",
-		"<%= file[0].toUpperCase() %><%= file.slice(1) %>": "public/js/{models,views,controllers,triggers}/**/*.js" 
+		}
 	},
 	"main": 						"app",
 	"cache":						false,
