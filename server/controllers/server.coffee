@@ -102,7 +102,7 @@ class Server
 
 			require(process.env.APP_DIR + '/lib/config/express/server')(app)
 	
-			require(process.env.APP_DIR + '/lib/routes/auth')(app)
+			require(process.env.APP_DIR + '/lib/routes/signin')(app)
 
 			server = http.createServer(app)
 

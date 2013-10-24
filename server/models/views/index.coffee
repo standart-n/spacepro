@@ -5,7 +5,7 @@ Index = Globals.extend
 
 	initialize: () ->
 		this.globals()
-		this.addStyle()
+		this.addLocalCssFile()
 
 
 

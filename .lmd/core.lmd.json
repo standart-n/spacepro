@@ -1,7 +1,7 @@
 {
-	"name": 						"sn build",
+	"name": 						"core",
 	"root": 						"../",
-	"output": 						"public/js/sn.lmd.js",
+	"output": 						"public/js/core.lmd.js",
 	"modules": {
 		"_": {
 			"path": 				"public/lib/underscore/underscore.min.js",
@@ -17,10 +17,6 @@
 			"path": 				"public/lib/json2/json2.min.js",
 			"exports": 				"JSON"
 		},
-		"ejs": 						"public/lib/ejs/ejs.min.js",
-		"moment": 					"public/lib/moment/moment.min.js",
-		"moment-ru": 				"public/lib/moment/lang/ru.js",
-		"bootstrap": 				"public/lib/bootstrap/bootstrap.min.js",
 		"Backbone": {
 			"path": 				"public/lib/backbone/backbone.min.js",
 			"require": {

@@ -74,10 +74,10 @@ module.exports = (grunt) ->
 				]
 		
 		lmd:
-			sn:
+			app:
 				options:
-					output:		'./public/js/sn.lmd.<%= pkg.version %>.js'
-				build: 			'sn'
+					output:		'./public/js/app.<%= pkg.version %>.js'
+				build: 			'app'
 
 			signin:
 				options:
@@ -97,5 +97,5 @@ module.exports = (grunt) ->
 	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
 	grunt.registerTask 'server', ['coffee:main', 'coffee:server', 'copy:views']
-	grunt.registerTask 'client', ['recess:style', 'coffee:client', 'lmd:sn', 'lmd:signin']
+	grunt.registerTask 'client', ['recess:style', 'coffee:client', 'lmd']
 

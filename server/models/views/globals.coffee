@@ -15,9 +15,12 @@ Globals = Common.extend
 
 		this.set 'title', "#{this.get('name')} v#{this.get('version')}"
 
-		this.set 'css', [
-			"bootstrap/_bootstrap.#{this.get('version')}.css"
-		]
+		this.set 'css', []
+		this.set 'js', 	[]
+
+		# this.set 'css', [
+		# 	"bootstrap/_bootstrap.#{this.get('version')}.css"
+		# ]
 
 
 exports = module.exports = Globals
