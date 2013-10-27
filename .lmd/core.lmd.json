@@ -17,19 +17,17 @@
 			"path": 				"public/lib/json2/json2.min.js",
 			"exports": 				"JSON"
 		},
-		"Backbone": {
+		"jade": {
+			"path": 				"public/lib/jade/runtime.js",
+			"exports": 				"jade"
+		},		
+		"backbone": {
 			"path": 				"public/lib/backbone/backbone.min.js",
 			"require": {
 				"underscore": 		"_",
 				"jQuery": 			"$"
 			},
 			"exports": "Backbone"
-		},
-		"cookie": {
-			"path":					"public/lib/jquery-cookie/jquery.cookie.min.js",
-			"require": {
-				"jQuery": 			"$"        		
-			}
 		}
 	},
 	"main": 						"app",

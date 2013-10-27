@@ -57,18 +57,20 @@ module.exports = (grunt) ->
 
 		clean:
 			build: [
+				'lib/'
 				'public/js/'
 				'public/css/'
+				'public/templates/'
 			]
 
 		copy:
-			views:
+			templates:
 				files: [
 					{
 						expand:		true
-						cwd:		'./server/views'
+						cwd:		'./server/templates'
 						src:		'**/*.jade'
-						dest:		'./lib/views'
+						dest:		'./lib/templates'
 						ext:		'.jade'
 					}
 				]
@@ -84,18 +86,33 @@ module.exports = (grunt) ->
 					output:		'./public/js/signin.lmd.<%= pkg.version %>.js'
 				build: 			'signin'
 
+		
+		jade:
+			client:
+				options:
+					runtime: off
+				files: [
+					{
+						expand:		true
+						cwd:		'./server/templates'
+						src:		'**/*.jade'
+						dest:		'./public/templates'
+						ext:		'.jade'
+					}
+				]
+
 
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-concat'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
-	grunt.loadNpmTasks 'grunt-contrib-jade'
+	grunt.loadNpmTasks 'grunt-jade'
 	grunt.loadNpmTasks 'grunt-recess'
 	grunt.loadNpmTasks 'grunt-lmd'
 	
 	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
-	grunt.registerTask 'server', ['coffee:main', 'coffee:server', 'copy:views']
-	grunt.registerTask 'client', ['recess:style', 'coffee:client', 'lmd']
+	grunt.registerTask 'server', ['coffee:main', 'coffee:server', 'copy:templates']
+	grunt.registerTask 'client', ['recess:style', 'jade:client', 'coffee:client', 'lmd']
 

@@ -1,0 +1,23 @@
+
+
+.container.signin-wrap
+
+	.row
+
+		.col-md-6.col-md-offset-3.col-xs-12
+
+			form.signin-form
+				h3.signin-form-heading 
+					Авторизация
+					&nbsp;
+					small выберите пользователя
+
+				#signin-users.list-group
+		
+					- users.forEach(function(user){
+
+						include user
+
+					- })
+
+

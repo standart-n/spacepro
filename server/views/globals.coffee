@@ -1,10 +1,10 @@
 
-Common = require(process.env.APP_DIR + '/lib/models/views/common')
+Common = require(process.env.APP_DIR + '/lib/views/common')
 
 Globals = Common.extend
 
 	globals: () ->
-		this.set 'pretty',  on
+		this.common()
 
 		this.set 'theme', 			process.env.THEME
 		this.set 'name', 			process.env.APP_NAME
@@ -14,9 +14,6 @@ Globals = Common.extend
 		this.set 'version', 		process.env.APP_VERSION
 
 		this.set 'title', "#{this.get('name')} v#{this.get('version')}"
-
-		this.set 'css', []
-		this.set 'js', 	[]
 
 		# this.set 'css', [
 		# 	"bootstrap/_bootstrap.#{this.get('version')}.css"

@@ -1,0 +1,21 @@
+
+- js.forEach(function(file){
+
+	script(src = "js/#{file}", type = "text/javascript")
+
+- })
+
+
+- globalObjects.forEach(function(globalObject){
+
+	!= "<script type=\"text/javascript\">var " + globalObject.name + " = " + globalObject.data + ";</script>"
+
+- })
+
+
+- scripts.forEach(function(script){
+
+	script(type = "text/javascript") #{script}
+
+- })
+

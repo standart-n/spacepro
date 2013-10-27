@@ -3,19 +3,39 @@ Backbone = require('backbone')
 
 Common = Backbone.Model.extend
 
-	addLocalCssFile: (file = 'theme') ->
-		css = 	this.get 'css'
-		file = 	this.editLocalFileName(file, 'css')
-		css.push file
-		this.set 'css', css
+	common: () ->
+		this.set 'pretty',  on
 
+		this.set 'css', 			[]
+		this.set 'js', 				[]
+		this.set 'scripts',			[]
+		this.set 'globalObjects', 	[]
+
+
+	addLocalCssFile: (file = 'theme') ->
+		ms = 	this.get 'css'
+		file = 	this.editLocalFileName(file, 'css')
+		ms.push file
+		this.set 'css', ms
 
 	addLocalJsFile: (file = 'sn') ->
-		js = 	this.get 'js'
+		ms = 	this.get 'js'
 		file = 	this.editLocalFileName(file, 'js')
-		js.push file
-		this.set 'js', js
+		ms.push file
+		this.set 'js', ms
 
+	addScript: (script = '') ->
+		ms = this.get 'scripts'
+		ms.push script
+		this.set 'scripts', ms
+
+	exportGlobalObject: (name = 'val', obj = {}) ->
+		ms = this.get 'globalObjects'
+		# data = json.replace '/\&quot\;/g', '"'
+		ms.push
+			name: 	name
+			data: 	JSON.stringify(obj)
+		this.set 'globalObjects', ms
 	
 	editLocalFileName: (file = '', ext = 'css') ->
 		version = this.get 'version'

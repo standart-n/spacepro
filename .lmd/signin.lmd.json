@@ -1,10 +1,12 @@
 {
-	"name": 						"signin",
-	"root": 						"../",
-	"output": 						"public/js/signin.lmd.js",
-	"extends":						"./core.lmd.json",
+	"name": 				"signin",
+	"root": 				"../",
+	"output": 				"public/js/signin.lmd.js",
+	"extends":				"./core.lmd.json",
 	"modules": {
-		"app": 						"public/js/signin/app.js"
+		"app": 				"public/js/signin/app.js",
+		"<%= file %>": 		"public/js/signin/{models,views,controllers,triggers}/**/*.js",
+		"<%= file %>.tpl": 	"public/templates/signin/**/*.js"
 	},
-	"main": 						"app"
+	"main": 		"app"
 }

@@ -1,5 +1,5 @@
 
-Globals = require(process.env.APP_DIR + '/lib/models/views/globals')
+Globals = require(process.env.APP_DIR + '/lib/views/globals')
 
 Index = Globals.extend
 
