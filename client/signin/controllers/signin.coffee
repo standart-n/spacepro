@@ -5,7 +5,7 @@ ListOfUsers = 	require('listOfUsers')
 module.exports = Backbone.Router.extend
 
 	routes:
-		'change/:id': 	'changeUser'
+		':id': 	'changeUser'
 
 	initialize: () ->
 

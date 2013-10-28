@@ -1,6 +1,6 @@
 
 
-.container.signin-wrap
+.container.signin-container
 
 	.row
 
@@ -12,12 +12,12 @@
 					&nbsp;
 					small выберите пользователя
 
-				#signin-users.list-group
-		
-					- users.forEach(function(user){
+			.list-group.signin-form-list(data-view = "listOfUsers")
+	
+				- users.forEach(function(user){
 
-						include user
+					include user
 
-					- })
+				- })
 
 

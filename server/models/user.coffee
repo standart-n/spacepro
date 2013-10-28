@@ -8,12 +8,10 @@ module.exports = Backbone.Model.extend
 		d$uuid:			''
 		status:			0
 		username:		''
+		userlogin:		''
 		userpsw:		''
 		usergroup_id:	0
 		post:			''
-		f:				''
-		i:				''
-		o:				''
 
 
 	initialize: () ->
