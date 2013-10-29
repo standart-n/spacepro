@@ -33,9 +33,9 @@
     "jade": "~0.35.0",
     "backbone": "~1.1.0",
     "i18n-abide": "0.0.14",
-    "i18n": "~0.4.1",
     "validate": "~0.2.4",
-    "MD5": "~1.1.0"
+    "MD5": "~1.1.0",
+    "i18n": "~0.4.1"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.9",
@@ -47,6 +47,8 @@
     "grunt-recess": "~0.4.0",
     "grunt-lmd": "~0.1.13",
     "grunt-contrib-copy": "~0.4.1",
-    "grunt-jade": "~0.4.0"
+    "grunt-jade": "~0.4.0",
+    "grunt-po2json": "0.0.1",
+    "po2json": "0.0.6"
   }
 }

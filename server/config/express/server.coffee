@@ -1,5 +1,6 @@
 
 express = 			require('express')
+i18n = 				require('i18n-abide')
 session = 			require(process.env.APP_DIR + '/lib/config/express/session')
 logger = 			require(process.env.APP_DIR + '/lib/config/express/logger')
 
@@ -7,7 +8,7 @@ module.exports = (app) ->
 
 	maxAge = 365 * 24* 60 * 60 * 1000
 
-	app.configure ->
+	app.configure () ->
 
 		app.set 'port', process.env.PORT
 
@@ -18,7 +19,13 @@ module.exports = (app) ->
 		app.use express.urlencoded()
 
 		app.use express.methodOverride()
-		
+
+		app.use i18n.abide
+			supported_languages: 	['en']
+			default_lang:			'en'
+			# debug_lang:				'ru'
+			translation_directory:	process.env.APP_DIR + '/public/i18n'
+
 		# app.use session
 
 		app.use app.router

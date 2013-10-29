@@ -1,0 +1,55 @@
+
+
+# /public/templates/signin/form.jade
+
+msgid "Signin"
+msgstr "Authorization"
+
+msgid "Login"
+msgstr "Username"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Enter"
+msgstr "Signin"
+
+
+# /server/validates/signin.coffee
+
+msgid "Please enter your login"
+msgstr "Please enter your login"
+
+msgid "Please enter your password"
+msgstr "Please enter your password"
+
+
+# /server/controllers/signin.coffee
+
+msgid "No connection to the database"
+msgstr "Could not create a connection to the database"
+
+msgid "Failed to create transaction"
+msgstr "Error when opening the transaction"
+
+msgid "Error for user search"
+msgstr "Error for user search"
+
+msgid "User not found"
+msgstr "User not found"
+
+msgid "Account is not active"
+msgstr "This account is not active"
+
+msgid "The user has no password"
+msgstr "The user has no password"
+
+msgid "Error in database operations"
+msgstr "Error in database operations"
+
+msgid "You are not allowed to login"
+msgstr "You are not allowed to login"
+
+msgid "Incorrect login or password"
+msgstr "Incorrect login or password"
+

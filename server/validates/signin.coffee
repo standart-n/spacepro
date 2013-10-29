@@ -4,15 +4,15 @@ module.exports =
 	login:
 		type: 'string'
 		required: true
-		minLen: 2
-		maxLen: 20
-		message: 'Неверно заполнено поле Логин'
+		minLen: 1
+		maxLen: 100
+		message: 'Please enter your login'
 
 
 	password:
 		type: 'string'
 		required: true
-		minLen: 2
-		maxLen: 20
-		message: 'Неверно заполнено поле Пароль'
+		minLen: 1
+		maxLen: 100
+		message: 'Please enter your password'
 

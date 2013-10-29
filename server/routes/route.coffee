@@ -5,11 +5,11 @@ Signin = 	require(process.env.APP_DIR + '/lib/views/signin')
 module.exports = (app) ->
 
 	app.get '/', (req, res) ->
-		signin = new Signin()
+		signin = new Signin
+			req: req
+			res: res
+
 		res.render 'layout/signin', signin.toJSON()
 
-		# async.series [		
-		# 	(fn) -> signin.getUsers(fn)
-		# ], (err, results) ->
 
 

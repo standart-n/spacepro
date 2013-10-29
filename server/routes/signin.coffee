@@ -10,6 +10,8 @@ module.exports = (app) ->
 		data = 		JSON.parse model
 
 		signin = new Signin
+			req:		req 
+			res:		res
 			login:		data.login
 			password:	data.password
 			

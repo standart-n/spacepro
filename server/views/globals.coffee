@@ -7,7 +7,7 @@ Globals = Common.extend
 		this.common()
 
 		this.set 'theme', 			process.env.THEME
-		this.set 'name', 			process.env.APP_NAME
+		this.set 'name', 			this.toUpperCaseFirstLetter(process.env.APP_NAME)
 		this.set 'author', 			process.env.APP_AUTHOR
 		this.set 'description', 	process.env.APP_DESCRIPTION
 		this.set 'keywords', 		process.env.APP_KEYWORDS
@@ -18,6 +18,10 @@ Globals = Common.extend
 		# this.set 'css', [
 		# 	"bootstrap/_bootstrap.#{this.get('version')}.css"
 		# ]
+
+	toUpperCaseFirstLetter: (letter) ->
+		"#{letter[0].toUpperCase()}#{letter.slice(1)}"
+
 
 
 exports = module.exports = Globals

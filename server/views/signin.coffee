@@ -8,10 +8,11 @@ Signin = Globals.extend
 		users:	[]
 
 	initialize: () ->
+		req = this.get('req')
 
 		this.globals()
 
-		this.set 'title', "#{this.get('title')} | Авторизация"
+		this.set 'title', "#{this.get('title')} | #{req.gettext('Signin')}"
 
 		this.addLocalCssFile 	'signin'
 		this.addLocalJsFile 	'signin'
@@ -27,3 +28,4 @@ Signin = Globals.extend
 
 
 exports = module.exports = Signin
+

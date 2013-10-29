@@ -22,6 +22,7 @@ exports = module.exports = Backbone.Model.extend
 	initialize: () ->
 
 	check: (fn) ->
+		req = this.get('req')
 
 		valid = new Validate
 			schema:			'signin'
@@ -30,7 +31,7 @@ exports = module.exports = Backbone.Model.extend
 				password: 	this.get('password')
 
 		if !valid.check()
-			this.set 'error', valid.get('errors')[0]
+			this.set 'error', req.gettext(valid.get('errors')[0])
 
 		async.series
 			
@@ -41,7 +42,7 @@ exports = module.exports = Backbone.Model.extend
 						throw err if err 
 
 						if err
-							this.set 'error', 'Нет подключения к базе данных'
+							this.set 'error', req.gettext('No connection to the database')
 							fn(err)
 						else
 							this.set 'connect', connect
@@ -56,7 +57,7 @@ exports = module.exports = Backbone.Model.extend
 						throw err if err
 
 						if err
-							this.set 'error', 'Ошибка при открытии транзакции'
+							this.set 'error', req.gettext('Failed to create transaction')
 							fn(err)
 
 						else
@@ -74,21 +75,21 @@ exports = module.exports = Backbone.Model.extend
 						throw err if err
 
 						if err
-							this.set 'error', 'Ошибка при поиске пользователя'
+							this.set 'error', req.gettext('Error for user search')
 							tr.rollback()
 							this.unset 'transaction'
 							fn(err)
 						
 						else
 							if result.length < 1
-								this.set 'error', 'Пользователь не найден'
+								this.set 'error', req.gettext('User not found')
 
 							else
 								if result[0].status isnt 0
-									this.set 'error', 'Учетная запись не активна'
+									this.set 'error', req.gettext('Account is not active')
 
 								if result[0].userpsw.toString().length < 1
-									this.set 'error', 'Пароль у пользователя не установлен'
+									this.set 'error', req.gettext('The user has no password')
 
 								if !this.get('error')
 									this.set 
@@ -110,14 +111,14 @@ exports = module.exports = Backbone.Model.extend
 						throw err if err 
 
 						if err 
-							this.set 'error', 'Ошибка при работе с базой данных'
+							this.set 'error', req.gettext('Error in database operations')
 							tr.rollback()
 							fn(err)
 
 						else
 							tr.commit()
 							if result.length < 1
-								this.set 'error', 'У вас нет прав для входа в систему'
+								this.set 'error', req.gettext('You are not allowed to login')
 							fn()
 
 				else
@@ -134,10 +135,11 @@ exports = module.exports = Backbone.Model.extend
 
 
 	checkPassword: () ->
+		req = this.get('req')
 		if !this.get('error')
 			hash = md5 this.get('password')
 			if this.get('hash').toUpperCase() isnt hash.toUpperCase()
-				this.set 'error', 'Вы неправильно ввели логин или пароль'
+				this.set 'error', req.gettext('Incorrect login or password')
 
 	
 	closeConnection: () ->

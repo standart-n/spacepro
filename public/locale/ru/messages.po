@@ -1,0 +1,57 @@
+
+
+# /public/templates/signin/form.jade
+
+msgid "Signin"
+msgstr "Авторизация"
+
+msgid "Login"
+msgstr "Логин"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Enter"
+msgstr "Войти"
+
+
+# /server/validates/signin.coffee
+
+msgid "Please enter your login"
+msgstr "Пожалуйста, введите логин"
+
+msgid "Please enter your password"
+msgstr "Пожалуйста, введите пароль"
+
+
+# /server/controllers/signin.coffee
+
+msgid "No connection to the database"
+msgstr "Нет подключения к базе данных"
+
+msgid "Failed to create transaction"
+msgstr "Ошибка при открытии транзакции"
+
+msgid "Error for user search"
+msgstr "Ошибка при поиске пользователя"
+
+msgid "User not found"
+msgstr "Пользователь не найден"
+
+msgid "Account is not active"
+msgstr "Учетная запись не активна"
+
+msgid "The user has no password"
+msgstr "У пользователя не задан пароль"
+
+msgid "Error in database operations"
+msgstr "Ошибка при работе с базой данных"
+
+msgid "You are not allowed to login"
+msgstr "У вас нет прав для входа в систему"
+
+msgid "Incorrect login or password"
+msgstr "Вы неправильно ввели логин или пароль"
+
+
+

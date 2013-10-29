@@ -61,6 +61,9 @@ module.exports = (grunt) ->
 				'public/js/'
 				'public/css/'
 			]
+			i18n: [
+				'public/i18n'
+			]			
 
 		
 		lmd:
@@ -89,18 +92,28 @@ module.exports = (grunt) ->
 					}
 				]
 
+		po2json:
+			en:
+				src: ['./public/locale/en/*.po']
+				dest: './public/i18n/en'
+			ru:
+				src: ['./public/locale/ru/*.po']
+				dest: './public/i18n/ru'
+
 
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-concat'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
+	grunt.loadNpmTasks 'grunt-po2json'
 	grunt.loadNpmTasks 'grunt-jade'
 	grunt.loadNpmTasks 'grunt-recess'
 	grunt.loadNpmTasks 'grunt-lmd'
 	
 	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
+	grunt.registerTask 'i18n', ['clean:i18n', 'po2json']
 	grunt.registerTask 'server', ['coffee:main', 'coffee:server']
 	grunt.registerTask 'client', ['recess:style', 'jade:client', 'coffee:client', 'lmd']
 
