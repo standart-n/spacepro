@@ -1,15 +1,19 @@
 
-async = 	require('async')
-Signin = 	require(process.env.APP_DIR + '/lib/views/signin')
+_ = 		require('lodash')
+Signin = 	require(process.env.APP_DIR + '/lib/controllers/signin')
 
 module.exports = (app) ->
 
-	app.get '/', (req, res) ->
-		signin = new Signin()
+	app.post '/api/signin', (req, res) ->		
 
-		async.series [		
-			(fn) -> signin.getUsers(fn)
-		], (err, results) ->
-			res.render 'layout/signin', signin.toJSON()
+		model = 	if req.body?.model? then req.body.model else '{}'
+		data = 		JSON.parse model
+
+		signin = new Signin
+			login:		data.login
+			password:	data.password
+			
+		signin.check () ->
+			res.json _.pick signin.toJSON(), 'result', 'error'
 
 

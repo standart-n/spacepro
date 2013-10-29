@@ -4,13 +4,7 @@
 	"output": 						"public/js/signin.lmd.js",
 	"extends":						"./core.lmd.json",
 	"modules": {
-		"bootstrap": {
-			"path":					"public/lib/bootstrap/bootstrap.min.js",
-			"require": {
-				"jQuery": 			"$"
-			}
-		},
-		"app": 						"public/js/app/app.js"
+		"main": 					"public/js/app/main.js"
 	},
-	"main": 						"app"
+	"main": 						"main"
 }

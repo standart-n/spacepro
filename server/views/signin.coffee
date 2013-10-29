@@ -16,13 +16,14 @@ Signin = Globals.extend
 		this.addLocalCssFile 	'signin'
 		this.addLocalJsFile 	'signin'
 
-	getUsers: (fn) ->	
 
-		users = new Users()
-		users.getList () =>
-			this.set 				'users', users.toJSON()
-			this.exportGlobalObject 'users', this.get('users')
-			fn null, 'done' if typeof fn is 'function'
+	# getAllUsers: (fn) ->	
+
+	# 	users = new Users()
+	# 	users.getAllUsers () =>
+	# 		this.set 				'users', users.toJSON()
+	# 		this.exportGlobalObject 'users', this.get('users')
+	# 		fn null, 'done' if typeof fn is 'function'
 
 
 exports = module.exports = Signin

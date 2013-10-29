@@ -1,41 +1,33 @@
 
+Backbone = 		require('backbone')
 fb = 			require('node-firebird')
 
-class Fb
 
-	constructor: () ->
+exports = module.exports = Backbone.Model.extend
+
+	defaults:
+		host:			process.env.FIREBIRD_HOST
+		database: 		process.env.FIREBIRD_PATH
+		user: 			process.env.FIREBIRD_USER
+		password:		process.env.FIREBIRD_PASSWORD
+
+	
+	initialize: () ->
 
 	connection: (fn) ->
 
 		fb.attach
-			host:			process.env.FIREBIRD_HOST
-			database: 		process.env.FIREBIRD_PATH
-			user: 			process.env.FIREBIRD_USER
-			password:		process.env.FIREBIRD_PASSWORD
-		, (err, db) =>
+			host:			this.get('host')
+			database: 		this.get('database')
+			user: 			this.get('user')
+			password:		this.get('password')
+		, (err, db) =>			
+			throw err if err
+			
 			if err
-				throw err
+				fn err if typeof fn is 'function'
+			
 			else
-				this.db = db
-				fn db if typeof fn is 'function'
-
-
-	query: (query, fn) ->
-
-		if query? and this.db?
-
-			this.db.query query, (err, result) =>
-				if err
-					throw err
-				else
-					this.result = result
-					fn result if typeof fn is 'function'
-
-
-
-exports = module.exports = new Fb()
-
-exports.Fb = Fb
-
+				fn null, db if typeof fn is 'function'
 
 

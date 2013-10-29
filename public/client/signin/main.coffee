@@ -3,12 +3,11 @@ window.JSON = 				require('json2')
 window.jade = 				require('jade')
 window.jade.templates = 	{}
 
-require('user.tpl')
-
 require('jquery')
+require('bootstrap')
 
 Backbone = 		require('backbone')
-Signin = 		require('signin')
+App = 			require('app')
 
 $ () ->
 
@@ -28,6 +27,6 @@ $ () ->
 	Backbone.emulateHTTP = on
 	Backbone.emulateJSON = on
 
-	window.signin = new Signin()
+	window.app = new App()
 
 	Backbone.history.start()

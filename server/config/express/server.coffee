@@ -26,7 +26,7 @@ module.exports = (app) ->
 		app.use express.static process.env.APP_DIR + '/public'
 
 		app.configure () ->
-			app.set 'views', process.env.APP_DIR + '/lib/templates'
+			app.set 'views', process.env.APP_DIR + '/public/templates'
 			app.set 'view engine', 'jade'
 
 		app.configure 'development', () ->

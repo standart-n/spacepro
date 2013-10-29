@@ -28,9 +28,15 @@
 				"jQuery": 			"$"
 			},
 			"exports": "Backbone"
+		},
+		"bootstrap": {
+			"path":					"public/lib/bootstrap/bootstrap.min.js",
+			"require": {
+				"jQuery": 			"$"
+			}
 		}
 	},
-	"main": 						"app",
+	"main": 						"main",
 	"cache":						false,
 	"ie":							true,
 	"shortcuts": 					true,

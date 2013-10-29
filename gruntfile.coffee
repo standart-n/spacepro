@@ -29,7 +29,7 @@ module.exports = (grunt) ->
 				files: [
 					{
 						expand:			true
-						cwd:			'./client/'
+						cwd:			'./public/client/'
 						src:			'./**/*.coffee'
 						dest:			'./public/js/'
 						ext:			'.js'
@@ -60,20 +60,8 @@ module.exports = (grunt) ->
 				'lib/'
 				'public/js/'
 				'public/css/'
-				'public/templates/'
 			]
 
-		copy:
-			templates:
-				files: [
-					{
-						expand:		true
-						cwd:		'./server/templates'
-						src:		'**/*.jade'
-						dest:		'./lib/templates'
-						ext:		'.jade'
-					}
-				]
 		
 		lmd:
 			app:
@@ -94,9 +82,9 @@ module.exports = (grunt) ->
 				files: [
 					{
 						expand:		true
-						cwd:		'./server/templates'
+						cwd:		'./public/templates'
 						src:		'**/*.jade'
-						dest:		'./public/templates'
+						dest:		'./public/js/templates'
 						ext:		'.jade'
 					}
 				]
@@ -113,6 +101,6 @@ module.exports = (grunt) ->
 	
 	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
-	grunt.registerTask 'server', ['coffee:main', 'coffee:server', 'copy:templates']
+	grunt.registerTask 'server', ['coffee:main', 'coffee:server']
 	grunt.registerTask 'client', ['recess:style', 'jade:client', 'coffee:client', 'lmd']
 

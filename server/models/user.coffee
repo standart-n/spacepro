@@ -1,16 +1,14 @@
 
 Backbone = 		require('backbone')
 
-module.exports = Backbone.Model.extend
+exports = module.exports = Backbone.Model.extend
 
 	defaults:
 
 		d$uuid:			''
-		status:			0
 		username:		''
 		userlogin:		''
 		userpsw:		''
-		usergroup_id:	0
 		post:			''
 
 
