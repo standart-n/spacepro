@@ -52,7 +52,7 @@ module.exports = Backbone.View.extend
 				alert 'success'
 
 		if textStatus is 'error'
-			this.error "#{xhr.status}: Сервер не отвечает!"
+			this.error "#{xhr.status}: #{gettext('Server not found')}!"
 
 		this.user.unset 'result'
 		this.user.unset 'error'

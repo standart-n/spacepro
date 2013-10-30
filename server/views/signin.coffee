@@ -17,6 +17,8 @@ Signin = Globals.extend
 		this.addLocalCssFile 	'signin'
 		this.addLocalJsFile 	'signin'
 
+		this.addLocaleString 'Server not found'
+
 
 	# getAllUsers: (fn) ->	
 

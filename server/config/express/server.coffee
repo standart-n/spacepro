@@ -21,7 +21,7 @@ module.exports = (app) ->
 		app.use express.methodOverride()
 
 		app.use i18n.abide
-			supported_languages: 	['en']
+			supported_languages: 	['en', 'ru']
 			default_lang:			'en'
 			# debug_lang:				'ru'
 			translation_directory:	process.env.APP_DIR + '/public/i18n'

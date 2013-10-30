@@ -34,8 +34,7 @@
     "backbone": "~1.1.0",
     "i18n-abide": "0.0.14",
     "validate": "~0.2.4",
-    "MD5": "~1.1.0",
-    "i18n": "~0.4.1"
+    "MD5": "~1.1.0"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.9",

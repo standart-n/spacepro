@@ -15,6 +15,12 @@ msgid "Enter"
 msgstr "Войти"
 
 
+# /server/views/signin.coffee
+
+msgid "Server not found"
+msgstr "Сервер не отвечает"
+
+
 # /server/validates/signin.coffee
 
 msgid "Please enter your login"

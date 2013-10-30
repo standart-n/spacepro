@@ -21,6 +21,13 @@ $ () ->
 	window.jalert = (s) ->
 		alert JSON.stringify(s)
 
+	window.gettext = (msgid) ->
+		if window.json_locale_data?.messages?
+			if window.json_locale_data.messages[msgid].length > 1
+				msgstr = window.json_locale_data.messages[msgid][1]
+		msgstr ?= msgid
+		return msgstr
+
 	window.aid = () ->
 		Math.floor(Math.random() * Math.pow(10,10))
 
