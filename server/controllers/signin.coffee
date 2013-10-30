@@ -3,13 +3,13 @@ Backbone = 		require('backbone')
 async = 		require('async')
 md5 = 			require('MD5')
 Validate = 		require(process.env.APP_DIR + '/lib/controllers/validate')
+Session = 		require(process.env.APP_DIR + '/lib/controllers/session')
 FB = 			require(process.env.APP_DIR + '/lib/controllers/fb')
 
 
 exports = module.exports = Backbone.Model.extend
 
-	defaults:
-
+	defaults: 
 		id:				null
 		login:			null
 		password:		null
@@ -22,6 +22,9 @@ exports = module.exports = Backbone.Model.extend
 	initialize: () ->
 
 	check: (fn) ->
+
+		fn ?= () ->
+
 		req = this.get('req')
 
 		valid = new Validate
@@ -126,12 +129,34 @@ exports = module.exports = Backbone.Model.extend
 
 
 		, (err, results) =>
+
 			this.checkPassword()
 			this.closeConnection()
-			if !this.get('error')
-				this.set 'result', 'success'
 
-			fn() if typeof fn is 'function'
+			if !this.get('error')
+				this.startSession () =>
+					this.set 'result', 'success'
+					fn()
+
+			else
+				fn()
+
+	
+	startSession: (fn) ->
+
+		fn ?= () ->
+
+		session = new Session
+			req: this.get('req')
+
+		session.start this.get('id'), (err, result) ->
+			console.log 'err', err
+			console.log 'result', result
+			# if err
+			# 	this.set 'error', req.gettext("Can not create session")
+
+			fn()
+
 
 
 	checkPassword: () ->
@@ -146,6 +171,7 @@ exports = module.exports = Backbone.Model.extend
 		if this.get('connect')
 			connect = this.get('connect')
 			connect.detach()
+			this.unset 'connect'
 
 	
 	sqlUserExist: () ->

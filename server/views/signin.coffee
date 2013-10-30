@@ -17,16 +17,9 @@ Signin = Globals.extend
 		this.addLocalCssFile 	'signin'
 		this.addLocalJsFile 	'signin'
 
-		this.addLocaleString 'Server not found'
-
-
-	# getAllUsers: (fn) ->	
-
-	# 	users = new Users()
-	# 	users.getAllUsers () =>
-	# 		this.set 				'users', users.toJSON()
-	# 		this.exportGlobalObject 'users', this.get('users')
-	# 		fn null, 'done' if typeof fn is 'function'
+		this.addLocaleString [
+			'Server not found'
+		]
 
 
 exports = module.exports = Signin

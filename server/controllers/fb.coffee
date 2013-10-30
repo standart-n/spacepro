@@ -16,6 +16,8 @@ exports = module.exports = Backbone.Model.extend
 
 	connection: (fn) ->
 
+		fn ?= () ->
+
 		fb.attach
 			host:			this.get('host')
 			database: 		this.get('database')
@@ -25,9 +27,8 @@ exports = module.exports = Backbone.Model.extend
 			throw err if err
 			
 			if err
-				fn err if typeof fn is 'function'
-			
+				fn(err)			
 			else
-				fn null, db if typeof fn is 'function'
+				fn null, db
 
 
