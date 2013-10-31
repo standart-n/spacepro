@@ -11,13 +11,17 @@ Firebird = 		require(process.env.APP_DIR + '/lib/controllers/firebird')
 Signin = Firebird.extend
 
 	defaults: 
-		id:				null
-		login:			null
-		password:		null
-		error:			null
-		transaction:	null
-		connect:		null
-		result:			'error'
+		id:					null
+		login:				null
+		password:			null
+
+		web_group_id:		-20
+		
+		error:				null
+		fb_connection:		null
+		fb_transaction:		null
+		
+		result:				'error'
 
 
 	initialize: () ->
@@ -99,8 +103,6 @@ Signin = Firebird.extend
 			this.fbConnectionClose()
 			this.checkPassword()
 
-			console.log 'error', this.get('error')
-
 			if !this.get('error')
 				this.startSession () =>
 					this.set 'result', 'success'
@@ -150,7 +152,7 @@ Signin = Firebird.extend
 		id
 		from sp$group_detail
 		where
-		(group_id = -20) and (grouptable_id = #{this.get('id')})
+		(group_id = #{this.get('web_group_id')}) and (grouptable_id = #{this.get('id')})
 		"""
 
 exports = module.exports = Signin

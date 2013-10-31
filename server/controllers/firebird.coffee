@@ -16,6 +16,7 @@ Firebird = Backbone.Model.extend
 		fb_transaction:		null
 
 		error:				null
+		hide_errors:		null
 	
 	initialize: () ->
 
@@ -96,7 +97,8 @@ Firebird = Backbone.Model.extend
 			# throw err
 			if !this.get('error')
 				this.set 'error', err 
-				console.error err.red
+				if this.get('hide_errors') isnt true
+					console.error err.red
 			this.fbTransactionRollback()
 			fn(err)
 			return true

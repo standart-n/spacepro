@@ -21,3 +21,6 @@ node_modules
 /public/css
 /public/js
 /public/i18n
+
+/test/lib
+/test/conf

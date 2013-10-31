@@ -55,14 +55,32 @@ module.exports = (grunt) ->
 				files:
 					"./<%= pkg.name %>": 'server/app.coffee'
 
+			test:
+				options:
+					bare: on
+				files: [
+					{
+						expand:		true
+						cwd:		'./test/spec/'
+						src:		'**/*.coffee'
+						dest:		'./test/lib/'
+						ext:		'.js'
+					}
+				]
+
 		clean:
 			build: [
 				'lib/'
 				'public/js/'
 				'public/css/'
 			]
+			
 			i18n: [
 				'public/i18n'
+			]			
+			
+			test: [
+				'test/lib'
 			]			
 
 		
@@ -101,11 +119,20 @@ module.exports = (grunt) ->
 				dest: './public/i18n/ru'
 
 
+		mochaTest:
+			test:
+				options:
+					reporter: 'spec'
+				src: ['test/lib/*.js']
+
+
+
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-concat'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
+	grunt.loadNpmTasks 'grunt-mocha-test'
 	grunt.loadNpmTasks 'grunt-po2json'
 	grunt.loadNpmTasks 'grunt-jade'
 	grunt.loadNpmTasks 'grunt-recess'
@@ -113,6 +140,7 @@ module.exports = (grunt) ->
 	
 	grunt.registerTask 'default', ['clean:build', 'client', 'server']
 	grunt.registerTask 'all', ['default']
+	grunt.registerTask 'test', ['clean:test', 'coffee:test', 'mochaTest']	
 	grunt.registerTask 'i18n', ['clean:i18n', 'po2json']
 	grunt.registerTask 'server', ['coffee:main', 'coffee:server']
 	grunt.registerTask 'client', ['recess:style', 'jade:client', 'coffee:client', 'lmd']
