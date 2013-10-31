@@ -59,5 +59,7 @@ msgstr "У вас нет прав для входа в систему"
 msgid "Incorrect login or password"
 msgstr "Вы неправильно ввели логин или пароль"
 
+msgid "Create a session failed"
+msgstr "Не удалось создать сессию"
 
 

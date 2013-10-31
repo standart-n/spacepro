@@ -15,6 +15,12 @@ Signin = Firebird.extend
 		login:				null
 		password:			null
 
+		session_id:			null
+		session_success:	null
+		session_startdt:	null
+		workstation_id:		null
+		workstation_name:	null
+
 		web_group_id:		-20
 		
 		error:				null
@@ -29,6 +35,9 @@ Signin = Firebird.extend
 	check: (fn = () ->) ->
 
 		req = if this.get('req') then this.get('req') else { gettext: (s) -> s }
+
+		this.set 'login', 		if this.get('login')? 		then this.get('login').toString().trim() 		else ''
+		this.set 'password', 	if this.get('password')? 	then this.get('password').toString().trim()		else ''
 
 		valid = new Validate
 			schema:			'signin'
@@ -105,7 +114,8 @@ Signin = Firebird.extend
 
 			if !this.get('error')
 				this.startSession () =>
-					this.set 'result', 'success'
+					if !this.get('error')
+						this.set 'result', 'success'
 					fn()
 			else
 				fn()
@@ -114,14 +124,22 @@ Signin = Firebird.extend
 	startSession: (fn = () ->) ->
 
 		session = new Session
-			req: this.get('req')
+			req: 		this.get('req')
+			user_id:	this.get('id')
 
-		session.start this.get('id'), (err, result) ->
-			console.log 'err', err
-			console.log 'result', result
-			# if err
-			# 	this.set 'error', req.gettext("Can not create session")
+		session.start (err, result) =>
 
+			# console.log result
+
+			if err or !result?.success?
+				this.set 'error', req.gettext("Create a session failed")
+			else
+				this.set 'session_id', 			result.session_id
+				this.set 'session_success', 	result.success
+				this.set 'session_startdt', 	result.startdt
+				this.set 'workstation_id', 		result.workstation_id
+				this.set 'workstation_name', 	result.ws_name
+			
 			fn()
 
 

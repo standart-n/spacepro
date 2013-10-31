@@ -11,7 +11,7 @@ Session = Firebird.extend
 	defaults: () ->
 		user_id:			null
 		compname:			"web: #{os.hostname()}"
-		compip:				process.env.PORT.toString()
+		compip:				if process.env.PORT? then process.env.PORT.toString() else '2527'
 		mac:				"#{os.type()}, #{os.arch()}, #{os.release()}"
 		force:				0
 		prog:				'SPACEPRO'

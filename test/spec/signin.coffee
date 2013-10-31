@@ -27,9 +27,9 @@ describe 'Signin:', () ->
 			
 			signin.check () ->
 
-				assert.equal('Please enter your login', signin.get('error'))
-				assert.equal(null, signin.get('fb_connection'))
-				assert.equal(null, signin.get('fb_transaction'))
+				assert.equal 'Please enter your login', signin.get('error')
+				assert.equal null, signin.get('fb_connection'), 'fb_connection'
+				assert.equal null, signin.get('fb_transaction'), 'fb_transaction'
 				done()
 
 
@@ -44,9 +44,9 @@ describe 'Signin:', () ->
 	
 			signin.check () ->
 
-				assert.equal('Please enter your password', signin.get('error'))
-				assert.equal(null, signin.get('fb_connection'))
-				assert.equal(null, signin.get('fb_transaction'))
+				assert.equal 'Please enter your password', signin.get('error')
+				assert.equal null, signin.get('fb_connection'), 'fb_connection'
+				assert.equal null, signin.get('fb_transaction'), 'fb_transaction'
 				done()
 
 
@@ -61,9 +61,9 @@ describe 'Signin:', () ->
 	
 			signin.check () ->
 
-				assert.equal('User not found', signin.get('error'))
-				assert.equal(null, signin.get('fb_connection'))
-				assert.equal(null, signin.get('fb_transaction'))
+				assert.equal 'User not found', signin.get('error')
+				assert.equal null, signin.get('fb_connection'), 'fb_connection'
+				assert.equal null, signin.get('fb_transaction'), 'fb_transaction'
 				done()
 
 
@@ -78,9 +78,9 @@ describe 'Signin:', () ->
 	
 			signin.check () ->
 
-				assert.equal('Incorrect login or password', signin.get('error'))
-				assert.equal(null, signin.get('fb_connection'))
-				assert.equal(null, signin.get('fb_transaction'))
+				assert.equal 'Incorrect login or password', signin.get('error')
+				assert.equal null, signin.get('fb_connection'), 'fb_connection'
+				assert.equal null, signin.get('fb_transaction'), 'fb_transaction'
 				done()
 
 
@@ -96,7 +96,36 @@ describe 'Signin:', () ->
 	
 			signin.check () ->
 
-				assert.equal('You are not allowed to login', signin.get('error'))
-				assert.equal(null, signin.get('fb_connection'))
-				assert.equal(null, signin.get('fb_transaction'))
+				assert.equal 'You are not allowed to login', signin.get('error')
+				assert.equal null, signin.get('fb_connection'), 'fb_connection'
+				assert.equal null, signin.get('fb_transaction'), 'fb_transaction'
+				done()
+
+
+	describe 'Authorization successful:', () ->
+
+		signin = new Signin
+			login:			user_test_data.worker.login
+			password:		user_test_data.worker.password
+			hide_errors: 	true
+
+		it 'Should return session info', (done) ->
+	
+			signin.check () ->
+
+				assert.notEqual null, signin.get('session_success'), 'session_success'
+
+				if signin.get('session_success') is 1
+					assert.notEqual null, signin.get('session_id'), 'session_id'
+					assert.notEqual null, signin.get('workstation_id'), 'workstation_id'
+					assert.equal null, signin.get('workstation_name'), 'workstation_name'
+					assert.equal null, signin.get('session_startdt'), 'session_startdt'
+
+				else
+					assert.equal 0, signin.get('session_success'), 'session_success'
+					assert.notEqual null, signin.get('session_id'), 'session_id'
+					assert.notEqual null, signin.get('workstation_id'), 'workstation_id'
+					assert.notEqual null, signin.get('workstation_name'), 'workstation_name'
+					assert.notEqual null, signin.get('session_startdt'), 'session_startdt'
+
 				done()
