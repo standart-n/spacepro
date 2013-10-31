@@ -1,13 +1,14 @@
 
 Backbone = 		require('backbone')
 async = 		require('async')
+colors = 		require('colors')
 md5 = 			require('MD5')
 Validate = 		require(process.env.APP_DIR + '/lib/controllers/validate')
 Session = 		require(process.env.APP_DIR + '/lib/controllers/session')
-FB = 			require(process.env.APP_DIR + '/lib/controllers/fb')
+Firebird = 		require(process.env.APP_DIR + '/lib/controllers/firebird')
 
 
-exports = module.exports = Backbone.Model.extend
+Signin = Firebird.extend
 
 	defaults: 
 		id:				null
@@ -21,11 +22,9 @@ exports = module.exports = Backbone.Model.extend
 
 	initialize: () ->
 
-	check: (fn) ->
+	check: (fn = () ->) ->
 
-		fn ?= () ->
-
-		req = this.get('req')
+		req = if this.get('req') then this.get('req') else { gettext: (s) -> s }
 
 		valid = new Validate
 			schema:			'signin'
@@ -38,113 +37,79 @@ exports = module.exports = Backbone.Model.extend
 
 		async.series
 			
-			connection: (fn) =>
-				if !this.get('error')
-					fb = new FB()
-					fb.connection (err, connect) =>
-						throw err if err 
-
-						if err
-							this.set 'error', req.gettext('No connection to the database')
-							fn(err)
-						else
-							this.set 'connect', connect
-							fn(null, 'success')
-				else
-					fn()
+			openConnection: (fn) =>
+				this.fbConnectionOpen(fn)
 
 			startTransaction: (fn) =>
-				if !this.get('error')
-					connect = this.get('connect')
-					connect.startTransaction (err, tr) =>
-						throw err if err
-
-						if err
-							this.set 'error', req.gettext('Failed to create transaction')
-							fn(err)
-
-						else
-							this.set 'transaction', tr
-							fn(null, 'success')
-				else
-					fn()
-
-
+				this.fbTransactionStart(fn)
 
 			userExist: (fn) =>
-				if !this.get('error')
-					tr = this.get('transaction')
+				if this.get('fb_transaction')
+					tr = this.get('fb_transaction')
 					tr.query this.sqlUserExist(), (err, result) =>
-						throw err if err
 
-						if err
-							this.set 'error', req.gettext('Error for user search')
-							tr.rollback()
-							this.unset 'transaction'
-							fn(err)
-						
-						else
+						if result?.length?
+
 							if result.length < 1
-								this.set 'error', req.gettext('User not found')
+								this.fbCheckError('User not found', fn)
 
 							else
 								if result[0].status isnt 0
-									this.set 'error', req.gettext('Account is not active')
+									this.fbCheckError('Account is not active', fn)
 
-								if result[0].userpsw.toString().length < 1
-									this.set 'error', req.gettext('The user has no password')
+								else 
+									if result[0].userpsw.toString().length < 1
+										this.fbCheckError('The user has no password', fn)
 
-								if !this.get('error')
-									this.set 
-										'id': 		result[0].id
-										'name': 	result[0].username
-										'hash': 	result[0].userpsw
+									else
+										this.set 
+											id: 	result[0].id
+											name: 	result[0].username
+											hash: 	result[0].userpsw
 
+										fn(null, 'success')
 
-							fn(null, result.length)					
+						else
+							this.fbCheckError(err, fn)
+
 				
 				else
-					fn()
+					this.fbCheckError('Transaction not found', fn)
 
 
 			userGroupAllow: (fn) =>
-				if !this.get('error')
-					tr = this.get('transaction')
+				if this.get('fb_transaction')
+					tr = this.get('fb_transaction')
 					tr.query this.sqlUserGroupAllow(), (err, result) =>
-						throw err if err 
 
-						if err 
-							this.set 'error', req.gettext('Error in database operations')
-							tr.rollback()
-							fn(err)
-
-						else
-							tr.commit()
+						if result?.length?
 							if result.length < 1
-								this.set 'error', req.gettext('You are not allowed to login')
-							fn()
+								this.fbCheckError('You are not allowed to login', fn)
+							else
+								this.fbTransactionCommit(tr, fn)
+						else
+							this.fbCheckError(err, fn)
 
 				else
-					fn()
+					this.fbCheckError('Transaction not found', fn)
 
 
 		, (err, results) =>
 
+			this.fbConnectionClose()
 			this.checkPassword()
-			this.closeConnection()
+
+			console.log 'error', this.get('error')
 
 			if !this.get('error')
 				this.startSession () =>
 					this.set 'result', 'success'
 					fn()
-
 			else
 				fn()
 
 	
-	startSession: (fn) ->
-
-		fn ?= () ->
+	startSession: (fn = () ->) ->
 
 		session = new Session
 			req: this.get('req')
@@ -160,18 +125,14 @@ exports = module.exports = Backbone.Model.extend
 
 
 	checkPassword: () ->
-		req = this.get('req')
 		if !this.get('error')
+			req = if this.get('req') then this.get('req') else { gettext: (s) -> s }
 			hash = md5 this.get('password')
-			if this.get('hash').toUpperCase() isnt hash.toUpperCase()
+			if !this.get('hash') 
+				this.set 'hash', '0000' 
+			if this.get('hash').toString().toUpperCase() isnt hash.toString().toUpperCase()
 				this.set 'error', req.gettext('Incorrect login or password')
 
-	
-	closeConnection: () ->
-		if this.get('connect')
-			connect = this.get('connect')
-			connect.detach()
-			this.unset 'connect'
 
 	
 	sqlUserExist: () ->
@@ -192,5 +153,6 @@ exports = module.exports = Backbone.Model.extend
 		(group_id = -20) and (grouptable_id = #{this.get('id')})
 		"""
 
+exports = module.exports = Signin
 
 

@@ -3,10 +3,10 @@ _ = 			require('lodash')
 Backbone = 		require('backbone')
 async = 		require('async')
 os = 			require('os')
-FB = 			require(process.env.APP_DIR + '/lib/controllers/fb')
+Firebird = 		require(process.env.APP_DIR + '/lib/controllers/firebird')
 
 
-exports = module.exports = Backbone.Model.extend
+Session = Firebird.extend
 
 	defaults: () ->
 		user_id:			null
@@ -14,17 +14,18 @@ exports = module.exports = Backbone.Model.extend
 		compip:				process.env.PORT.toString()
 		mac:				"#{os.type()}, #{os.arch()}, #{os.release()}"
 		force:				0
-		prog:				"#{process.env.APP_NAME} v#{process.env.APP_VERSION}"
+		prog:				'SPACEPRO'
 		regdata:			''
 
 		session_id:			null
 		workstation_id:		null
 		success:			0
+		startdt:			null
 		ws_name:			''
 
-		err:				null
-		connect:			null
-		transaction:		null
+		error:				null
+		fb_connection:		null
+		fb_transaction:		null
 
 	initialize: () ->
 		if this.get('req')
@@ -46,92 +47,63 @@ exports = module.exports = Backbone.Model.extend
 
 		force = if force is true or force is 1 then 1 else 0
 
-		fn ?= () ->
-
 		this.set 'user_id', user_id
-		this.set 'force',	force	
+		this.set 'force',	force
 
+		fn 			?= () ->
+		user_id 	?= 0
 
-		if user_id?
+		async.series
 
-			async.series
+			openConnection: (fn) =>
+				this.fbConnectionOpen(fn)
 
-				connection: (fn) =>
+			startTransaction: (fn) =>
+				this.fbTransactionStart(fn)
+			
+			newSession: (fn) =>
 
-					fb = new FB()
-					fb.connection (err, connect) =>
-						if err
-							throw err
-							this.set 'err', err
-							fn(err)
+				if this.get('fb_transaction')
+					tr = this.get('fb_transaction')
+					tr.query this.sqlNewSession(), (err, result) =>
+						if result?.length? and result[0]?.success?
+
+							this.set
+								session_id:			result[0].session_id
+								workstation_id:		result[0].workstation_id
+								success:			result[0].success
+								ws_name:			result[0].ws_name
+
+							if this.get('success') is 0
+								tr.query this.sqlStartdtForSession(), (err, result) =>
+									if result?.length? and result[0]?.startdt?
+
+										this.set 'startdt', result[0].startdt
+										this.fbTransactionCommit(tr, fn)
+
+									else
+										this.fbCheckError(err, fn)
+
+							else
+								this.fbTransactionCommit(tr, fn)
+						
 						else
-							this.set 'connect', connect
-							fn null, 'success'
+							this.fbCheckError(err, fn)
+
+				else
+					this.fbCheckError('Transaction not found', fn)
 
 
-				transaction: (fn) =>
+		, (err, results) =>
 
-					if this.get('connect')
-						connect = this.get('connect')
-						connect.startTransaction (err, tr) =>
-							if err
-								throw err
-								this.set 'err', err
-								fn(err)
-							else
-								this.set 'transaction', tr
-								fn null, 'success'
+			this.fbConnectionClose()
 
-					else
-						fn()
-
-				
-				newSession: (fn) =>
-
-					if this.get('transaction')
-						tr = this.get('transaction')
-						tr.query this.sqlNewSession(), (err, result) =>
-							if err
-								throw err
-								this.set 'err', err
-								tr.rollback()
-								fn(err)
-							else
-								this.set
-									session_id:			result[0].session_id
-									workstation_id:		result[0].workstation_id
-									success:			result[0].success
-									ws_name:			result[0].ws_name
-
-								tr.commit (err) ->									
-									throw err if err									
-									fn null, 'success'
-					else
-						fn()
-
-
-			, (err, results) =>
-
-				this.closeConnection()
-
-				fn this.get('err'), 
-					session_id: 		this.get('session_id')
-					workstation_id: 	this.get('workstation_id')
-					success: 			this.get('success')
-					ws_name: 			this.get('ws_name')
-
-		else
-			err = 'User_id not found'
-			throw err
-			fn(err)
-
-
-	closeConnection: () ->
-		if this.get('connect')
-			connect = this.get('connect')
-			connect.detach()
-			this.unset 'connect'
-
+			fn this.get('error'), 
+				session_id: 		this.get('session_id')
+				workstation_id: 	this.get('workstation_id')
+				success: 			this.get('success')
+				ws_name: 			this.get('ws_name')
+				startdt: 			this.get('startdt')
 
 
 	sqlNewSession: () ->
@@ -148,4 +120,14 @@ exports = module.exports = Backbone.Model.extend
 		'#{this.get('regdata')}')
 		"""
 
+	sqlStartdtForSession: () ->
+		"""
+		select
+		startdt
+		from sp$sessions
+		where
+		(id = '#{this.get('session_id').toString()}')
+		"""
+
+exports = module.exports = Session
 
