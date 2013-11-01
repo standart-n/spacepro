@@ -17,6 +17,4 @@ exports = module.exports = Backbone.Model.extend
 		this.set 'd$uuid', 	this.get('d$uuid').toString().trim()
 		this.set 'id', 		this.get('d$uuid')
 
-		
-		
-
+	

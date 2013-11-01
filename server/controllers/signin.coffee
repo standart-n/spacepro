@@ -114,8 +114,6 @@ Signin = Firebird.extend
 
 			if !this.get('error')
 				this.startSession () =>
-					if !this.get('error')
-						this.set 'result', 'success'
 					fn()
 			else
 				fn()
@@ -138,8 +136,9 @@ Signin = Firebird.extend
 				this.set 'session_success', 	result.success
 				this.set 'session_startdt', 	result.startdt
 				this.set 'workstation_id', 		result.workstation_id
-				this.set 'workstation_name', 	result.ws_name
-			
+				this.set 'workstation_name', 	result.ws_name				
+				this.set 'result', 				'success'
+
 			fn()
 
 

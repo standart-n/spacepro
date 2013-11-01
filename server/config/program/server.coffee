@@ -66,9 +66,9 @@ module.exports = (program) ->
 
 			if cluster.isWorker
 
-				process.on 'uncaughtException', (err) ->
-					# console.log arguments
-					console.error 'Caught exception:'.red, JSON.stringify(err).blue
+				# process.on 'uncaughtException', (err) ->
+				# 	# console.log arguments
+				# 	console.error 'Caught exception:'.red, JSON.stringify(err).blue
 
 				server.run (service) ->
 					service.listen process.env.PORT

@@ -1,6 +1,5 @@
 
 Backbone = 	require('backbone')
-User = 		require('user')
 
 module.exports = Backbone.View.extend
 
@@ -11,7 +10,7 @@ module.exports = Backbone.View.extend
 
 	initialize: () ->
 
-		this.user = new User()
+		this.model = window.user
 
 		this.$form = 		this.$el.find("[data-type=\"form\"]")
 		this.$login = 		this.$form.find("[data-type=\"login\"]")
@@ -29,7 +28,9 @@ module.exports = Backbone.View.extend
 
 		this.$button.button('loading')
 
-		this.user.save
+		this.model.reset()
+
+		this.model.save
 			login:		this.$login.val()
 			password:	this.$password.val()	
 		,
@@ -49,13 +50,13 @@ module.exports = Backbone.View.extend
 				this.$password.val('')
 				this.$password.focus()
 			else
-				alert 'success'
+				if res.session_success is 1
+					alert 'success'
+				# else
+
 
 		if textStatus is 'error'
 			this.error "#{xhr.status}: #{gettext('Server not found')}!"
-
-		this.user.unset 'result'
-		this.user.unset 'error'
 
 
 	error: (text = '') ->
@@ -68,13 +69,5 @@ module.exports = Backbone.View.extend
 			if this.$alertError.data('aid') is aid
 				this.$alertError.addClass('hide')
 		, 3000
-
-
-
-
-
-
-
-
 
 

@@ -88,7 +88,7 @@ module.exports = (grunt) ->
 			app:
 				options:
 					output:		'./public/js/app.<%= pkg.version %>.js'
-				build: 			'app'
+				build:			'app'
 
 			signin:
 				options:

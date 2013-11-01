@@ -14,6 +14,24 @@ msgstr "Password"
 msgid "Enter"
 msgstr "Signin"
 
+msgid "Enter"
+msgstr "Signin"
+
+msgid "Loading"
+msgstr "Loading"
+
+
+# /public/templates/signin/resolve.jade
+
+msgid "Attention"
+msgstr "Attention"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "Cancel"
+msgstr "Cancel"
+
 
 # /server/views/signin.coffee
 
@@ -61,4 +79,21 @@ msgstr "Incorrect login or password"
 
 msgid "Create a session failed"
 msgstr "Create a session failed"
+
+msgid "Dear user"
+msgstr "Dear user"
+
+msgid "Your session is opened on another workstation"
+msgstr "Your session is opened on another workstation"
+
+msgid "Session is opened"
+msgstr "Session is open"
+
+msgid "It was incorrect to exit the program"
+msgstr "It was incorrect to exit the program"
+
+msgid "Do you want to close the previous session and log in"
+msgstr "Do you want to close the previous session and log in"
+
+
 

@@ -16,6 +16,15 @@ module.exports = (app) ->
 			password:	data.password
 			
 		signin.check () ->
-			res.json _.pick signin.toJSON(), 'result', 'error'
+			res.json _.pick signin.toJSON(), 
+				'result', 
+				'error',
+				'id',
+				'name',
+				'session_id',
+				'session_success',
+				'session_startdt',
+				'workstation_id',
+				'workstation_name'
 
 

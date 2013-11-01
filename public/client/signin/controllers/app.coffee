@@ -1,6 +1,7 @@
 
 Backbone = 		require('backbone')
 Signin = 		require('signin')
+Resolve = 		require('resolve')
 
 module.exports = Backbone.Router.extend
 
@@ -10,6 +11,7 @@ module.exports = Backbone.Router.extend
 	initialize: () ->
 
 		this.signin = new Signin()
+		this.resolve = new Resolve()
 
 
 	# changeUser: (id) ->

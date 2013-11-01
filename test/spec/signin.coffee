@@ -114,6 +114,8 @@ describe 'Signin:', () ->
 			signin.check () ->
 
 				assert.notEqual null, signin.get('session_success'), 'session_success'
+				assert.equal null, signin.get('fb_connection'), 'fb_connection'
+				assert.equal null, signin.get('fb_transaction'), 'fb_transaction'
 
 				if signin.get('session_success') is 1
 					assert.notEqual null, signin.get('session_id'), 'session_id'

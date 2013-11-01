@@ -4,7 +4,7 @@ Backbone = 		require('backbone')
 fb = 			require('node-firebird')
 
 
-Firebird = Backbone.Model.extend
+exports = module.exports = Backbone.Model.extend
 
 	defaults: () ->
 		fb_host:			process.env.FIREBIRD_HOST
@@ -105,5 +105,3 @@ Firebird = Backbone.Model.extend
 		else
 			return false
 
-
-exports = module.exports = Firebird
