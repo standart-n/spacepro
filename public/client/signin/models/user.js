@@ -4,11 +4,14 @@ var Backbone;
 Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
+
   defaults: {
     login:    '',
     password: ''
   },
+
   initialize: function() {},
+
   reset: function() {
     this.unset('result');
     this.unset('error');
@@ -20,4 +23,5 @@ module.exports = Backbone.Model.extend({
     this.unset('workstation_id');
     this.unset('workstation_name');
   }
+
 });

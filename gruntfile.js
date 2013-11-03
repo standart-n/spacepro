@@ -13,11 +13,11 @@ module.exports = function(grunt) {
         },
         files: [
           {
-            expand: true,
-            cwd: './public/style/',
-            src: './**/_*.less',
-            dest: './public/css/',
-            ext: ".<%= pkg.version %>.css"
+            expand:  true,
+            cwd:     './public/style/',
+            src:     './**/_*.less',
+            dest:    './public/css/',
+            ext:     ".<%= pkg.version %>.css"
           }
         ]
       }
@@ -52,11 +52,11 @@ module.exports = function(grunt) {
         },
         files: [
           {
-            expand: true,
-            cwd: './public/templates',
-            src: '**/*.jade',
-            dest: './public/js/templates',
-            ext: '.jade'
+            expand:  true,
+            cwd:     './public/templates',
+            src:     '**/*.jade',
+            dest:    './public/js/templates',
+            ext:     '.jade'
           }
         ]
       }
@@ -78,13 +78,19 @@ module.exports = function(grunt) {
           ]
         }
       },
+      client: {
+        options: {
+          eqnull: true
+        },
+        files: {
+          src: [
+            './public/client/**/*.js',
+          ]
+        }
+      },
       test: {
         options: {
-        },
-        directives: {
-          predef: [
-            'node'
-          ]
+          eqnull: true
         },
         files: {
           src: [
@@ -127,11 +133,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-recess');
   grunt.loadNpmTasks('grunt-lmd');
   
-  grunt.registerTask('default', ['clean:build', 'client', 'server']);
-  grunt.registerTask('all', ['default']);
-  grunt.registerTask('test', ['jshint:test', 'mochaTest']);
-  grunt.registerTask('i18n', ['clean:i18n', 'po2json']);
-  grunt.registerTask('client', ['recess:style', 'jade:client', 'lmd']);
-  grunt.registerTask('server', ['jshint:server']);
+  grunt.registerTask('default',  ['clean:build', 'client', 'server']);
+  grunt.registerTask('all',      ['default']);
+  grunt.registerTask('test',     ['jshint:test', 'mochaTest']);
+  grunt.registerTask('i18n',     ['clean:i18n', 'po2json']);
+  grunt.registerTask('client',   ['jshint:client', 'recess:style', 'jade:client', 'lmd']);
+  grunt.registerTask('server',   ['jshint:server']);
 
 };
