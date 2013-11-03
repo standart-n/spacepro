@@ -105,16 +105,19 @@ describe('Signin:', function() {
 
   describe('Authorization successful:', function() {
     var signin;
+
     signin = new Signin({
       login: user_test_data.worker.login,
       password: user_test_data.worker.password,
       hide_errors: true
     });
+
     it('Should return session info', function(done) {
       signin.check(function() {
         assert.notEqual(null, signin.get('session_success'), 'session_success');
         assert.equal(null, signin.get('fb_connection'), 'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
+
         if (signin.get('session_success') === 1) {
           assert.notEqual(null, signin.get('session_id'), 'session_id');
           assert.notEqual(null, signin.get('workstation_id'), 'workstation_id');
@@ -127,6 +130,7 @@ describe('Signin:', function() {
           assert.notEqual(null, signin.get('workstation_name'), 'workstation_name');
           assert.notEqual(null, signin.get('session_startdt'), 'session_startdt');
         }
+
         done();
       });
     });
