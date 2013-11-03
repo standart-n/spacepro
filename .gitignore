@@ -14,7 +14,6 @@ results
 npm-debug.log
 node_modules
 
-/lib
 /spacepro
 /bower_components
 
@@ -22,5 +21,4 @@ node_modules
 /public/js
 /public/i18n
 
-/test/lib
 /test/conf

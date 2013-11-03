@@ -1,12 +1,12 @@
 {
-	"name": 				"signin",
-	"root": 				"../",
-	"output": 				"public/js/signin.lmd.js",
-	"extends":				"./core.lmd.json",
-	"modules": {
-		"main": 			"public/js/signin/main.js",
-		"<%= file %>": 		"public/js/signin/{models,views,controllers,triggers}/**/*.js",
-		"<%= file %>.tpl": 	"public/js/templates/signin/resolve.jade/*.js"
-	},
-	"main": 		"main"
+  "name": "signin",
+  "root": "../",
+  "output": "public/js/signin.lmd.js",
+  "extends": "./core.lmd.json",
+  "modules": {
+    "main":             "public/client/signin/main.js",
+    "<%= file %>":      "public/client/signin/{models,views,controllers,triggers}/**/*.js",
+    "<%= file %>.tpl":  "public/js/templates/signin/resolve.jade/*.js"
+  },
+  "main": "main"
 }

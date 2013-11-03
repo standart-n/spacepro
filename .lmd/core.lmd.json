@@ -1,51 +1,51 @@
 {
-	"name": 						"core",
-	"root": 						"../",
-	"output": 						"public/js/core.lmd.js",
-	"modules": {
-		"_": {
-			"path": 				"public/lib/underscore/underscore.min.js",
-			"exports": 				"_"
-		},
-		"underscore": 				"@_",
-		"$": {
-			"path": 				"public/lib/jquery/jquery.min.js",
-			"exports": 				"jQuery"
-		},
-		"jquery": 					"@$",
-		"json2": {
-			"path": 				"public/lib/json2/json2.min.js",
-			"exports": 				"JSON"
-		},
-		"jade": {
-			"path": 				"public/lib/jade/runtime.js",
-			"exports": 				"jade"
-		},		
-		"backbone": {
-			"path": 				"public/lib/backbone/backbone.min.js",
-			"require": {
-				"underscore": 		"_",
-				"jQuery": 			"$"
-			},
-			"exports": "Backbone"
-		},
-		"bootstrap": {
-			"path":					"public/lib/bootstrap/bootstrap.min.js",
-			"require": {
-				"jQuery": 			"$"
-			}
-		},
-		"moment": 					"public/lib/moment/moment.min.js",
-		"moment-ru": 				"public/lib/moment/lang/ru.js"
-	},
-	"main": 						"main",
-	"cache":						false,
-	"ie":							true,
-	"shortcuts": 					true,
-	"pack":		 					false,
-	"lazy":							false,
-	"optimize":		 				false,
-	"log": 							true,
-	"warn": 						true
+  "name": "core",
+  "root": "../",
+  "output": "public/js/core.lmd.js",
+  "modules": {
+    "_": {
+      "path": "public/lib/underscore/underscore.min.js",
+      "exports": "_"
+    },
+    "underscore": "@_",
+    "$": {
+      "path": "public/lib/jquery/jquery.min.js",
+      "exports": "jQuery"
+    },
+    "jquery": "@$",
+    "json2": {
+      "path": "public/lib/json2/json2.min.js",
+      "exports": "JSON"
+    },
+    "jade": {
+      "path": "public/lib/jade/runtime.js",
+      "exports": "jade"
+    },      
+    "backbone": {
+      "path": "public/lib/backbone/backbone.min.js",
+      "require": {
+        "underscore": "_",
+        "jQuery": "$"
+      },
+      "exports": "Backbone"
+    },
+    "bootstrap": {
+      "path": "public/lib/bootstrap/bootstrap.min.js",
+      "require": {
+        "jQuery": "$"
+      }
+    },
+    "moment": "public/lib/moment/moment.min.js",
+    "moment-ru": "public/lib/moment/lang/ru.js"
+  },
+  "main":       "main",
+  "cache":      false,
+  "ie":         true,
+  "shortcuts":  true,
+  "pack":       false,
+  "lazy":       false,
+  "optimize":   false,
+  "log":        true,
+  "warn":       true
 
 }

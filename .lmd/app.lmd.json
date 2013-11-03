@@ -1,10 +1,10 @@
 {
-	"name": 						"signin",
-	"root": 						"../",
-	"output": 						"public/js/signin.lmd.js",
-	"extends":						"./core.lmd.json",
-	"modules": {
-		"main": 					"public/js/app/main.js"
-	},
-	"main": 						"main"
+  "name": "signin",
+  "root": "../",
+  "output": "public/js/signin.lmd.js",
+  "extends": "./core.lmd.json",
+  "modules": {
+    "main": "public/client/app/main.js"
+  },
+  "main": "main"
 }
