@@ -62,6 +62,38 @@ module.exports = function(grunt) {
       }
     },
 
+    jshint: {
+      server: {
+        options: {
+          eqnull: true
+        },
+        directives: {
+          predef: [
+            'node'
+          ]
+        },
+        files: {
+          src: [
+            './lib/**/*.js',
+          ]
+        }
+      },
+      test: {
+        options: {
+        },
+        directives: {
+          predef: [
+            'node'
+          ]
+        },
+        files: {
+          src: [
+            './test/spec/**/*.js',
+          ]
+        }
+      }
+    },
+
     po2json: {
       en: {
         src: ['./public/locale/en/*.po'],
@@ -84,6 +116,7 @@ module.exports = function(grunt) {
 
   });
   
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
@@ -94,10 +127,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-recess');
   grunt.loadNpmTasks('grunt-lmd');
   
-  grunt.registerTask('default', ['clean:build', 'client']);
+  grunt.registerTask('default', ['clean:build', 'client', 'server']);
   grunt.registerTask('all', ['default']);
-  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('test', ['jshint:test', 'mochaTest']);
   grunt.registerTask('i18n', ['clean:i18n', 'po2json']);
   grunt.registerTask('client', ['recess:style', 'jade:client', 'lmd']);
+  grunt.registerTask('server', ['jshint:server']);
 
 };
