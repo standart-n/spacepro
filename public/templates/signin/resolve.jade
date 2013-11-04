@@ -10,7 +10,8 @@
 			.modal-body(data-type = "modal-body")
 				p 
 					| #{gettext('Dear user')}, #{name}!<br>
-					| #{gettext('Your session is opened on another workstation')}: #{workstation_name}.<br>
+					| #{gettext('Your session is opened on another workstation')}:<br> 
+					| #{workstation_name}.<br>
 					| #{gettext('Session is opened')} #{moment(session_startdt).fromNow()}.<br>
 					| #{gettext('It was incorrect to exit the program')}.<br>
 					
