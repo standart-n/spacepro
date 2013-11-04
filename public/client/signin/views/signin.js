@@ -28,7 +28,7 @@ module.exports = Backbone.View.extend({
       login:     this.$login.val(),
       password:  this.$password.val()
     }, {
-      url: '/api/signin',
+      url: '/api/user/signin',
       timeout: 10000,
       complete: function(xhr, textStatus) {
         _this.checkResponse(xhr, textStatus);
