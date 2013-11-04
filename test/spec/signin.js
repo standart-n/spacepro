@@ -29,7 +29,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('Please enter your login', signin.get('error'));
-        assert.equal(null, signin.get('fb_connection'), 'fb_connection');
+        assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
       });
@@ -49,7 +49,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('Please enter your password', signin.get('error'));
-        assert.equal(null, signin.get('fb_connection'), 'fb_connection');
+        assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
       });
@@ -69,7 +69,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('User not found', signin.get('error'));
-        assert.equal(null, signin.get('fb_connection'), 'fb_connection');
+        assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
       });
@@ -89,7 +89,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('Incorrect login or password', signin.get('error'));
-        assert.equal(null, signin.get('fb_connection'), 'fb_connection');
+        assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
       });
@@ -110,7 +110,7 @@ describe('Signin:', function() {
   
       signin.check(function() {
         assert.equal('You are not allowed to login', signin.get('error'));
-        assert.equal(null, signin.get('fb_connection'), 'fb_connection');
+        assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
       });
