@@ -29,6 +29,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('Please enter your login', signin.get('error'));
+        assert.equal('error', signin.get('result'), 'result');
         assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
@@ -49,6 +50,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('Please enter your password', signin.get('error'));
+        assert.equal('error', signin.get('result'), 'result');
         assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
@@ -69,6 +71,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('User not found', signin.get('error'));
+        assert.equal('error', signin.get('result'), 'result');
         assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
@@ -89,6 +92,7 @@ describe('Signin:', function() {
 
       signin.check(function() {
         assert.equal('Incorrect login or password', signin.get('error'));
+        assert.equal('error', signin.get('result'), 'result');
         assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
@@ -110,6 +114,7 @@ describe('Signin:', function() {
   
       signin.check(function() {
         assert.equal('You are not allowed to login', signin.get('error'));
+        assert.equal('error', signin.get('result'), 'result');
         assert.equal(null, signin.get('fb_connection'),  'fb_connection');
         assert.equal(null, signin.get('fb_transaction'), 'fb_transaction');
         done();
@@ -130,10 +135,11 @@ describe('Signin:', function() {
 
       signin.check(function() {
         
-        assert.notEqual(null, signin.get('session_success'), 'session_success');
-        assert.equal(null,    signin.get('fb_connection'),   'fb_connection');
-        assert.equal(null,    signin.get('fb_transaction'),  'fb_transaction');
-        assert.equal(null,    signin.get('error'),           'error');
+        assert.notEqual(null,     signin.get('session_success'), 'session_success');
+        assert.equal(null,        signin.get('fb_connection'),   'fb_connection');
+        assert.equal(null,        signin.get('fb_transaction'),  'fb_transaction');
+        assert.equal(null,        signin.get('error'),           'error');
+        assert.equal('success',   signin.get('result'),          'result');
 
         if (signin.get('session_success') === 1) {
 
@@ -195,9 +201,10 @@ describe('Signin:', function() {
 
       signin.logout(function() {
 
-        assert.equal(null, signin.get('fb_connection'),   'fb_connection');
-        assert.equal(null, signin.get('fb_transaction'),  'fb_transaction');
-        assert.equal(null, signin.get('error'),           'error');
+        assert.equal(null,        signin.get('fb_connection'),   'fb_connection');
+        assert.equal(null,        signin.get('fb_transaction'),  'fb_transaction');
+        assert.equal(null,        signin.get('error'),           'error');
+        assert.equal('success',   signin.get('result'),          'result');
 
         assert.equal(false,               signin.get('session_open'),     'session_open');
         assert.deepEqual(session_id,      signin.get('session_id'),       'session_id');

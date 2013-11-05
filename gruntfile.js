@@ -65,7 +65,8 @@ module.exports = function(grunt) {
     jshint: {
       server: {
         options: {
-          eqnull: true
+          eqnull: true,
+          proto:  true
         },
         directives: {
           predef: [

@@ -4,7 +4,7 @@
   "description": "ERP by standart-n",
   "main": "index.js",
   "scripts": {
-    "test": "text"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",

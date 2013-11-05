@@ -11,8 +11,12 @@ build:
 	@./node_modules/.bin/grunt
 
 
+test:
+	@./node_modules/.bin/grunt test
+
+
 finish:
 	@echo "\nSuccessfully built at ${DATE}."
 
 
-.PHONY: test bootstrap
+.PHONY: test
