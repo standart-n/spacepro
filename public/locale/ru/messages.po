@@ -45,7 +45,7 @@ msgid "Please enter your password"
 msgstr "Пожалуйста, введите пароль"
 
 
-# /server/controllers/signin.coffee
+# /server/controllers/auth.coffee
 
 msgid "No connection to the database"
 msgstr "Нет подключения к базе данных"
@@ -92,7 +92,8 @@ msgstr "Возможно, не был выполнен корректный вы
 msgid "Do you want to close the previous session and log in"
 msgstr "Вы хотите закрыть обнаруженную сессию и войти"
 
-
+msgid "Your session is outdated"
+msgstr "Ваша сессия устарела"
 
 
 
