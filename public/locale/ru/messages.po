@@ -30,13 +30,13 @@ msgid "Cancel"
 msgstr "Нет"
 
 
-# /server/views/signin.coffee
+# /lib/views/signin.js
 
 msgid "Server not found"
 msgstr "Сервер не отвечает"
 
 
-# /server/validates/signin.coffee
+# /lib/validates/signin.js
 
 msgid "Please enter your login"
 msgstr "Пожалуйста, введите логин"
@@ -45,7 +45,7 @@ msgid "Please enter your password"
 msgstr "Пожалуйста, введите пароль"
 
 
-# /server/controllers/auth.coffee
+# /lib/controllers/auth.js
 
 msgid "No connection to the database"
 msgstr "Нет подключения к базе данных"
