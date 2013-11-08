@@ -1,22 +1,22 @@
 
 
 .modal.fade.signin-resolve(data-type = "modal", role = "dialog", tabindex = "-1")
-	.modal-dialog
-		.modal-content
-			.modal-header
-				button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;			
-				h4.modal-title #{gettext('Attention')}!
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;     
+        h4.modal-title #{gettext('Attention')}!
 
-			.modal-body(data-type = "modal-body")
-				p 
-					| #{gettext('Dear user')}, #{name}!<br>
-					| #{gettext('Your session is opened on another workstation')}:<br> 
-					| #{workstation_name}.<br>
-					| #{gettext('Session is opened')} #{moment(session_startdt).fromNow()}.<br>
-					| #{gettext('It was incorrect to exit the program')}.<br>
-					
-					strong #{gettext('Do you want to close the previous session and log in')}?
+      .modal-body(data-type = "modal-body")
+        p 
+          | #{gettext('Dear user')}, #{name}!<br>
+          | #{gettext('Your session is opened on another workstation')}:<br> 
+          | #{workstation_name}.<br>
+          | #{gettext('Session is opened')} #{moment(session_startdt).fromNow()}.<br>
+          | #{gettext('It was incorrect to exit the program')}.<br>
+          
+          strong #{gettext('Do you want to close the previous session and log in')}?
 
-			.modal-footer
-				button.btn.btn-primary(type = "button", data-dismiss = "modal") #{gettext('Yes')}
-				button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel')}
+      .modal-footer
+        button.btn.btn-primary(type = "button", data-dismiss = "modal") #{gettext('Yes')}
+        button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel')}
