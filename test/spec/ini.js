@@ -1,5 +1,5 @@
 
-var asser, ini;
+var assert, ini;
 
 process.env.APP_DIR = '../..';
 
@@ -111,6 +111,23 @@ describe('Ini:', function() {
         };
 
       assert.deepEqual(json, ini.parse(text, {textFields: ['deletesql_selected']}));
+    });
+
+    it('Strings whith multiplie "="', function() {
+      var
+        text =  "[cfSelect]\r\n" +
+                "select=field=expression=SELECTCAPTION\r\n" +
+                "Allways=Partial=1\r\n" +
+                "\r\n",
+
+        json = {
+            "cfSelect": {
+              "select": "field=expression=SELECTCAPTION",
+              "Allways": "Partial=1"
+            }
+        };
+
+      assert.deepEqual(json, ini.parse(text));
     });
 
 
