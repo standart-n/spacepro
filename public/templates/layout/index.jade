@@ -10,42 +10,21 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
 		#main
 			.container
 				.row
-					.col-md-6
+					.col-md-12
 						table.table
 							thead
-								th as1
-								th as2
+								- mainDict.columns.forEach(function(column){
+									th #{column.Caption}
+								- })
+
 							tbody
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
-								tr
-									td td1
-									td td2
+								- mainDict.data.forEach(function(line){
+									tr
+										- mainDict.columns.forEach(function(column){
+											td #{line[column.Field]}
+										- })
+								- })
+
 
 		#bottom.container
 			.row

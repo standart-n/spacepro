@@ -121,4 +121,35 @@ describe('Firebird:', function() {
   });
 
 
+  describe('Auto commit and close connection:', function() {
+    it('Should return without error', function(done) {
+      var firebird;
+
+      firebird = new Firebird();
+
+      firebird.fbConnectionOpen(function() {      
+        assert.equal(null,      firebird.get('error'),            'error');
+        assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
+        assert.notEqual(null,   firebird.get('fb_connection'),    'fb_connection');
+
+        firebird.fbTransactionStart(function() {      
+          assert.equal(null,      firebird.get('error'),           'error');
+          assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
+          assert.notEqual(null,   firebird.get('fb_connection'),   'fb_connection');
+
+          firebird.fbCommitAndCloseConnection(function() {
+
+            assert.equal(null,    firebird.get('error'),           'error');
+            assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
+            assert.equal(null,    firebird.get('fb_connection'),   'fb_connection');
+
+            done();
+          });
+        });
+      });
+
+    });
+  });
+
+
 });
