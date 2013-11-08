@@ -99,6 +99,21 @@ describe('Ini:', function() {
     });
 
 
+    it('Parse text fields', function() {
+      var
+        text =  "[deletesql_selected]\r\n" +
+                "update VW_DEVICE\r\n" +
+                "set status=iif(status=1,0,1)\r\n" +
+                "where d$uuid in (:selected_ids: )\r\n",
+
+        json = {
+            "deletesql_selected" : "update VW_DEVICE set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )"
+        };
+
+      assert.deepEqual(json, ini.parse(text, {textFields: ['deletesql_selected']}));
+    });
+
+
   });
 
 });

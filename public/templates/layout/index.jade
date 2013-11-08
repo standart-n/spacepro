@@ -14,14 +14,14 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
             table.table.table-hover.dict
               thead
                 tr
-                  - mainDict.columns.forEach(function(column){
+                  - parentDict.columns.forEach(function(column){
                     th #{column.Caption}
                   - })
 
               tbody
-                - mainDict.data.forEach(function(line){
+                - parentDict.data.forEach(function(line){
                   tr
-                    - mainDict.columns.forEach(function(column){
+                    - parentDict.columns.forEach(function(column){
                       td #{line[column.Field]}
                     - })
                 - })
