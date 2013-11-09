@@ -11,7 +11,7 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
       .container
         .row
           .col-md-12
-            table.table.table-hover.dict
+            table.table.table-condensed.table-hover.dict
               thead
                 tr
                   - parentDict.columns.forEach(function(column){
@@ -19,7 +19,7 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
                   - })
 
               tbody
-                - parentDict.data.forEach(function(line){
+                - parentDict.data.forEach(function(line, index){
                   tr
                     - parentDict.columns.forEach(function(column){
                       td #{line[column.Field]}
@@ -29,8 +29,21 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
 
     #bottom.container
       .row
-        .col-md-6 131313131
-        .col-md-6 423423423
+        .col-md-12
+          table.table.table-condensed.table-hover.dict
+            thead
+              tr
+                - parentDict.childs[1].columns.forEach(function(column){
+                  th #{column.Caption}
+                - })
+
+            tbody
+              - parentDict.childs[1].data.forEach(function(line){
+                tr
+                  - parentDict.childs[1].columns.forEach(function(column){
+                    td #{line[column.Field]}
+                  - })
+              - })
 
 
     include ../includes/js
