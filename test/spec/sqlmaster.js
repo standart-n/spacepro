@@ -242,6 +242,204 @@ describe('Sqlmaster:', function() {
       assert.deepEqual(sql_out, sqlmaster.setParams(sql_in, local));
     });
 
+  });
+
+
+  describe('Limit / First:', function() {
+
+    it('Without "first" in query', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE where status=1",
+        sql_out = "select first 40 * from VW_DEVICE where status=1";
+
+      sqlmaster = new Sqlmaster();
+
+      assert.deepEqual(sql_out, sqlmaster.limit(sql_in, 40));
+    });
+
+    it('With "first" in query', function() {
+      var sqlmaster,
+        sql_in =  "select first 60 * from VW_DEVICE where status=1",
+        sql_out = "select first 40 * from VW_DEVICE where status=1";
+
+      sqlmaster = new Sqlmaster();
+
+      assert.deepEqual(sql_out, sqlmaster.limit(sql_in, 40));
+    });
+
+  });
+
+
+  describe('Search:', function() {
+
+    it('Simple query without "where"', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE",
+        sql_out = "select * from VW_DEVICE where selectcaption='myQuery'";
+
+      sqlmaster = new Sqlmaster({
+        cfselect: 'selectcaption',
+        query:    'myQuery'
+      });
+
+      assert.deepEqual(sql_out, sqlmaster.search(sql_in));
+    });
+
+    it('Simple query with "where"', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE where status=1",
+        sql_out = "select * from VW_DEVICE where selectcaption='myQuery' and status=1";
+
+      sqlmaster = new Sqlmaster({
+        cfselect: 'selectcaption',
+        query:    'myQuery'
+      });
+
+      assert.deepEqual(sql_out, sqlmaster.search(sql_in));
+    });
+
+    it('Simple query with only "order by"', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE ORDER by id DESC",
+        sql_out = "select * from VW_DEVICE where selectcaption='myQuery' ORDER by id DESC";
+
+      sqlmaster = new Sqlmaster({
+        cfselect: 'selectcaption',
+        query:    'myQuery'
+      });
+
+      assert.deepEqual(sql_out, sqlmaster.search(sql_in));
+    });
+
+    it('Simple query with "group by" and "order by"', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE GROUP by id ORDER by id DESC",
+        sql_out = "select * from VW_DEVICE where selectcaption='myQuery' GROUP by id ORDER by id DESC";
+
+      sqlmaster = new Sqlmaster({
+        cfselect: 'selectcaption',
+        query:    'myQuery'
+      });
+
+      assert.deepEqual(sql_out, sqlmaster.search(sql_in));
+    });
+
+
+  });
+
+
+  describe('Extend values:', function() {
+
+    it('Simple test', function() {
+      var sqlmaster,
+        vals = {
+          'bp': 200,
+          'cp': 300
+        },
+        vals_out = {
+          'ap': 10,
+          'bp': 200,
+          'cp': 300
+        };
+
+      sqlmaster = new Sqlmaster({
+        vals: {
+          'ap': 10,
+          'bp': 20
+        }
+      });
+
+      assert.deepEqual(vals_out, sqlmaster.extVals(vals));
+    });
+
+    it('Simple test whithout first vals', function() {
+      var sqlmaster,
+        vals = 'string',
+        vals_out = {
+          'ap': 10,
+          'bp': 20
+        };
+
+      sqlmaster = new Sqlmaster({
+        vals: {
+          'ap': 10,
+          'bp': 20
+        }
+      });
+
+      assert.deepEqual(vals_out, sqlmaster.extVals(vals));
+    });
+
+  });
+
+
+  describe('Select:', function() {
+
+    it('Simple test', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE where status=0 order by street",
+        sql_out = "select * from VW_DEVICE where status=0 order by street";
+
+      sqlmaster = new Sqlmaster({
+        selectsql: sql_in
+      });
+
+      assert.equal(sql_out, sqlmaster.select());
+    });
+
+    it('Test with limit', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE where status=0 order by street",
+        sql_out = "select first 40 * from VW_DEVICE where status=0 order by street";
+
+      sqlmaster = new Sqlmaster({
+        sql: sql_in,
+        limit: 40
+      });
+
+      assert.equal(sql_out, sqlmaster.select());
+    });
+
+    it('Test with limit and keys', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE where status=:st order by street",
+        sql_out = "select first 40 * from VW_DEVICE where status=1 order by street";
+
+      sqlmaster = new Sqlmaster({
+        sql: sql_in,
+        limit: 40,
+        keys: {
+          'st': 'status'
+        },
+        vals: {
+          'status': 1
+        }
+      });
+
+      assert.equal(sql_out, sqlmaster.select());
+    });
+
+    it('Test with limit, keys and query', function() {
+      var sqlmaster,
+        sql_in =  "select * from VW_DEVICE where status=:st order by street",
+        sql_out = "select first 40 * from VW_DEVICE where selectcaption='myQuery' and status=1 order by street";
+
+      sqlmaster = new Sqlmaster({
+        sql: sql_in,
+        limit: 40,
+        keys: {
+          'st': 'status'
+        },
+        vals: {
+          'status': 1
+        },
+        cfselect: 'selectcaption',
+        query:    'myQuery'
+      });
+
+      assert.equal(sql_out, sqlmaster.select());
+    });
+
 
   });
 
