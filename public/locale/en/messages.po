@@ -32,6 +32,9 @@ msgstr "Cancel"
 
 # /public/templates/index/navbar.jade
 
+msgid "Search"
+msgstr "Поиск"
+
 msgid "Logout"
 msgstr "Logout"
 

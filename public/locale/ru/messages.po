@@ -32,6 +32,9 @@ msgstr "Нет"
 
 # /public/templates/index/navbar.jade
 
+msgid "Search"
+msgstr "Поиск"
+
 msgid "Logout"
 msgstr "Выход"
 

@@ -2,11 +2,16 @@
 nav.navbar.navbar-default.navbar-fixed-top(role = "navigation")
 
   .navbar-header
-    a.navbar-brand(href = "#") #{name}
+    a.navbar-brand(href = "/") #{parentDict.caption}
+    //- a.navbar-brand(href = "#") #{name}
 
-  ul.nav.navbar-nav
-    li.active
-      a(href = "#") #{parentDict.caption}
+  //- ul.nav.navbar-nav
+  //-   li.active
+  //-     a(href = "#") #{parentDict.caption}
+
+  form.navbar-form.navbar-left(data-view = "search", role = "search")
+    .form-group
+      input.form-control(type = "text", placeholder = "#{gettext('Search')}")
 
   .pull-right
     ul.nav.navbar-nav
