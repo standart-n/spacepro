@@ -10,6 +10,8 @@ module.exports = Backbone.View.extend({
   },
 
   initialize: function() {
+    var _this = this;
+
     this.model = window.user;
     this.$form =        this.$el.find("[data-type=\"form\"]");
     this.$login =       this.$form.find("[data-type=\"login\"]");
@@ -17,17 +19,29 @@ module.exports = Backbone.View.extend({
     this.$button =      this.$form.find("[data-type=\"submit\"]");
     this.$alertError =  this.$el.find("[data-type=\"error\"]");
     this.$login.focus();
+
+    this.on('force', function() {
+      _this.$button.button('loading');
+      _this.model.reset();
+      _this.model.set('force', 1);
+      _this.sendRequest();
+    });
   },
 
   submit: function(e) {
     var _this = this;
     e.preventDefault();
-    this.$button.button('loading');
     this.model.reset();
-    this.model.save({
+    this.model.set({
       login:     this.$login.val(),
       password:  this.$password.val()
-    }, {
+    });
+    this.sendRequest();
+  },
+
+  sendRequest: function() {
+    var _this = this;
+    this.model.save(null, {
       url: '/api/auth/login',
       timeout: 10000,
       complete: function(xhr, textStatus) {
@@ -47,7 +61,11 @@ module.exports = Backbone.View.extend({
         this.$password.focus();
       } else {
         if (res.session_success === 1) {
-          alert('success');
+          window.location.href = "/";
+        } else {
+          window.app.navigate('signin/resolve', {
+            trigger: true
+          });
         }
       }
     }

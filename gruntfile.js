@@ -31,7 +31,7 @@ module.exports = function(grunt) {
     lmd: {
       app: {
         options: {
-          output: './public/js/app.<%= pkg.version %>.js',
+          output: './public/js/app.lmd.<%= pkg.version %>.js',
           warn: false
         },
         build: 'app'

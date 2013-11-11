@@ -30,6 +30,12 @@ msgid "Cancel"
 msgstr "Нет"
 
 
+# /public/templates/index/navbar.jade
+
+msgid "Logout"
+msgstr "Выход"
+
+
 # /lib/views/signin.js
 
 msgid "Server not found"
@@ -94,6 +100,21 @@ msgstr "Вы хотите закрыть обнаруженную сессию �
 
 msgid "Your session is outdated"
 msgstr "Ваша сессия устарела"
+
+
+# /lib/controllers/dict.js
+
+msgid "Dict not found"
+msgstr "Сетка для отображения данных не найдена"
+
+
+# /lib/controllers/firebird.js
+
+msgid "Connection not found"
+msgstr "Соединение с базой данных не найдено"
+
+msgid "Transaction not found"
+msgstr "Транзакция не найдена"
 
 
 

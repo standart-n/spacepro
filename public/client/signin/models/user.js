@@ -7,7 +7,8 @@ module.exports = Backbone.Model.extend({
 
   defaults: {
     login:    '',
-    password: ''
+    password: '',
+    force:    0,
   },
 
   initialize: function() {},

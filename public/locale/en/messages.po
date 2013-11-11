@@ -14,9 +14,6 @@ msgstr "Password"
 msgid "Enter"
 msgstr "Signin"
 
-msgid "Enter"
-msgstr "Signin"
-
 msgid "Loading"
 msgstr "Loading"
 
@@ -31,6 +28,12 @@ msgstr "Yes"
 
 msgid "Cancel"
 msgstr "Cancel"
+
+
+# /public/templates/index/navbar.jade
+
+msgid "Logout"
+msgstr "Logout"
 
 
 # /lib/views/signin.js
@@ -112,5 +115,4 @@ msgstr "Connection not found"
 
 msgid "Transaction not found"
 msgstr "Transaction not found"
-
 

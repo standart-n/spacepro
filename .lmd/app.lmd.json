@@ -4,7 +4,8 @@
   "output": "public/js/signin.lmd.js",
   "extends": "./core.lmd.json",
   "modules": {
-    "main": "public/client/app/main.js"
+    "main": "public/client/app/main.js",
+    "<%= file %>":      "public/client/app/{models,views,controllers,triggers}/**/*.js"
   },
   "main": "main"
 }
