@@ -7,43 +7,6 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
     #bar
       include ../index/navbar
 
-    #main
-      .container
-        .row
-          .col-md-12
-            table.table.table-condensed.table-hover.dict
-              thead
-                tr
-                  - parentDict.columns.forEach(function(column){
-                    th #{column.Caption}
-                  - })
-
-              tbody
-                - parentDict.data.forEach(function(line, index){
-                  tr
-                    - parentDict.columns.forEach(function(column){
-                      td #{line[column.Field]}
-                    - })
-                - })
-
-
-    #bottom.container
-      .row
-        .col-md-12
-          table.table.table-condensed.table-hover.dict
-            thead
-              tr
-                - parentDict.childs[1].columns.forEach(function(column){
-                  th #{column.Caption}
-                - })
-
-            tbody
-              - parentDict.childs[1].data.forEach(function(line){
-                tr
-                  - parentDict.childs[1].columns.forEach(function(column){
-                    td #{line[column.Field]}
-                  - })
-              - })
-
+    include ../dict/grid
 
     include ../includes/js

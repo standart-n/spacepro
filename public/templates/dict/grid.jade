@@ -1,0 +1,33 @@
+
+#main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}", data-dict-limit = "#{parentDict.limit}")
+  .container
+    .row
+      .col-md-12
+        table.table.table-condensed.table-hover.dict
+          thead
+            tr
+              - each column in parentDict.columns
+                th #{column.Caption}
+
+          tbody
+            - each line, index in parentDict.data
+              tr
+                - each column in parentDict.columns
+                  td #{line[column.Field]}
+
+
+#bottom(data-view = "dict", data-dict-type = "child", data-dict-sid = "#{childDict.sid}", data-dict-limit = "#{childDict.limit}")
+  .container
+    .row
+      .col-md-12
+        table.table.table-condensed.table-hover.dict
+          thead
+            tr
+              - each column in childDict.columns
+                th #{column.Caption}
+
+          tbody
+            - each line, index in childDict.data
+              tr
+                - each column in childDict.columns
+                  td #{line[column.Field]}

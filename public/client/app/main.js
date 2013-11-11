@@ -2,9 +2,14 @@
 var Backbone, App;
 
 window.JSON = require('json2');
+window.jade = require('jade');
+
+window.jade.templates = {};
 
 require('jquery');
 require('bootstrap');
+
+require('line.tpl');
 
 Backbone =  require('backbone');
 App =       require('app');

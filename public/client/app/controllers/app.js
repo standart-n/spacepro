@@ -1,24 +1,21 @@
-var Backbone;
+var Backbone, Dict;
 
 Backbone =  require('backbone');
+Dict =      require('dict');
 
 module.exports = Backbone.Router.extend({
 
-  routes: {
-    'auth/logout':   'logout',
-  },
-
   initialize: function() {
-  },
+    var _this = this;
 
-  logout: function() {
-    $.ajax({
-      url: '/api/auth/logout',
-      timeout: 10000,
-      success: function() {
-        window.location.href = "/";
-      }
+    this.dicts = [];
+    
+    $('[data-view=\"dict\"]').each(function(i, element) {
+      _this.dicts.push(new Dict({
+        el: element
+      }));
     });
+  
   }
 
 });
