@@ -13,7 +13,6 @@ module.exports = Backbone.View.extend({
 
     this.$el.on('submit', function(e) {
       e.preventDefault();
-      // _this.search();
     });
 
     this.$el.on('keyup', function(e) {
