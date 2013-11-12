@@ -419,6 +419,33 @@ describe('Sqlmaster:', function() {
       assert.deepEqual(vals_out, sqlmaster.extVals(vals));
     });
 
+    it('Extend values with clean array', function() {
+      var sqlmaster,
+        vals = {
+          'bp': 200,
+          'cp': 300,
+          'dp': 400
+        },
+        vals_out = {
+          'ap': 10,
+          'bp': 200
+        };
+
+      sqlmaster = new Sqlmaster({
+        keys: {
+          'ap_id': 'ap',
+          'bp_id': 'bp'
+        },
+        vals: {
+          'ap': 10,
+          'bp': 20
+        }
+      });
+
+      assert.deepEqual(vals_out, sqlmaster.extVals(vals, true));
+    });
+
+
   });
 
 

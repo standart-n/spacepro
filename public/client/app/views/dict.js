@@ -1,5 +1,6 @@
-var Backbone, Data;
+var _, Backbone, Data;
 
+_ =        require('underscore');
 Backbone = require('backbone');
 Data =     require('data');
 
@@ -38,7 +39,7 @@ module.exports = Backbone.View.extend({
     this.on('update', function(vals) {
       if (_this.type === 'child') {
         _this.limit = 50;
-        _this.vals = vals;
+        _this.vals = this.cleanVals(vals);
         _this.data.reset();
         _this.$el.find('tbody').empty();
         _this.sendRequest();
@@ -76,8 +77,8 @@ module.exports = Backbone.View.extend({
     });
 
 
-    this.$el.on('click', 'td', function(e) {
-      var $tr = $(e.target).parent();
+    this.$el.on('click', 'td', function() {
+      var $tr = $(this).parent();
       _this.selectRowUUID = $tr.data('uuid');
       _this.colorActiveLine();
       _this.updateChilds();
@@ -90,6 +91,49 @@ module.exports = Backbone.View.extend({
       }));
     });
 
+  },
+
+  setValsToLowerCase: function(ms) {
+    var tmp = {};
+    _.each(ms || {}, function(value, key) {
+      tmp[key] = value.toLowerCase();
+    });
+    return tmp;
+  },
+
+  setKeysToLowerCase: function(ms) {
+    var tmp = {};
+    _.each(ms || {}, function(value, key) {
+      tmp[key.toLowerCase()] = value;
+    });
+    return tmp;
+  },
+
+  cleanVals: function(new_vals) {
+    var keys, vals, 
+      tmp = {};
+
+    keys = this.keys || {};
+    vals = this.vals || {};
+
+    if ((new_vals != null) && (typeof new_vals === 'object')) {
+      vals = _.extend({}, vals, new_vals);
+    }
+
+    keys =  this.setValsToLowerCase(keys);
+    vals =  this.setKeysToLowerCase(vals);
+
+    _.each(keys, function(value, key) {
+      if (vals[value] != null) {
+        if (typeof vals[value] === 'string') {
+          tmp[value] = vals[value].trim();
+        } else {
+          tmp[value] = vals[value];
+        }
+      }
+    });
+
+    return tmp;
   },
 
   colorActiveLine: function() {
