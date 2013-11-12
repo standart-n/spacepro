@@ -22,6 +22,7 @@ module.exports = Backbone.View.extend({
     if (this.type === 'parent') {
       this.on('search', function(query) {
         _this.query = query;
+        _this.$el.find('tbody').empty();
         _this.sendRequest();
       });
 

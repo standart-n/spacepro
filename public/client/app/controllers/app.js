@@ -7,6 +7,7 @@ Search =    require('search');
 module.exports = Backbone.Router.extend({
 
   routes: {
+    'search/':       'search',
     'search/:query': 'search'
   },
 
@@ -25,7 +26,7 @@ module.exports = Backbone.Router.extend({
   },
 
   search: function(query) {
-    this.dicts[0].trigger('search', query);
+    this.dicts[0].trigger('search', query || '');
   }
 
 });

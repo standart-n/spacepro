@@ -13,7 +13,13 @@ module.exports = Backbone.View.extend({
 
     this.$el.on('submit', function(e) {
       e.preventDefault();
-      _this.search();
+      // _this.search();
+    });
+
+    this.$el.on('keyup', function(e) {
+      if (e.keyCode === 13) {
+        _this.search();
+      }
     });
 
   },
