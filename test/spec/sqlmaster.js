@@ -269,13 +269,38 @@ describe('Sqlmaster:', function() {
 
   });
 
+  describe('Containing:', function() {
+
+    it('One word', function() {
+      var sqlmaster,
+        query = 'myQuery',
+        cfselect = 'selectcaption',
+        str_out = 'selectcaption containing \'myQuery\'';
+
+      sqlmaster = new Sqlmaster();
+
+      assert.equal(str_out, sqlmaster.containing(query, cfselect));
+    });
+
+    it('Any words', function() {
+      var sqlmaster,
+        query = 'my first query',
+        cfselect = 'caption',
+        str_out = 'caption containing \'my\' and caption containing \'first\' and caption containing \'query\'';
+
+      sqlmaster = new Sqlmaster();
+
+      assert.equal(str_out, sqlmaster.containing(query, cfselect));
+    });
+
+  });
 
   describe('Search:', function() {
 
     it('Simple query without "where"', function() {
       var sqlmaster,
         sql_in =  "select * from VW_DEVICE",
-        sql_out = "select * from VW_DEVICE where selectcaption='myQuery'";
+        sql_out = "select * from VW_DEVICE where selectcaption containing 'myQuery'";
 
       sqlmaster = new Sqlmaster({
         cfselect: 'selectcaption',
@@ -288,7 +313,7 @@ describe('Sqlmaster:', function() {
     it('Simple query with "where"', function() {
       var sqlmaster,
         sql_in =  "select * from VW_DEVICE where status=1",
-        sql_out = "select * from VW_DEVICE where selectcaption='myQuery' and status=1";
+        sql_out = "select * from VW_DEVICE where selectcaption containing 'myQuery' and status=1";
 
       sqlmaster = new Sqlmaster({
         cfselect: 'selectcaption',
@@ -301,7 +326,7 @@ describe('Sqlmaster:', function() {
     it('Simple query with only "order by"', function() {
       var sqlmaster,
         sql_in =  "select * from VW_DEVICE ORDER by id DESC",
-        sql_out = "select * from VW_DEVICE where selectcaption='myQuery' ORDER by id DESC";
+        sql_out = "select * from VW_DEVICE where selectcaption containing 'myQuery' ORDER by id DESC";
 
       sqlmaster = new Sqlmaster({
         cfselect: 'selectcaption',
@@ -314,7 +339,7 @@ describe('Sqlmaster:', function() {
     it('Simple query with "group by" and "order by"', function() {
       var sqlmaster,
         sql_in =  "select * from VW_DEVICE GROUP by id ORDER by id DESC",
-        sql_out = "select * from VW_DEVICE where selectcaption='myQuery' GROUP by id ORDER by id DESC";
+        sql_out = "select * from VW_DEVICE where selectcaption containing 'myQuery' GROUP by id ORDER by id DESC";
 
       sqlmaster = new Sqlmaster({
         cfselect: 'selectcaption',
@@ -422,7 +447,7 @@ describe('Sqlmaster:', function() {
     it('Test with limit, keys and query', function() {
       var sqlmaster,
         sql_in =  "select * from VW_DEVICE where status=:st order by street",
-        sql_out = "select first 40 * from VW_DEVICE where selectcaption='myQuery' and status=1 order by street";
+        sql_out = "select first 40 * from VW_DEVICE where selectcaption containing 'myQuery' and status=1 order by street";
 
       sqlmaster = new Sqlmaster({
         sql: sql_in,
