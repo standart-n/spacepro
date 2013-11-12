@@ -8,10 +8,12 @@ module.exports = Backbone.View.extend({
   el: "[data-view=\"dict\"]",
 
   initialize: function() {
-    var _this = this;
+    var model,
+      _this = this;
 
     this.sid =      this.$el.data("dict-sid");
     this.type =     this.$el.data("dict-type");
+    this.limit =    50;
     this.step =     20;
     this.query =    '';
     this.keys =     {};
@@ -19,9 +21,10 @@ module.exports = Backbone.View.extend({
     
     this.data = new Data();
     this.data.reset(window[this.sid].data);
-    this.limit = this.data.length;
 
-    this.selectRowUUID = window[this.sid].selectRowUUID || '';
+    this.selectRowUUID = window[this.sid].selectRowUUID || this.$el.find('tbody').find('tr:first').data('uuid') || '';
+
+    this.colorActiveLine();
 
     if (this.type === 'parent') {
       this.child = this.$el.data("dict-child");
@@ -34,6 +37,7 @@ module.exports = Backbone.View.extend({
 
     this.on('update', function(vals) {
       if (_this.type === 'child') {
+        _this.limit = 50;
         _this.vals = vals;
         _this.data.reset();
         _this.$el.find('tbody').empty();
@@ -50,6 +54,7 @@ module.exports = Backbone.View.extend({
 
     this.on('search', function(query) {
       if (_this.type === 'parent') {
+        _this.limit = 50;
         _this.query = query;
         _this.data.reset();
         _this.$el.find('tbody').empty();
@@ -58,12 +63,24 @@ module.exports = Backbone.View.extend({
     });
 
     this.$el.on('scroll', function() {
-      // if (_this.type === 'parent') {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
         _this.limit = _this.data.length + _this.step;
         _this.sendRequest();
       }
-      // }
+    });
+
+    this.$el.on('mouseover', function() {
+      $(this).css({
+        'cursor': 'pointer'
+      });
+    });
+
+
+    this.$el.on('click', 'td', function(e) {
+      var $tr = $(e.target).parent();
+      _this.selectRowUUID = $tr.data('uuid');
+      _this.colorActiveLine();
+      _this.updateChilds();
     });
 
     this.data.on('add', function(line) {
@@ -73,6 +90,12 @@ module.exports = Backbone.View.extend({
       }));
     });
 
+  },
+
+  colorActiveLine: function() {
+    this.$el.find('tr').removeClass('success');
+    this.$activeLine = this.$el.find("[data-uuid=\"" + this.selectRowUUID + "\"]");
+    this.$activeLine.addClass('success');
   },
 
   sendRequest: function() {
@@ -92,24 +115,29 @@ module.exports = Backbone.View.extend({
     });
   },
 
-  checkResponse: function() {
-    var selectRowUUID, model;
+  updateChilds: function() {
+    var model = this.data.findWhere({'d$uuid': this.selectRowUUID});
+    if ((this.child != null) && (this.data != null)) {
+      if (window.app[this.child] != null) {
+        if (model != null) {
+          window.app[this.child].trigger('update', model.toJSON() || {});
+        } else {
+          window.app[this.child].trigger('clear');
+        }
+      }
+    }
+  },
 
-    selectRowUUID = this.$el.find('tbody').find('tr:first').data('d$uuid');
+  checkResponse: function() {
+    var selectRowUUID;
+
+    selectRowUUID = this.$el.find('tbody').find('tr:first').data('uuid');
 
     if (this.type === 'parent') {
-      if ((this.child != null) && (this.data != null)) {
-        if (window.app[this.child] != null) {      
-          if (selectRowUUID != this.selectRowUUID) {
-            this.selectRowUUID = selectRowUUID;
-            model = this.data.findWhere({'d$uuid': selectRowUUID});
-            if (model != null) {              
-              window.app[this.child].trigger('update', model.toJSON() || {});
-            } else {
-              window.app[this.child].trigger('clear');
-            }
-          }      
-        }
+      if (selectRowUUID != this.selectRowUUID) {
+        this.selectRowUUID = selectRowUUID;
+        this.colorActiveLine();
+        this.updateChilds();
       }
     }
 

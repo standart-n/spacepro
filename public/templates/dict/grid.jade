@@ -11,7 +11,7 @@
 
           tbody
             - each line, index in parentDict.data
-              tr(data-d$uuid = "#{line.d$uuid}")
+              tr(data-uuid = "#{line.d$uuid}")
                 - each column in parentDict.columns
                   td #{line[column.Field]}
 
@@ -28,6 +28,6 @@
 
           tbody
             - each line, index in childDict.data
-              tr(data-d$uuid = "#{line.d$uuid}")
+              tr(data-uuid = "#{line.d$uuid}")
                 - each column in childDict.columns
                   td #{line[column.Field]}
