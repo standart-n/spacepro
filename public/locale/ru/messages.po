@@ -39,6 +39,12 @@ msgid "Logout"
 msgstr "Выход"
 
 
+# /public/templates/dict/nothing.jade
+
+msgid "Information not found"
+msgstr "Информация не найдена"
+
+
 # /lib/views/signin.js
 
 msgid "Server not found"

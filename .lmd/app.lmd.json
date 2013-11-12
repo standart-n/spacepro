@@ -6,7 +6,7 @@
   "modules": {
     "main": "public/client/app/main.js",
     "<%= file %>":      "public/client/app/{models,views,controllers,triggers}/**/*.js",
-    "<%= file %>.tpl":  "public/js/templates/dict/line.jade/*.js"
+    "<%= file %>.tpl":  "public/js/templates/dict/{line,nothing,loading}.jade/*.js"
   },
   "main": "main"
 }

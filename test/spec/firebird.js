@@ -16,6 +16,60 @@ Firebird = require(process.env.APP_DIR + '/lib/controllers/firebird');
 
 describe('Firebird:', function() {
 
+  describe('Get fields:', function() {
+    it('Should return fields with types', function() {
+      var firebird,
+        fields = [
+          { 
+            type:     452,
+            field:    'D$UUID',
+            relation: 'VW_DEVICE',
+            alias:    'D$UUID' 
+          },
+          { 
+            type:     448,
+            field:    'KEY_ID',
+            relation: 'VW_DEVICE',
+            alias:    'KEY_ID' 
+          },
+          { 
+            type:     510,
+            field:    'INSERTDT',
+            relation: 'VW_DEVICE',
+            alias:    'INSERTDT' 
+          }
+        ],
+        result = {
+          'd$uuid': { 
+            type:     452,
+            mtype:    'text',
+            field:    'D$UUID',
+            relation: 'VW_DEVICE',
+            alias:    'D$UUID' 
+          },
+          'key_id': { 
+            type:     448,
+            mtype:    'varying',
+            field:    'KEY_ID',
+            relation: 'VW_DEVICE',
+            alias:    'KEY_ID' 
+          },
+          'insertdt': { 
+            type:     510,
+            mtype:    'timestamp',
+            field:    'INSERTDT',
+            relation: 'VW_DEVICE',
+            alias:    'INSERTDT' 
+          }
+        };
+
+      firebird = new Firebird();
+      assert.deepEqual(result,firebird.getFields(fields));
+
+    });
+  });
+
+
   describe('Open and commit:', function() {
     it('Should return without errors', function(done) {
       var firebird;

@@ -10,6 +10,8 @@ require('jquery');
 require('bootstrap');
 
 require('line.tpl');
+require('nothing.tpl');
+require('loading.tpl');
 
 Backbone =  require('backbone');
 App =       require('app');

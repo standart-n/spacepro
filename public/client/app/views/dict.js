@@ -41,7 +41,10 @@ module.exports = Backbone.View.extend({
         _this.limit = 50;
         _this.vals = this.cleanVals(vals);
         _this.data.reset();
-        _this.$el.find('tbody').empty();
+        // _this.$el.find('tbody').empty();
+        _this.$el.find('tbody').html(jade.templates.loading({
+          columns: window[_this.sid].columns
+        }));
         _this.sendRequest();
       }
     });
@@ -58,7 +61,10 @@ module.exports = Backbone.View.extend({
         _this.limit = 50;
         _this.query = query;
         _this.data.reset();
-        _this.$el.find('tbody').empty();
+        // _this.$el.find('tbody').empty();
+        _this.$el.find('tbody').html(jade.templates.loading({
+          columns: window[_this.sid].columns
+        }));
         _this.sendRequest();
       }
     });
@@ -75,7 +81,6 @@ module.exports = Backbone.View.extend({
         'cursor': 'pointer'
       });
     });
-
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
@@ -175,6 +180,10 @@ module.exports = Backbone.View.extend({
   checkResponse: function() {
     var selectRowUUID;
 
+    if (this.$el.find('tbody').find('tr:first').data('type') === 'loading') {
+      this.$el.find('tbody').find('tr:first').remove();
+    }
+
     selectRowUUID = this.$el.find('tbody').find('tr:first').data('uuid');
 
     if (this.type === 'parent') {
@@ -183,6 +192,12 @@ module.exports = Backbone.View.extend({
         this.colorActiveLine();
         this.updateChilds();
       }
+    }
+
+    if (this.data.length < 1) {
+      this.$el.find('tbody').html(jade.templates.nothing({
+        columns: window[this.sid].columns
+      }));
     }
 
   }
