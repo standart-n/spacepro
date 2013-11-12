@@ -16,9 +16,9 @@ node_modules
 
 /bower_components
 
-/public/css
-/public/js
-/public/i18n
+/public/client
+/public/style
+/public/locale
 
 /grids
 

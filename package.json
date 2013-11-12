@@ -2,7 +2,10 @@
   "name": "spacepro",
   "version": "0.0.1",
   "description": "ERP by standart-n",
-  "main": "index.js",
+  "main": "spacepro.js",
+  "bin": {
+    "spacepro": "./.bin/spacepro"
+  },
   "scripts": {
     "test": "grunt test"
   },
