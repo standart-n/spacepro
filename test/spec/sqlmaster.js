@@ -242,8 +242,32 @@ describe('Sqlmaster:', function() {
       assert.deepEqual(sql_out, sqlmaster.setParams(sql_in, local));
     });
 
-  });
+    it('Parsing in complex', function() {
+      var sqlmaster,
+        string =    'b_id=building_d$uuid,ap=APARTMENT',
+        sql_in =    'select * from VW_ACCOUNT_DATA where building_d$uuid=:b_id ' +
+                    'and APARTMENT=:AP  and status=:ap order by ' +
+                    'insertdt :B_ID',
+        sql_out =   'select * from VW_ACCOUNT_DATA where building_d$uuid=\'dom\' ' +
+                    'and APARTMENT=24  and status=24 order by ' +
+                    'insertdt \'dom\'',
+        local = {
+          'APARTMENT': 24
+        };
 
+      sqlmaster = new Sqlmaster();
+
+      sqlmaster.extVals({
+        'building_d$uuid': 'dom',
+        'apartment':       12
+      });
+
+      sqlmaster.parseString(string);
+
+      assert.equal(sql_out, sqlmaster.setParams(sql_in, local));
+    });
+
+  });
 
   describe('Limit / First:', function() {
 
@@ -393,6 +417,51 @@ describe('Sqlmaster:', function() {
       });
 
       assert.deepEqual(vals_out, sqlmaster.extVals(vals));
+    });
+
+  });
+
+
+  describe('Extend keys:', function() {
+
+    it('Simple test', function() {
+      var sqlmaster,
+        keys = {
+          'bp': 200,
+          'cp': 300
+        },
+        keys_out = {
+          'ap': 10,
+          'bp': 200,
+          'cp': 300
+        };
+
+      sqlmaster = new Sqlmaster({
+        keys: {
+          'ap': 10,
+          'bp': 20
+        }
+      });
+
+      assert.deepEqual(keys_out, sqlmaster.extKeys(keys));
+    });
+
+    it('Simple test whithout first keys', function() {
+      var sqlmaster,
+        keys = 'string',
+        keys_out = {
+          'ap': 10,
+          'bp': 20
+        };
+
+      sqlmaster = new Sqlmaster({
+        keys: {
+          'ap': 10,
+          'bp': 20
+        }
+      });
+
+      assert.deepEqual(keys_out, sqlmaster.extKeys(keys));
     });
 
   });

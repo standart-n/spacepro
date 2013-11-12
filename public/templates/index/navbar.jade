@@ -9,7 +9,7 @@ nav.navbar.navbar-default.navbar-fixed-top(role = "navigation")
   //-   li.active
   //-     a(href = "#") #{parentDict.caption}
 
-  form.navbar-form.navbar-left(data-view = "search", role = "search")
+  form.navbar-form.navbar-left(data-view = "search", data-search-dict = "#{parentDict.sid}", role = "search")
     .form-group
       input.form-control(type = "text", placeholder = "#{gettext('Search')}")
 
