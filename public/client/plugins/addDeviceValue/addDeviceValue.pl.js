@@ -56,8 +56,28 @@ module.exports = Backbone.View.extend({
     });
 
     this.$el.on('keyup', "[data-" + name + "=\"input\"]", function(e) {
+      var __this = this;
       if (e.keyCode === 13) {
-        $(this).parent().addClass('success');
+        // $(this).parent().addClass('success');
+        this.blur();
+        $.ajax({
+          url:       '/api/' + name,
+          type:      'POST',
+          dataType:  'text',
+          data: {
+            uuid:   _this.uuid.trim(),
+            value:  $(this).val()
+          },
+          success: function(s) {
+            var sid = _this.sid;
+            $(__this).parent().html(_this.template.line({
+              value: $(__this).val()
+            }));
+            if (window[sid] != null) {
+              window[sid].trigger('update.childs');
+            }
+          }
+        });
       }
     });
 

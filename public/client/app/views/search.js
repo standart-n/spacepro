@@ -25,9 +25,10 @@ module.exports = Backbone.View.extend({
   },
 
   search: function() {
-    if (this.dict != null){
-      if (window.app[this.dict] != null) {
-        window.app[this.dict].trigger('search', this.$query.val());
+    var dict = this.dict;
+    if (dict != null){
+      if (window[dict] != null) {
+        window[dict].trigger('search', this.$query.val());
       }
     }
   }

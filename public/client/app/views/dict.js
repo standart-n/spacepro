@@ -70,6 +70,20 @@ module.exports = Backbone.View.extend({
       }
     });
 
+    this.on('update.childs', function() {
+      var _this = this;
+      var model = _this.data.findWhere({'d$uuid': _this.selectRowUUID});
+      if ((_this.child != null) && (_this.data != null)) {
+        if (window[_this.child] != null) {
+          if (model != null) {
+            window[_this.child].trigger('update', model.toJSON() || {});
+          } else {
+            window[_this.child].trigger('clear');
+          }
+        }
+      }
+    });
+
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
         _this.limit = _this.data.length + _this.step;
@@ -88,7 +102,7 @@ module.exports = Backbone.View.extend({
       var $tr = $(this).parent();
       _this.selectRowUUID = $tr.data('uuid');
       _this.colorActiveLine();
-      _this.updateChilds();
+      _this.trigger('update.childs');
     });
 
     this.data.on('add', function(line) {
@@ -97,6 +111,11 @@ module.exports = Backbone.View.extend({
         fields:  _this.fields,
         line:    line.toJSON()
       }));
+      _this.$el.trigger('add.line', line.toJSON());
+    });
+
+    this.data.on('remove', function(line) {
+      _this.$worksheet.find("[data-uuid=\"" + line.get('d$uuid') + "\"]").remove();
       _this.$el.trigger('add.line', line.toJSON());
     });
 
@@ -169,19 +188,6 @@ module.exports = Backbone.View.extend({
     }
   },
 
-  updateChilds: function() {
-    var model = this.data.findWhere({'d$uuid': this.selectRowUUID});
-    if ((this.child != null) && (this.data != null)) {
-      if (window[this.child] != null) {
-        if (model != null) {
-          window[this.child].trigger('update', model.toJSON() || {});
-        } else {
-          window[this.child].trigger('clear');
-        }
-      }
-    }
-  },
-
   showInformationNotFound: function() {
     this.$worksheet.html(jade.templates.line_nothing({
       columns: this.columns || {}
@@ -205,7 +211,7 @@ module.exports = Backbone.View.extend({
   showLoading: function(type) {
 
     if (type == null) {
-      type = 'replace';
+      type = 'before';
     }
 
     if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
@@ -243,9 +249,13 @@ module.exports = Backbone.View.extend({
 
     switch (type) {
       case 'update':
+        this.$worksheet.empty();
+        this.data.reset();
         this.showLoading();
       break;
       case 'search':
+        this.$worksheet.empty();
+        this.data.reset();
         this.showLoading();
       break;
       case 'scroll':
@@ -291,7 +301,7 @@ module.exports = Backbone.View.extend({
       case 'search':
         this.selectRowUUID = this.getUUIDbyFirstRecord();
         this.colorActiveLine();
-        this.updateChilds();
+        this.trigger('update.childs');
       break;      
     }
 
