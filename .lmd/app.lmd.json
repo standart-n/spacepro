@@ -1,12 +1,15 @@
 {
-  "name": "signin",
+  "name": "app",
   "root": "../",
-  "output": "public/js/signin.lmd.js",
+  "output": "public/js/app.lmd.js",
   "extends": "./core.lmd.json",
   "modules": {
     "main": "public/client/app/main.js",
-    "<%= file %>":      "public/client/app/{models,views,controllers,triggers}/**/*.js",
-    "<%= file %>.tpl":  "public/js/templates/dict/{line_data,line_nothing,line_loading,line_error}.jade/*.js"
+    "<%= file %>": "public/client/app/**/*.js",
+    "<%= file.replace('.pl','') %>.pl": "public/client/plugins/**/*.pl.js",
+    "<%= file.replace('.po','') %>.po": "public/client/plugins/**/*.po.js",
+    "<%= file.replace('.tpl','') %>.tpl": "public/client/plugins/**/*.tpl.js",
+    "<%= file %>.jade": "public/js/templates/dict/line_*.jade/*.js"
   },
   "main": "main"
 }

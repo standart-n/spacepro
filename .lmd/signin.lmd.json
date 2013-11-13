@@ -6,7 +6,7 @@
   "modules": {
     "main":             "public/client/signin/main.js",
     "<%= file %>":      "public/client/signin/{models,views,controllers,triggers}/**/*.js",
-    "<%= file %>.tpl":  "public/js/templates/signin/resolve.jade/*.js"
+    "<%= file %>.jade": "public/js/templates/signin/resolve.jade/*.js"
   },
   "main": "main"
 }

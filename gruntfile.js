@@ -48,7 +48,9 @@ module.exports = function(grunt) {
     jade: {
       client: {
         options: {
-          runtime: false
+          runtime: false,
+          warn:    true,
+          err:     true
         },
         files: [
           {

@@ -13,14 +13,15 @@
             - each line, index in parentDict.data
               tr(data-uuid = "#{line.d$uuid}")
                 - each column in parentDict.columns
-                  - if ((parentDict.fields[column.Field].mtype == 'timestamp') && (line[column.Field] != null)) {
-                    td 
-                      span #{moment(line[column.Field]).format('DD.MM.YYYY')}
-                      &nbsp;
-                      small #{moment(line[column.Field]).format('HH:mm')}
-                  - } else {
-                    td #{line[column.Field]}
-                  - }
+                  td(data-col-field = "#{column.Field}")
+                    - if ((line[column.Field] != null) && (line[column.Field] !== ''))
+                      - if (parentDict.fields[column.Field].mtype == 'timestamp')
+                        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+                        &nbsp;
+                        small #{moment(line[column.Field]).format('HH:mm')}
+                      - else
+                        span #{line[column.Field]}
+
 
 
 
@@ -38,11 +39,11 @@
             - each line, index in childDict.data
               tr(data-uuid = "#{line.d$uuid}")
                 - each column in childDict.columns
-                  - if ((childDict.fields[column.Field].mtype == 'timestamp') && (line[column.Field] != null)) {
-                    td 
-                      span #{moment(line[column.Field]).format('DD.MM.YYYY')}
-                      &nbsp;
-                      small #{moment(line[column.Field]).format('HH:mm')}
-                  - } else {
-                    td #{line[column.Field]}
-                  - }
+                  td(data-col-field = "#{column.Field}")
+                    - if ((line[column.Field] != null) && (line[column.Field] !== ''))
+                      - if (childDict.fields[column.Field].mtype == 'timestamp')
+                        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+                        &nbsp;
+                        small #{moment(line[column.Field]).format('HH:mm')}
+                      - else
+                        span #{line[column.Field]}

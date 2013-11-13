@@ -10,7 +10,7 @@ require('jquery');
 require('bootstrap');
 require('moment');
 
-require('resolve.tpl');
+require('resolve.jade');
 
 Backbone =  require('backbone');
 App =       require('app');

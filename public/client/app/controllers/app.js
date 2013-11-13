@@ -1,4 +1,4 @@
-var Backbone, Dict;
+var Backbone, Dict, Search;
 
 Backbone =  require('backbone');
 Dict =      require('dict');
@@ -12,9 +12,13 @@ module.exports = Backbone.Router.extend({
     this.search = new Search();
     
     $('[data-view=\"dict\"]').each(function(i, el) {
-      _this[$(el).data("dict-sid")] = new Dict({
-        el: "[data-dict-sid=\"" + $(el).data("dict-sid") + "\"]"
+      var sid = $(el).data("dict-sid");
+
+      window[sid] = new Dict({
+        el:  "[data-dict-sid=\"" + sid + "\"]",
+        sid: sid
       });
+
     });
   
   }

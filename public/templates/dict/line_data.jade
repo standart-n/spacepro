@@ -1,11 +1,11 @@
 
 tr(data-uuid = "#{line.d$uuid}")
   - each column in columns
-    - if ((fields[column.Field].mtype == 'timestamp') && (line[column.Field] != null)) {
-      td 
-        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
-        &nbsp;
-        small #{moment(line[column.Field]).format('HH:mm')}
-    - } else {
-      td #{line[column.Field]}
-    - }
+    td(data-col-field = "#{column.Field}")
+      - if ((line[column.Field] != null) && (line[column.Field] !== ''))
+        - if (fields[column.Field].mtype == 'timestamp')
+          span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+          &nbsp;
+          small #{moment(line[column.Field]).format('HH:mm')}
+        - else
+          span #{line[column.Field]}

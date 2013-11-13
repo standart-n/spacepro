@@ -1,5 +1,5 @@
 
-var Backbone, App;
+var Backbone, App, AddDeviceValues;
 
 window.JSON = require('json2');
 window.jade = require('jade');
@@ -10,13 +10,13 @@ require('jquery');
 require('bootstrap');
 require('moment');
 
-require('line_data.tpl');
-require('line_nothing.tpl');
-require('line_error.tpl');
-require('line_loading.tpl');
+require('line_data.jade');
+require('line_nothing.jade');
+require('line_error.jade');
+require('line_loading.jade');
 
-Backbone =  require('backbone');
-App =       require('app');
+Backbone =    require('backbone');
+App =         require('app');
 
 $(function() {
 
@@ -33,11 +33,14 @@ $(function() {
     alert(JSON.stringify(s));
   };
 
-  window.gettext = function(msgid) {
-    var msgstr, _ref;
-    if (((_ref = window.json_locale_data) != null ? _ref.messages[msgid] : void 0) != null) {
-      if (window.json_locale_data.messages[msgid].length > 1) {
-        msgstr = window.json_locale_data.messages[msgid][1];
+  window.gettext = function(msgid, json_locale_data) {
+    var msgstr, data;
+    data = json_locale_data || window.json_locale_data || {};
+    if (data.messages != null) {
+      if (data.messages[msgid] != null) {
+        if (data.messages[msgid].length > 1) {
+          msgstr = data.messages[msgid][1];
+        }
       }
     }
     if (msgstr == null) {

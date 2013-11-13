@@ -1,8 +1,10 @@
-var _, Backbone, Data;
+var _, Backbone, Data, AddDeviceValue;
 
 _ =        require('underscore');
 Backbone = require('backbone');
 Data =     require('data');
+
+AddDeviceValue = require('addDeviceValue.pl');
 
 module.exports = Backbone.View.extend({
 
@@ -14,39 +16,41 @@ module.exports = Backbone.View.extend({
 
     this.$worksheet =  this.$el.find('tbody');
 
-    this.sid =         this.$el.data("dict-sid");
-    this.type =        this.$el.data("dict-type");
+    this.sid =         this.options.sid  || this.$el.data("dict-sid")  || '';
+    this.type =        this.options.type || this.$el.data("dict-type") || '';
     this.limit =       50;
     this.step =        20;
     this.query =       '';
     this.keys =        {};
     this.vals =        {};
 
-    this.columns =     window[this.sid].columns || {};
-    this.fields =      window[this.sid].fields  || {};
+    this.conf =        this.sid + '_data';
+    this.columns =     window[this.conf].columns || {};
+    this.fields =      window[this.conf].fields  || {};
     
     this.data = new Data();
-    this.data.reset(window[this.sid].data);
+    this.data.reset(window[this.conf].data);
 
-    this.selectRowUUID = window[this.sid].selectRowUUID || this.getUUIDbyFirstRecord();
+    this.selectRowUUID = window[this.conf].selectRowUUID || this.getUUIDbyFirstRecord();
 
     this.colorActiveLine();
 
-    this.cleanVals();
+    this.vals = this.cleanVals();
 
     if (this.type === 'parent') {
       this.child = this.$el.data("dict-child");
     }
 
     if (this.type === 'child') {
-      this.keys = window[this.sid].keys || {};
-      this.vals = window[this.sid].vals || {};
+      this.keys = window[this.conf].keys || {};
+      this.vals = window[this.conf].vals || {};
     }
 
     this.on('update', function(vals) {
       if (_this.type === 'child') {
         _this.limit = 50;
         _this.vals = _this.cleanVals(vals);
+        _this.$el.trigger('start.update');
         _this.sendRequest('update');
       }
     });
@@ -61,6 +65,7 @@ module.exports = Backbone.View.extend({
       if (_this.type === 'parent') {
         _this.limit = 50;
         _this.query = query;
+        _this.$el.trigger('start.search');
         _this.sendRequest('search');
       }
     });
@@ -68,6 +73,7 @@ module.exports = Backbone.View.extend({
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
         _this.limit = _this.data.length + _this.step;
+        _this.$el.trigger('start.scroll');
         _this.sendRequest('scroll');
       }
     });
@@ -91,7 +97,15 @@ module.exports = Backbone.View.extend({
         fields:  _this.fields,
         line:    line.toJSON()
       }));
+      _this.$el.trigger('add.line', line.toJSON());
     });
+
+    if (this.sid == 'DEVICE_DATA') {
+      window.addDeviceValue = new AddDeviceValue({
+        el:  this.el,
+        sid: this.sid
+      });
+    }    
 
   },
 
@@ -145,7 +159,7 @@ module.exports = Backbone.View.extend({
   colorActiveLine: function(classname) {
 
     if (classname == null) {
-      classname = 'success';
+      classname = 'active';
     }
 
     this.$worksheet.find('tr').removeClass(classname);
@@ -158,11 +172,11 @@ module.exports = Backbone.View.extend({
   updateChilds: function() {
     var model = this.data.findWhere({'d$uuid': this.selectRowUUID});
     if ((this.child != null) && (this.data != null)) {
-      if (window.app[this.child] != null) {
+      if (window[this.child] != null) {
         if (model != null) {
-          window.app[this.child].trigger('update', model.toJSON() || {});
+          window[this.child].trigger('update', model.toJSON() || {});
         } else {
-          window.app[this.child].trigger('clear');
+          window[this.child].trigger('clear');
         }
       }
     }
@@ -229,15 +243,17 @@ module.exports = Backbone.View.extend({
 
     switch (type) {
       case 'update':
-        _this.showLoading();
+        this.showLoading();
       break;
       case 'search':
-        _this.showLoading();
+        this.showLoading();
       break;
       case 'scroll':
-        _this.showLoading('after');
+        this.showLoading('after');
       break;
     }
+
+    this.$el.trigger('request:' + type);
 
     this.data.fetch({
       url:     '/api/dict/' + this.sid,
@@ -282,6 +298,8 @@ module.exports = Backbone.View.extend({
     if (this.data.length < 1) {
       this.showInformationNotFound();
     }
+
+    this.$el.trigger('response:' + type);
 
   }
 
