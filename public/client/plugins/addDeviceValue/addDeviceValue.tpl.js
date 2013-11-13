@@ -30,7 +30,15 @@ Template.prototype.line = function(locals) {
     buf.push(window.gettext('Add', this.locale_data));
   }
   buf.push("</a>");
-  buf.push("<input class=\"form-control hide\" data-" + this.name + "=\"input\" type=\"text\" placeholder=\"" + window.gettext('New value', this.locale_data) + "\">");
+  buf.push("<input ");
+  buf.push("class=\"input-sm form-control hide\" ");
+  buf.push("data-" + this.name + "=\"input\" ");
+  buf.push("type=\"text\" ");
+  if ((locals.value != null) && (locals.value.toString().trim() !== '')) {
+    buf.push("value=\"" + locals.value + "\" ");
+  }
+  buf.push("placeholder=\"" + window.gettext('New value', this.locale_data) + "\"");
+  buf.push(">");
 
   return buf.join("");
 };
