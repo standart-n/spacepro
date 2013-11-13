@@ -39,10 +39,16 @@ msgid "Logout"
 msgstr "Logout"
 
 
-# /public/templates/dict/nothing.jade
+# /public/templates/dict/line_nothing.jade
 
 msgid "Information not found"
 msgstr "Information not found"
+
+
+# /public/templates/dict/line_error.jade
+
+msgid "Error on server"
+msgstr "Server error"
 
 
 # /lib/views/signin.js

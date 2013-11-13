@@ -12,20 +12,27 @@ module.exports = Backbone.View.extend({
     var model,
       _this = this;
 
-    this.sid =      this.$el.data("dict-sid");
-    this.type =     this.$el.data("dict-type");
-    this.limit =    50;
-    this.step =     20;
-    this.query =    '';
-    this.keys =     {};
-    this.vals =     {};
+    this.$worksheet =  this.$el.find('tbody');
+
+    this.sid =         this.$el.data("dict-sid");
+    this.type =        this.$el.data("dict-type");
+    this.limit =       50;
+    this.step =        20;
+    this.query =       '';
+    this.keys =        {};
+    this.vals =        {};
+
+    this.columns =     window[this.sid].columns || {};
+    this.fields =      window[this.sid].fields  || {};
     
     this.data = new Data();
     this.data.reset(window[this.sid].data);
 
-    this.selectRowUUID = window[this.sid].selectRowUUID || this.$el.find('tbody').find('tr:first').data('uuid') || '';
+    this.selectRowUUID = window[this.sid].selectRowUUID || this.getUUIDbyFirstRecord();
 
     this.colorActiveLine();
+
+    this.cleanVals();
 
     if (this.type === 'parent') {
       this.child = this.$el.data("dict-child");
@@ -39,20 +46,14 @@ module.exports = Backbone.View.extend({
     this.on('update', function(vals) {
       if (_this.type === 'child') {
         _this.limit = 50;
-        _this.vals = this.cleanVals(vals);
-        _this.data.reset();
-        // _this.$el.find('tbody').empty();
-        _this.$el.find('tbody').html(jade.templates.loading({
-          columns: window[_this.sid].columns
-        }));
-        _this.sendRequest();
+        _this.vals = _this.cleanVals(vals);
+        _this.sendRequest('update');
       }
     });
 
     this.on('clear', function() {
       if (_this.type === 'child') {
-        _this.data.reset();
-        _this.$el.find('tbody').empty();
+        _this.showInformationNotFound();
       }
     });
 
@@ -60,19 +61,14 @@ module.exports = Backbone.View.extend({
       if (_this.type === 'parent') {
         _this.limit = 50;
         _this.query = query;
-        _this.data.reset();
-        // _this.$el.find('tbody').empty();
-        _this.$el.find('tbody').html(jade.templates.loading({
-          columns: window[_this.sid].columns
-        }));
-        _this.sendRequest();
+        _this.sendRequest('search');
       }
     });
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
         _this.limit = _this.data.length + _this.step;
-        _this.sendRequest();
+        _this.sendRequest('scroll');
       }
     });
 
@@ -90,9 +86,10 @@ module.exports = Backbone.View.extend({
     });
 
     this.data.on('add', function(line) {
-      _this.$el.find('tbody').append(jade.templates.line({
-        columns: window[_this.sid].columns,
-        line: line.toJSON()
+      _this.$worksheet.append(jade.templates.line_data({
+        columns: _this.columns,
+        fields:  _this.fields,
+        line:    line.toJSON()
       }));
     });
 
@@ -141,27 +138,21 @@ module.exports = Backbone.View.extend({
     return tmp;
   },
 
-  colorActiveLine: function() {
-    this.$el.find('tr').removeClass('success');
-    this.$activeLine = this.$el.find("[data-uuid=\"" + this.selectRowUUID + "\"]");
-    this.$activeLine.addClass('success');
+  getUUIDbyFirstRecord: function() {
+    return this.$worksheet.find('tr:first').data('uuid') || '';
   },
 
-  sendRequest: function() {
-    var _this = this;
-    this.data.fetch({
-      url:     '/api/dict/' + this.sid,
-      timeout: 10000,
-      data: {
-        limit: this.limit  || null,
-        query: this.query  || '',
-        keys:  this.keys   || {},
-        vals:  this.vals   || {}
-      },
-      success: function() {
-        _this.checkResponse();
-      }
-    });
+  colorActiveLine: function(classname) {
+
+    if (classname == null) {
+      classname = 'success';
+    }
+
+    this.$worksheet.find('tr').removeClass(classname);
+    this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.selectRowUUID + "\"]");
+    if (this.$activeLine != null) {
+      this.$activeLine.addClass(classname);
+    }
   },
 
   updateChilds: function() {
@@ -177,27 +168,119 @@ module.exports = Backbone.View.extend({
     }
   },
 
-  checkResponse: function() {
-    var selectRowUUID;
+  showInformationNotFound: function() {
+    this.$worksheet.html(jade.templates.line_nothing({
+      columns: this.columns || {}
+    }));
+  },
 
-    if (this.$el.find('tbody').find('tr:first').data('type') === 'loading') {
-      this.$el.find('tbody').find('tr:first').remove();
+  hideInformationNotFound: function() {
+    this.$worksheet.find("[data-type=\"nothing\"]").remove();
+  },
+
+  showErrorOnServer: function() {
+    this.$worksheet.html(jade.templates.line_error({
+      columns: this.columns || {}
+    }));
+  },
+
+  hideErrorOnServer: function() {
+    this.$worksheet.find("[data-type=\"error\"]").remove();
+  },
+
+  showLoading: function(type) {
+
+    if (type == null) {
+      type = 'replace';
     }
 
-    selectRowUUID = this.$el.find('tbody').find('tr:first').data('uuid');
-
-    if (this.type === 'parent') {
-      if (selectRowUUID != this.selectRowUUID) {
-        this.selectRowUUID = selectRowUUID;
-        this.colorActiveLine();
-        this.updateChilds();
+    if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
+      switch (type) {
+        case 'replace':
+          this.$worksheet.html(jade.templates.line_loading({
+            columns: this.columns || {}
+          }));
+        break;
+        case 'after':
+          this.$worksheet.append(jade.templates.line_loading({
+            columns: this.columns || {}
+          }));
+        break;
+        case 'before':
+          this.$worksheet.prepend(jade.templates.line_loading({
+            columns: this.columns || {}
+          }));
+        break;
       }
     }
 
+  },
+
+  hideLoading: function() {
+    this.$worksheet.find("[data-type=\"loading\"]").remove();
+  },
+
+  sendRequest: function(type) {
+    var _this = this;
+
+    if (type == null) {
+      type = 'scroll';
+    }
+
+    switch (type) {
+      case 'update':
+        _this.showLoading();
+      break;
+      case 'search':
+        _this.showLoading();
+      break;
+      case 'scroll':
+        _this.showLoading('after');
+      break;
+    }
+
+    this.data.fetch({
+      url:     '/api/dict/' + this.sid,
+      timeout: 10000,
+      data: {
+        limit: this.limit  || null,
+        query: this.query  || '',
+        keys:  this.keys   || {},
+        vals:  this.vals   || {}
+      },
+      success: function() {
+        _this.hideLoading();
+        _this.hideErrorOnServer();
+        _this.hideInformationNotFound();
+        _this.checkResponse(type);
+      },
+      error: function() {
+        _this.hideLoading();
+        _this.showErrorOnServer();
+      }
+    });
+  },
+
+  checkResponse: function(type) {
+
+    if (type == null) {
+      type = "scroll";
+    }
+
+    switch (type) {
+      case 'update':
+        this.selectRowUUID = this.getUUIDbyFirstRecord();
+        this.colorActiveLine();
+      break;
+      case 'search':
+        this.selectRowUUID = this.getUUIDbyFirstRecord();
+        this.colorActiveLine();
+        this.updateChilds();
+      break;      
+    }
+
     if (this.data.length < 1) {
-      this.$el.find('tbody').html(jade.templates.nothing({
-        columns: window[this.sid].columns
-      }));
+      this.showInformationNotFound();
     }
 
   }

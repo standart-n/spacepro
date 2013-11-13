@@ -8,10 +8,12 @@ window.jade.templates = {};
 
 require('jquery');
 require('bootstrap');
+require('moment');
 
-require('line.tpl');
-require('nothing.tpl');
-require('loading.tpl');
+require('line_data.tpl');
+require('line_nothing.tpl');
+require('line_error.tpl');
+require('line_loading.tpl');
 
 Backbone =  require('backbone');
 App =       require('app');
@@ -47,6 +49,13 @@ $(function() {
   window.aid = function() {
     return Math.floor(Math.random() * Math.pow(10, 10));
   };
+
+  window.lang = $('html').attr('lang');
+
+  if (window.lang !== 'en') {
+    require("moment-" + window.lang);
+    moment.lang(window.lang);
+  }
 
   Backbone.emulateHTTP = true;
   Backbone.emulateJSON = true;
