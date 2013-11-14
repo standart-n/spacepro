@@ -119,7 +119,7 @@ module.exports = Backbone.View.extend({
       _this.$el.trigger('add.line', line.toJSON());
     });
 
-    if (this.sid == 'DEVICE_DATA') {
+    if (this.sid == 'WEB$DEVICE_DATA') {
       window.addDeviceValue = new AddDeviceValue({
         el:  this.el,
         sid: this.sid
