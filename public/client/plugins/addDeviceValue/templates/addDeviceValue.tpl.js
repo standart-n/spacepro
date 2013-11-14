@@ -13,7 +13,7 @@ Template = function(options) {
 
 Template.prototype.i18n = function() {
   this.lang = $('html').attr('lang') || window.lang || 'en';
-  this.locale_data = require(name + '.' + lang + '.po');
+  this.locale_data = require(this.name + '.' + this.lang + '.po');
 };
 
 Template.prototype.line = function(locals) {  
