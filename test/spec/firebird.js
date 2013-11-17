@@ -85,24 +85,24 @@ describe('Firebird with local connection:', function() {
       firebird.fbConnectionOpen(function() {      
         assert.equal(null,      firebird.get('fb_error'),         'fb_error');
         assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   firebird.get('fb_connection'),    'fb_connection');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection 1');
 
         firebird.fbTransactionStart(function() {      
           assert.equal(null,      firebird.get('fb_error'),        'fb_error');
           assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   firebird.get('fb_connection'),   'fb_connection');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection 2');
 
           firebird.fbTransactionCommit(function() {
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.notEqual(null, firebird.get('fb_connection'),   'fb_connection');
+            assert.equal(true,    firebird.fbIsConnectionReady(),  'fb_connection 3');
 
             firebird.fbConnectionClose();
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.equal(null,    firebird.get('fb_connection'),   'fb_connection');
+            assert.equal(false,   firebird.fbIsConnectionReady(),  'fb_connection 4');
 
             done();
           });
@@ -124,24 +124,24 @@ describe('Firebird with local connection:', function() {
       firebird.fbConnectionOpen(function() {      
         assert.equal(null,      firebird.get('fb_error'),         'fb_error');
         assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   firebird.get('fb_connection'),    'fb_connection');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection');
 
         firebird.fbTransactionStart(function() {      
           assert.equal(null,      firebird.get('fb_error'),        'fb_error');
           assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   firebird.get('fb_connection'),   'fb_connection');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection');
 
           firebird.fbTransactionRollback(function() {
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.notEqual(null, firebird.get('fb_connection'),   'fb_connection');
+            assert.equal(true,    firebird.fbIsConnectionReady(),  'fb_connection');
 
             firebird.fbConnectionClose();
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.equal(null,    firebird.get('fb_connection'),   'fb_connection');
+            assert.equal(false,   firebird.fbIsConnectionReady(),  'fb_connection');
 
             done();
           });
@@ -161,24 +161,24 @@ describe('Firebird with local connection:', function() {
       });
 
       firebird.fbConnectionOpen(function() {      
-        assert.equal(null,      firebird.get('fb_error'),         'fb_error');
-        assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   firebird.get('fb_connection'),    'fb_connection');
+        assert.equal(null,      firebird.get('fb_error'),         'fb_error 1');
+        assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction 1');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection 1');
 
         firebird.fbTransactionStart(function() {      
-          assert.equal(null,      firebird.get('fb_error'),        'fb_error');
-          assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   firebird.get('fb_connection'),   'fb_connection');
+          assert.equal(null,      firebird.get('fb_error'),        'fb_error 2');
+          assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction 2');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection 2');
 
           firebird.fbCheckError('Test error', function() {
 
-            assert.equal('Test error',    firebird.get('fb_error'),        'fb_error');
-            assert.equal(null,            firebird.get('fb_transaction'),  'fb_transaction');
-            assert.notEqual(null,         firebird.get('fb_connection'),   'fb_connection');
+            assert.equal('Test error',    firebird.get('fb_error'),        'fb_error 3');
+            assert.equal(null,            firebird.get('fb_transaction'),  'fb_transaction 3');
+            assert.equal(true,            firebird.fbIsConnectionReady(),  'fb_connection 3');
 
             firebird.fbConnectionClose();
 
-            assert.equal(null,            firebird.get('fb_connection'),   'fb_connection');
+            assert.equal(false,           firebird.fbIsConnectionReady(),  'fb_connection 4');
 
             done();
           });
@@ -200,18 +200,18 @@ describe('Firebird with local connection:', function() {
       firebird.fbConnectionOpen(function() {      
         assert.equal(null,      firebird.get('fb_error'),         'fb_error');
         assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   firebird.get('fb_connection'),    'fb_connection');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection');
 
         firebird.fbTransactionStart(function() {      
           assert.equal(null,      firebird.get('fb_error'),        'fb_error');
           assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   firebird.get('fb_connection'),   'fb_connection');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection');
 
           firebird.fbCommitAndCloseConnection(function() {
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.equal(null,    firebird.get('fb_connection'),   'fb_connection');
+            assert.equal(false,   firebird.fbIsConnectionReady(),  'fb_connection');
 
             done();
           });
@@ -236,24 +236,24 @@ describe('Firebird with global connection:', function() {
       firebird.fbConnectionOpen(function() {      
         assert.equal(null,      firebird.get('fb_error'),         'fb_error');
         assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   global.fb_connection,             'fb_connection');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection');
 
         firebird.fbTransactionStart(function() {      
           assert.equal(null,      firebird.get('fb_error'),        'fb_error');
           assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   global.fb_connection,            'fb_connection');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection');
 
           firebird.fbTransactionCommit(function() {
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.notEqual(null, global.fb_connection,            'fb_connection');
+            assert.equal(true,    firebird.fbIsConnectionReady(),  'fb_connection');
 
             firebird.fbConnectionClose();
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.equal(null,    global.fb_connection,            'fb_connection');
+            assert.equal(false,   firebird.fbIsConnectionReady(),  'fb_connection');
 
             done();
           });
@@ -273,24 +273,24 @@ describe('Firebird with global connection:', function() {
       firebird.fbConnectionOpen(function() {      
         assert.equal(null,      firebird.get('fb_error'),         'fb_error');
         assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   global.fb_connection,             'fb_connection');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection');
 
         firebird.fbTransactionStart(function() {      
           assert.equal(null,      firebird.get('fb_error'),        'fb_error');
           assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   global.fb_connection,            'fb_connection');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection');
 
           firebird.fbTransactionRollback(function() {
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.notEqual(null, global.fb_connection,            'fb_connection');
+            assert.equal(true,    firebird.fbIsConnectionReady(),  'fb_connection');
 
             firebird.fbConnectionClose();
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.equal(null,    global.fb_connection,            'fb_connection');
+            assert.equal(false,   firebird.fbIsConnectionReady(),  'fb_connection');
 
             done();
           });
@@ -308,24 +308,24 @@ describe('Firebird with global connection:', function() {
       firebird = new Firebird();
 
       firebird.fbConnectionOpen(function() {      
-        assert.equal(null,      firebird.get('fb_error'),         'fb_error');
-        assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   global.fb_connection,             'fb_connection');
+        assert.equal(null,      firebird.get('fb_error'),         'fb_error 1');
+        assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction 1');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection 1');
 
         firebird.fbTransactionStart(function() {      
-          assert.equal(null,      firebird.get('fb_error'),        'fb_error');
-          assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   global.fb_connection,            'fb_connection');
+          assert.equal(null,      firebird.get('fb_error'),        'fb_error 2');
+          assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction 2');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection 2');
 
           firebird.fbCheckError('Test error', function() {
 
-            assert.equal('Test error',    firebird.get('fb_error'),        'fb_error');
-            assert.equal(null,            firebird.get('fb_transaction'),  'fb_transaction');
-            assert.notEqual(null,         global.fb_connection,            'fb_connection');
+            assert.equal('Test error',    firebird.get('fb_error'),        'fb_error 3');
+            assert.equal(null,            firebird.get('fb_transaction'),  'fb_transaction 3');
+            assert.equal(true,            firebird.fbIsConnectionReady(),  'fb_connection 3');
 
             firebird.fbConnectionClose();
 
-            assert.equal(null,            global.fb_connection,            'fb_connection');
+            assert.equal(false,           firebird.fbIsConnectionReady(),  'fb_connection 4');
 
             done();
           });
@@ -345,18 +345,18 @@ describe('Firebird with global connection:', function() {
       firebird.fbConnectionOpen(function() {      
         assert.equal(null,      firebird.get('fb_error'),         'fb_error');
         assert.equal(null,      firebird.get('fb_transaction'),   'fb_transaction');
-        assert.notEqual(null,   global.fb_connection,             'fb_connection');
+        assert.equal(true,      firebird.fbIsConnectionReady(),   'fb_connection');
 
         firebird.fbTransactionStart(function() {      
           assert.equal(null,      firebird.get('fb_error'),        'fb_error');
           assert.notEqual(null,   firebird.get('fb_transaction'),  'fb_transaction');
-          assert.notEqual(null,   global.fb_connection,            'fb_connection');
+          assert.equal(true,      firebird.fbIsConnectionReady(),  'fb_connection');
 
           firebird.fbCommitAndCloseConnection(function() {
 
             assert.equal(null,    firebird.get('fb_error'),        'fb_error');
             assert.equal(null,    firebird.get('fb_transaction'),  'fb_transaction');
-            assert.equal(null,    global.fb_connection,            'fb_connection');
+            assert.equal(false,   firebird.fbIsConnectionReady(),  'fb_connection');
 
             done();
           });

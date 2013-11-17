@@ -81,9 +81,8 @@ describe('Auth:', function() {
         assert.equal(null,    auth.get('user_id'),        'user_id');
         assert.equal(null,    auth.get('name'),           'user_name');
         assert.equal(null,    auth.get('fb_transaction'), 'fb_transaction');
-        assert.equal(false,   auth.fbIsConnectionClose(), 'fb_connection');
+
         auth.fbConnectionClose();
-        assert.equal(true,    auth.fbIsConnectionClose(), 'fb_connection');
 
         done();
       });
@@ -107,9 +106,8 @@ describe('Auth:', function() {
         assert.notEqual(null, auth.get('user_id'),        'user_id');
         assert.notEqual(null, auth.get('user_name'),      'user_name');
         assert.equal(null,    auth.get('fb_transaction'), 'fb_transaction');
-        assert.equal(false,   auth.fbIsConnectionClose(), 'fb_connection');
+
         auth.fbConnectionClose();
-        assert.equal(true,    auth.fbIsConnectionClose(), 'fb_connection');
 
         done();
       });
@@ -134,9 +132,8 @@ describe('Auth:', function() {
         assert.notEqual(null, auth.get('user_id'),        'user_id');
         assert.notEqual(null, auth.get('user_name'),      'user_name');
         assert.equal(null,    auth.get('fb_transaction'), 'fb_transaction');
-        assert.equal(false,   auth.fbIsConnectionClose(), 'fb_connection');
+
         auth.fbConnectionClose();
-        assert.equal(true,    auth.fbIsConnectionClose(), 'fb_connection');
 
         done();
       });
@@ -144,7 +141,7 @@ describe('Auth:', function() {
     });
   });
 
-  describe('Signinorization successful:', function() {
+  describe('Authorization successful:', function() {
     it('Should login or force login', function(done) {
       var auth;
 
@@ -157,7 +154,6 @@ describe('Auth:', function() {
       auth.login(function() {
         
         assert.notEqual(null,     auth.get('session_success'), 'session_success');
-        assert.notEqual(null,     auth.get('fb_connection'),   'fb_connection');
         assert.equal(null,        auth.get('fb_transaction'),  'fb_transaction');
         assert.notEqual(null,     auth.get('user_id'),         'user_id');
         assert.notEqual(null,     auth.get('user_name'),       'user_name');
@@ -237,7 +233,8 @@ describe('Auth:', function() {
         assert.equal(null,                auth.get('error'),            'error');
         assert.equal('success',           auth.get('result'),           'result');
         assert.equal(null,                auth.get('fb_transaction'),   'fb_transaction');
-        assert.equal(true,                auth.fbIsConnectionClose(),   'fb_connection');
+
+        auth.fbConnectionClose();
 
         done();
       });
