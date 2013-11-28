@@ -7,6 +7,19 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     recess: {
+      default: {
+        options: {
+          compress: true
+        },
+        files: {
+          './public/themes/default/css/index.<%= pkg.version %>.css': [
+            './public/themes/default/less/index.less'
+          ]
+          './public/themes/default/css/signin.<%= pkg.version %>.css': [
+            './public/themes/default/less/signin.less'
+          ]
+        }
+      },
       style: {
         options: {
           compress: true
@@ -24,7 +37,7 @@ module.exports = function(grunt) {
     },
 
     clean: {
-      build: ['public/js/', 'public/css/'],
+      build: ['public/js/'],
       i18n: ['public/i18n']
     },
 
@@ -140,7 +153,7 @@ module.exports = function(grunt) {
   grunt.registerTask('all',      ['default']);
   grunt.registerTask('test',     ['jshint:test', 'mochaTest']);
   grunt.registerTask('i18n',     ['clean:i18n', 'po2json']);
-  grunt.registerTask('client',   ['jshint:client', 'recess:style', 'jade:client', 'lmd']);
+  grunt.registerTask('client',   ['jshint:client', 'jade:client', 'lmd']);
   grunt.registerTask('server',   ['jshint:server']);
 
 };
