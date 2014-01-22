@@ -14,7 +14,7 @@ module.exports = Backbone.View.extend({
     var _this = this;
 
     this.$worksheet =  this.$el.find('tbody');
-    
+
     this.sid =         this.options.sid         || '';    
     this.targetField = this.options.targetField || 'account_data';
     this.uuid = '';
@@ -22,7 +22,6 @@ module.exports = Backbone.View.extend({
     this.template = new Template();
 
     this.checkLines();
-
 
     this.$el.on('add.line', function(e, line) {
       var $el, $line;      

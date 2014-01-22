@@ -12,10 +12,10 @@ module.exports = function(grunt) {
           compress: true
         },
         files: {
-          './public/themes/default/css/index.<%= pkg.version %>.css': [
+          "./public/themes/default/css/index.<%= pkg.version %>.css": [
             './public/themes/default/less/index.less'
-          ]
-          './public/themes/default/css/signin.<%= pkg.version %>.css': [
+          ],
+          "./public/themes/default/css/signin.<%= pkg.version %>.css": [
             './public/themes/default/less/signin.less'
           ]
         }
@@ -38,7 +38,9 @@ module.exports = function(grunt) {
 
     clean: {
       build: ['public/js/'],
-      i18n: ['public/i18n']
+      i18n: ['public/i18n'],
+      themeDefault: ['./public/themes/default/css/*.css'],
+      themeSimpliq: ['./public/themes/simpliq/css/*.css']
     },
 
     lmd: {
@@ -155,5 +157,7 @@ module.exports = function(grunt) {
   grunt.registerTask('i18n',     ['clean:i18n', 'po2json']);
   grunt.registerTask('client',   ['jshint:client', 'jade:client', 'lmd']);
   grunt.registerTask('server',   ['jshint:server']);
+
+  grunt.registerTask('themeDefault', ['clean:themeDefault', 'recess:default']);
 
 };

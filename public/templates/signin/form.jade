@@ -7,15 +7,15 @@
     .col-md-4.col-md-offset-4.col-xs-12
 
 
-      form.signin-form(data-type = "form")
+      form.signin-form(data-signin = "form")
         h2.signin-form-headin #{gettext('Signin')}
 
-        .alert.alert-danger.hide(data-type = "error")
+        .alert.alert-danger.hide(data-signin = "error")
 
-        input.form-control.input-lg.signin-form-login(data-type = "login", type = "text", placeholder = "#{gettext('Login')}")
+        input.form-control.input-lg.signin-form-login(data-signin = "login", type = "text", placeholder = "#{gettext('Login')}")
 
-        input.form-control.input-lg.signin-form-password(data-type = "password",type = "password", placeholder = "#{gettext('Password')}")
+        input.form-control.input-lg.signin-form-password(data-signin = "password",type = "password", placeholder = "#{gettext('Password')}")
 
-        button.btn.btn-primary.btn-lg.btn-block.signin-form-submit(data-type = "submit", type = "submit", data-loading-text = "#{gettext('Loading')}...") #{gettext('Enter')}
+        button.btn.btn-primary.btn-lg.btn-block.signin-form-submit(data-signin = "submit", type = "submit", data-loading-text = "#{gettext('Loading')}...") #{gettext('Enter')}
 
 

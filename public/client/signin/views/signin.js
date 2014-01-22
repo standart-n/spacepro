@@ -6,18 +6,18 @@ module.exports = Backbone.View.extend({
   el: "[data-view=\"signin\"]",
 
   events: {
-    "submit [data-type=\"form\"]": 'submit'
+    "submit [data-signin=\"form\"]": 'submit'
   },
 
   initialize: function() {
     var _this = this;
 
     this.model = window.user;
-    this.$form =        this.$el.find("[data-type=\"form\"]");
-    this.$login =       this.$form.find("[data-type=\"login\"]");
-    this.$password =    this.$form.find("[data-type=\"password\"]");
-    this.$button =      this.$form.find("[data-type=\"submit\"]");
-    this.$alertError =  this.$el.find("[data-type=\"error\"]");
+    this.$form =        this.$el.find("[data-signin=\"form\"]");
+    this.$login =       this.$form.find("[data-signin=\"login\"]");
+    this.$password =    this.$form.find("[data-signin=\"password\"]");
+    this.$button =      this.$form.find("[data-signin=\"submit\"]");
+    this.$alertError =  this.$el.find("[data-signin=\"error\"]");
     this.$login.focus();
 
     this.on('force', function() {

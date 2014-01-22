@@ -1,13 +1,13 @@
 
 
-.modal.fade.signin-resolve(data-type = "modal", role = "dialog", tabindex = "-1")
+.modal.fade.signin-resolve(data-signin = "modal", role = "dialog", tabindex = "-1")
   .modal-dialog
     .modal-content
       .modal-header
-        button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;     
+        button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;
         h4.modal-title #{gettext('Attention')}!
 
-      .modal-body(data-type = "modal-body")
+      .modal-body(data-signin = "modal-body")
         p 
           | #{gettext('Dear user')}, #{name}!<br>
           | #{gettext('Your session is opened on another workstation')}:<br> 
@@ -18,5 +18,5 @@
           strong #{gettext('Do you want to close the previous session and log in')}?
 
       .modal-footer
-        button.btn.btn-primary(type = "button", data-type = "force", data-dismiss = "modal") #{gettext('Yes')}
+        button.btn.btn-primary(type = "button", data-signin = "force", data-dismiss = "modal") #{gettext('Yes')}
         button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel')}

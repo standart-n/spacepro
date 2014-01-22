@@ -195,7 +195,7 @@ module.exports = Backbone.View.extend({
   },
 
   hideInformationNotFound: function() {
-    this.$worksheet.find("[data-type=\"nothing\"]").remove();
+    this.$worksheet.find("[data-dict=\"nothing\"]").remove();
   },
 
   showErrorOnServer: function() {
@@ -205,7 +205,7 @@ module.exports = Backbone.View.extend({
   },
 
   hideErrorOnServer: function() {
-    this.$worksheet.find("[data-type=\"error\"]").remove();
+    this.$worksheet.find("[data-dict=\"error\"]").remove();
   },
 
   showLoading: function(type) {
@@ -214,7 +214,7 @@ module.exports = Backbone.View.extend({
       type = 'before';
     }
 
-    if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
+    if (!this.$worksheet.find("[data-dict=\"loading\"]").length) {
       switch (type) {
         case 'replace':
           this.$worksheet.html(jade.templates.line_loading({
@@ -237,7 +237,7 @@ module.exports = Backbone.View.extend({
   },
 
   hideLoading: function() {
-    this.$worksheet.find("[data-type=\"loading\"]").remove();
+    this.$worksheet.find("[data-dict=\"loading\"]").remove();
   },
 
   sendRequest: function(type) {
