@@ -14,8 +14,8 @@ module.exports = function(grunt) {
         files: [
           {
             expand:  true,
-            cwd:     './public/style/',
-            src:     './**/_*.less',
+            cwd:     './public/style/main',
+            src:     './*.less',
             dest:    './public/css/',
             ext:     ".<%= pkg.version %>.css"
           }
