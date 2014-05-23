@@ -19,6 +19,7 @@ node_modules
 /public/css
 /public/js
 /public/i18n
+/public/themes
 
 /grids
 

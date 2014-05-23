@@ -15,17 +15,17 @@ a#main-menu-toggle {
 
 #sidebar-left {
 	background: @darkGrey;
-	padding: 10px;
+	padding: 10px !important;
 	
-	.actions {
-		
-		.search {
-			background: darken(@darkGrey, 5%);
-			color: white;
-			border: none;
-			.border-radius;
-		}
-		
+	.search {
+		background: darken(@darkGrey, 5%);
+		color: white;
+		border: none;
+		.border-radius;
+		width: 100%;
+		padding: 5px 10px;
+		margin-bottom: 10px;
+		border: none;
 	}
 	
 	.label {
@@ -39,16 +39,21 @@ a#main-menu-toggle {
 }
 
 .sidebar-nav > ul {
-	margin: 0px -10px;
+	margin: 0px -25px;
 	border: none;
 	padding-bottom: 1px;
 	font-size: 14px;
+	white-space:nowrap;
 }
 
 .sidebar-nav > ul > li > ul {
 	list-style: none;
 	display: none;
 	margin: 0px 0px;
+}
+
+.nav-tabs.nav-stacked > li > a {
+	margin: 0px;
 }
 
 .nav-tabs.nav-stacked > li > a,
@@ -63,13 +68,17 @@ a#main-menu-toggle {
 }
 
 .nav-tabs.nav-stacked > li > ul > li > a {
-	padding: 10px 20px;	
+	padding: 10px 20px;
+	margin-left: -40px;	
 }
 
 
 .nav-tabs.nav-stacked > li > a > i,
 .nav-tabs.nav-stacked > li > ul > li > a > i {
 	margin-right: 10px;
+	width: 20px;
+	display: inline-block;
+	text-align: center;
 }
 
 .nav-tabs.nav-stacked > li > a:hover {

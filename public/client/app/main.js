@@ -7,6 +7,7 @@ window.jade = require('jade');
 window.jade.templates = {};
 
 require('jquery');
+// require('jquery-ui');
 require('bootstrap');
 require('moment');
 

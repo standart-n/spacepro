@@ -14,14 +14,13 @@
               tr(data-uuid = "#{line.d$uuid}")
                 - each column in parentDict.columns
                   td(data-col-field = "#{column.Field}")
-                    //- - if ((line[column.Field] != null) && (line[column.Field] !== ''))
-                    //-   - if (parentDict.fields[column.Field].mtype == 'timestamp')
-                    //-     span #{moment(line[column.Field]).format('DD.MM.YYYY')}
-                    //-     &nbsp;
-                    //-     small #{moment(line[column.Field]).format('HH:mm')}
-                    //-   - else
-                    //-     span #{line[column.Field]}
-                    span.label.label-success active
+                    - if ((line[column.Field] != null) && (line[column.Field] !== ''))
+                      - if (parentDict.fields[column.Field].mtype == 'timestamp')
+                        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+                        &nbsp;
+                        small #{moment(line[column.Field]).format('HH:mm')}
+                      - else
+                        span #{line[column.Field]}
 
 
 

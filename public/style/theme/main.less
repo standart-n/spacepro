@@ -8,12 +8,18 @@
 	margin-left: 0px !important;
 }
 
+.noPadding {
+	padding: 0px !important;
+}
+
 body {
-	background: @bodyBackground;
+	background: @darkGrey;
 	color: @darkGrey;
 	border: none;
 	font-family: 'Lato', sans-serif;
 	font-weight: 400;
+	margin: 0;
+	padding: 0;
 }
 
 a {
@@ -31,6 +37,7 @@ h6 { font-size: 12px; line-height: 12px; }
 	min-height: 100%;
 	padding: 20px 20px;
 	position: relative;
+	background: @bodyBackground;
 	
 	&.full {
 		width: 100% !important;
@@ -48,14 +55,18 @@ h6 { font-size: 12px; line-height: 12px; }
 .box {
 	.border-radius(2px);
 	.box-shadow(0px 1px 0px 1px lighten(@grey, 10%));
-	overflow: hidden;
-	margin: 0px 0px 28px 0px;
+	margin: 0px 0px 30px 0px;
+	
+	&.noOverflow {
+		overflow: hidden;
+	}
 	
 	.box-header {
 		background: @mainColor;
 		color: white;
 		font-size: 16px;
 		overflow: hidden;
+		.border-radius(2px 2px 0 0);
 
 		h2 {
 			float:left;
@@ -108,7 +119,8 @@ h6 { font-size: 12px; line-height: 12px; }
 	
 	.box-content {
 		padding: 10px;
-		background: white;	
+		background: white;
+		.border-radius(0 0 2px 2px);	
 	}
 	
 }

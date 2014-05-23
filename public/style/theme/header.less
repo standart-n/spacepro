@@ -1,17 +1,11 @@
 /* Header Section
 =================================================================== */
 .navbar {
-	margin-bottom: 0px;
-}
-
-.navbar-inner {
-	margin-bottom: 0px;
-  	min-height: 40px;
-  	padding: 0px 20px;
-	background: @mainColor;
+	margin: 0;
+	min-height: 40px;
 	border: none;
-	color: #fff;
-  	.border-radius;
+	background: @mainColor;
+	.border-radius;
 	
 	a {
 		color: #7b7b7b;
@@ -27,14 +21,13 @@
 		}
 		
 	}
-	
 }
 
-a.brand {
+a.navbar-brand {
 	background: darken(@mainColor, 10%);
 	text-align: center;
 	border-bottom: 1px solid darken(@mainColor, 10%);
-	padding: 10px 0px !important;
+	padding: 9px 0 10px 0 !important;
 	
 	span {
 		font-family: 'Kaushan Script', cursive;
@@ -45,6 +38,10 @@ a.brand {
 	&.noBg {
 		background: @mainColor;
 		border-bottom: none;
+	}
+	
+	&:hover {
+		background: darken(@mainColor, 10%);
 	}
 }
 
@@ -63,27 +60,19 @@ a.brand {
 	  	.border-radius;
 	  	.box-shadow;
 	
-		.caret {
-			border-top-color: #fff !important;
-			border-bottom-color: #fff !important;
-		}
-		
-		&:hover {
-			
-			.caret {
-				border-top-color: #fff !important;
-				border-bottom-color: #fff !important;
-			}
-		}
 	}
 	
 	a.btn  {
 		color: #fff !important;
 		text-shadow: none !important;
-		padding: 8px 15px 12px 15px !important;
+		padding: 8px 15px 11px 15px !important;
 		
 		&.account {
-			padding: 7px 10px 5px 0px !important;
+			padding: 6px 10px 5px 0px !important;
+		}
+		
+		&:hover {
+			background: darken(@mainColor, 10%);
 		}
 	}
 	
@@ -143,7 +132,7 @@ a.brand {
   	z-index: 1000;
   	display: none;
   	float: left;
-  	min-width: 160px;
+  	min-width: 166px;
 	max-width: 300px;
   	padding: 0px;
   	margin: 0;
@@ -259,7 +248,7 @@ ul.notifications li .icon {
 	margin: -5px 10px -5px -10px !important;
 	padding: 7px 10px 9px 10px;
 	color: white;
-	width: 16px;
+	width: 40px;
 	display: inline-block;
 	text-align: center;
 	
