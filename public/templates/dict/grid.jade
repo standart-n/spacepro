@@ -1,49 +1,56 @@
 
-#main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}", data-dict-child = "#{childDict.sid}")
-  .container
-    .row
-      .col-md-12
-        table.table.table-condensed.table-hover.dict.bootstrap-datatable.datatable
-          thead
-            tr
+
+#content.col-lg-10.col-sm-11
+
+  .row
+
+    #main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}", data-dict-child = "#{childDict.sid}")
+      //- .container
+      //-   .row
+      //-     .col-md-12
+
+      table.table.table-condensed.table-striped.table-hover.dict
+        thead
+          tr
+            - each column in parentDict.columns
+              th 
+                small #{column.Caption}
+
+        tbody
+          - each line, index in parentDict.data
+            tr(data-uuid = "#{line.d$uuid}")
               - each column in parentDict.columns
-                th #{column.Caption}
-
-          tbody
-            - each line, index in parentDict.data
-              tr(data-uuid = "#{line.d$uuid}")
-                - each column in parentDict.columns
-                  td(data-col-field = "#{column.Field}")
-                    - if ((line[column.Field] != null) && (line[column.Field] !== ''))
-                      - if (parentDict.fields[column.Field].mtype == 'timestamp')
-                        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
-                        &nbsp;
-                        small #{moment(line[column.Field]).format('HH:mm')}
-                      - else
-                        span #{line[column.Field]}
+                td(data-col-field = "#{column.Field}")
+                  - if ((line[column.Field] != null) && (line[column.Field] !== ''))
+                    - if (parentDict.fields[column.Field].mtype == 'timestamp')
+                      span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+                      &nbsp;
+                      small #{moment(line[column.Field]).format('HH:mm')}
+                    - else
+                      span #{line[column.Field]}
 
 
 
 
-#bottom(data-view = "dict", data-dict-type = "child", data-dict-sid = "#{childDict.sid}")
-  .container
-    .row
-      .col-md-12
-        table.table.table-condensed.table-hover.dict
-          thead
-            tr
+    #bottom(data-view = "dict", data-dict-type = "child", data-dict-sid = "#{childDict.sid}")
+      //- .container
+      //-   .row
+      //-     .col-md-12
+      table.table.table-condensed.table-striped.table-hover.dict
+        thead
+          tr
+            - each column in childDict.columns
+              th #{column.Caption}
+
+        tbody
+          - each line, index in childDict.data
+            tr(data-uuid = "#{line.d$uuid}")
               - each column in childDict.columns
-                th #{column.Caption}
-
-          tbody
-            - each line, index in childDict.data
-              tr(data-uuid = "#{line.d$uuid}")
-                - each column in childDict.columns
-                  td(data-col-field = "#{column.Field}")
-                    - if ((line[column.Field] != null) && (line[column.Field] !== ''))
-                      - if (childDict.fields[column.Field].mtype == 'timestamp')
-                        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
-                        &nbsp;
-                        small #{moment(line[column.Field]).format('HH:mm')}
-                      - else
-                        span #{line[column.Field]}
+                td(data-col-field = "#{column.Field}")
+                  - if ((line[column.Field] != null) && (line[column.Field] !== ''))
+                    - if (childDict.fields[column.Field].mtype == 'timestamp')
+                      span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+                      &nbsp;
+                      small #{moment(line[column.Field]).format('HH:mm')}
+                    - else
+                      span #{line[column.Field]}

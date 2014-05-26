@@ -4,9 +4,13 @@ html(lang = "#{lang}", lang_dir = "#{lang_dir}")
     include ../includes/head
 
   body
-    #bar
-      include ../index/navbar
+    include ../index/navbar
 
-    include ../dict/grid
+    .container
+      .row
+
+        include ../index/sidebar
+
+        include ../dict/grid
 
     include ../includes/js
