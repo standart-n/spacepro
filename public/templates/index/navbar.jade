@@ -11,12 +11,19 @@ header.navbar
       i.fa.fa-bars
 
     a.navbar-brand.col-lg-2.col-sm-1.col-xs-12(href = "/")
+      i.fa.fa-rocket.fa-lg.fa-inverse
+      &nbsp;
       span SpacePro
 
 
     .header-nav.nav-no-collapse
       ul.nav.pull-right
-        li.dropdown 213131
+        li
+          a.btn(href = "#auth/logout")
+            i.glyphicon.glyphicon-icon.log_out
+            &nbsp;
+            span 
+              small #{gettext('Logout')}
 
 
 

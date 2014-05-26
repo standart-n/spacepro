@@ -13,8 +13,7 @@
         thead
           tr
             - each column in parentDict.columns
-              th 
-                small #{column.Caption}
+              th #{column.Caption}
 
         tbody
           - each line, index in parentDict.data

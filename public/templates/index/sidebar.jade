@@ -3,9 +3,13 @@
   .sidebar-nav.nav-collapse.collapse.navbar-collapse.bs-navbar-collapse
     ul.nav.nav-tabs.nav-stacked.main-menu
 
-      li.active
-        a(href = "#") Dashboard
-
-      li
-        a(href = "#") Settings
+      - each dict in webDicts.dicts
+        - if (dict.sid == webDicts.active.sid)
+          li.active
+            a(href = "#") 
+              small #{dict.caption}
+        - else
+          li
+            a(href = "#")
+              small #{dict.caption}
 

@@ -14,7 +14,7 @@ module.exports = Backbone.View.extend({
 
     this.$el.on('transform', function() {    
       
-      var left = _this.$el.offset().left + 10;
+      var left = _this.$el.offset().left + 5;
 
       _this.$main.css({
         left: left
