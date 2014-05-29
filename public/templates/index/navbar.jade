@@ -11,19 +11,31 @@ header.navbar
       i.fa.fa-bars
 
     a.navbar-brand.col-lg-2.col-sm-1.col-xs-12(href = "/")
-      i.fa.fa-rocket.fa-lg.fa-inverse
-      &nbsp;
+      i.fa.fa-rocket.fa-lg.fa-inverse.fa-fw
       span SpacePro
 
 
     .header-nav.nav-no-collapse
-      ul.nav.pull-right
+
+      //- ul.nav.navbar-nav.col-sm-offset-6
+
+
+      ul.nav.navbar-nav.pull-right
+        //- li
+        //-   a.btn(href = "#settings")
+        //-     i.fa.fa-cog.fa-fw
+        //-     &nbsp;
+        //-     small Настройки
         li
           a.btn(href = "#auth/logout")
-            i.glyphicon.glyphicon-icon.log_out
+            i.fa.fa-power-off.fa-fw
             &nbsp;
-            span 
-              small #{gettext('Logout')}
+            small #{gettext('Logout')}
+
+      //- ul.nav.navbar-nav.pull-right.col-lg-9
+      //-   li.col-sm-3
+      //-     .controls
+      //-       input.search.input-xs.form-control(type = "text", placeholder = "...", style = "margin-top: 3px;")
 
 
 
