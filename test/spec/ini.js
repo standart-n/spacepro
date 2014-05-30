@@ -64,9 +64,9 @@ describe('Ini:', function() {
                 "\r\n",
 
         json = {
-            "cfSelect": {
+            "cfselect": {
               "selectfieldexpression": "SELECTCAPTION",
-              "AllwaysPartial": "1"
+              "allwayspartial": "1"
             },
             "form_show": {
               "position": "0",
@@ -88,9 +88,9 @@ describe('Ini:', function() {
                 "\r\n",
 
         json = {
-            "cfSelect": {
+            "cfselect": {
               "selectfieldexpression": "SELECTCAPTION",
-              "AllwaysPartial": "1"
+              "allwayspartial": "1"
             },
             "selectsql": "select * from VW_DEVICE where status=0 order by street, sortedcaptionb, sortedcaptiona,d$uuid"
         };
@@ -121,9 +121,9 @@ describe('Ini:', function() {
                 "\r\n",
 
         json = {
-            "cfSelect": {
+            "cfselect": {
               "select": "field=expression=SELECTCAPTION",
-              "Allways": "Partial=1"
+              "allways": "Partial=1"
             }
         };
 

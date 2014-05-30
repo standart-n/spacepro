@@ -27,20 +27,20 @@
           thead
             tr
               - each column in parentDict.columns
-                th(class = "#{column.HiddenClass}") #{column.Caption}
+                th(class = "#{column.hidden_class}") #{column.caption}
 
           tbody
             - each line, index in parentDict.data
               tr(data-uuid = "#{line.d$uuid}")
                 - each column in parentDict.columns
-                  td(class = "#{column.HiddenClass}", data-col-field = "#{column.Field}")
-                    - if ((line[column.Field] != null) && (line[column.Field] !== ''))
-                      - if (parentDict.fields[column.Field].mtype == 'timestamp')
-                        span #{moment(line[column.Field]).format('DD.MM.YYYY')}
+                  td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")
+                    - if ((line[column.field] != null) && (line[column.field] !== ''))
+                      - if (parentDict.fields[column.field].mtype == 'timestamp')
+                        span #{moment(line[column.field]).format('DD.MM.YYYY')}
                         &nbsp;
-                        small #{moment(line[column.Field]).format('HH:mm')}
+                        small #{moment(line[column.field]).format('HH:mm')}
                       - else
-                        span #{line[column.Field]}
+                        span #{line[column.field]}
                     //- - else
                     //-   span none
 
