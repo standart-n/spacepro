@@ -7,9 +7,19 @@
         - if (dict.sid == webDicts.active.sid)
           li.active
             a(href = "#") 
+              - if (dict.settings.main.fa_icon !== undefined) {
+                i(class = "fa #{dict.settings.main.fa_icon}")
+              - } else {
+                i.fa.fa-power-off
+              - }
               small #{dict.caption}
         - else
           li
             a(href = "#")
+              - if (dict.settings.main.fa_icon !== undefined) {
+                i(class = "fa #{dict.settings.main.fa_icon}")
+              - } else {
+                i.fa.fa-table
+              - }
               small #{dict.caption}
 
