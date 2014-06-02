@@ -3,16 +3,27 @@
 #content.col-sm-11.col-lg-10
 
   .row
+    .col-md-12
+      ul.nav.nav-pills
+        li.active
+          a(href = "#") 
+            i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
+            span.hidden-xs #{parentDict.caption}
+        - each child in parentDict.childsInfo
+          - if (child.wdict !== undefined) {
+            li
+              a(href = "#") 
+                i(class = "fa fa-fw fa-lg #{child.fa_icon}")
+                span.hidden-xs #{child.caption}
+          - }
 
+  br
+  .row
     .col-md-12
       form.form-inline
         .form-group.col-xs-12.col-md-6.col-lg-4
           input.form-control(type = "search", placeholder = "search")
         a.btn(href = "#") button
-
-    //- #main
-
-    //- #bottom
 
   .row
 
@@ -30,18 +41,3 @@
                 th(class = "#{column.hidden_class}") #{column.caption}
 
           tbody
-            //- - each line, index in parentDict.data
-            //-   tr(data-uuid = "#{line.d$uuid}")
-            //-     - each column in parentDict.columns
-            //-       td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")
-            //-         - if ((line[column.field] != null) && (line[column.field] !== ''))
-            //-           - if (parentDict.fields[column.field].mtype == 'timestamp')
-            //-             span #{moment(line[column.field]).format('DD.MM.YYYY')}
-            //-             &nbsp;
-            //-             small #{moment(line[column.field]).format('HH:mm')}
-            //-           - else
-            //-             span #{line[column.field]}
-            //-         //- - else
-            //-         //-   span none
-
-
