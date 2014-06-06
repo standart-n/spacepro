@@ -8,13 +8,13 @@
         li.active
           a(href = "#") 
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
-            span.hidden-xs #{parentDict.caption}
+            span.hidden-xs.hidden-sm #{parentDict.caption}
         - each child in parentDict.childsInfo
           - if (child.wdict !== undefined) {
             li
               a(href = "#") 
                 i(class = "fa fa-fw fa-lg #{child.fa_icon}")
-                span.hidden-xs #{child.caption}
+                span.hidden-xs.hidden-sm #{child.caption}
           - }
 
   br

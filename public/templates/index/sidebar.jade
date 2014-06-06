@@ -6,20 +6,22 @@
       - each dict in webDicts.dicts
         - if (dict.sid == webDicts.active.sid)
           li.active
-            a(href = "#") 
-              - if (dict.settings.main.fa_icon !== undefined) {
-                i(class = "fa #{dict.settings.main.fa_icon}")
-              - } else {
-                i.fa.fa-power-off
-              - }
-              small #{dict.caption}
+            a(href = "#")
+              .visible-sm
+                - if (dict.settings.main.fa_icon !== undefined) {
+                  i(class = "fa #{dict.settings.main.fa_icon}")
+                - } else {
+                  i.fa.fa-power-off
+                - }
+              small.hidden-sm #{dict.caption}
         - else
           li
             a(href = "#")
-              - if (dict.settings.main.fa_icon !== undefined) {
-                i(class = "fa #{dict.settings.main.fa_icon}")
-              - } else {
-                i.fa.fa-table
-              - }
-              small #{dict.caption}
+              .visible-sm
+                - if (dict.settings.main.fa_icon !== undefined) {
+                  i(class = "fa #{dict.settings.main.fa_icon}")
+                - } else {
+                  i.fa.fa-table
+                - }
+              small.hidden-sm #{dict.caption}
 
