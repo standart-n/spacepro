@@ -6,38 +6,44 @@
     .col-md-12
       ul.nav.nav-pills
         li.active
-          a(href = "#") 
+          a(href = "#dddd", data-toggle = "tab") 
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
             span.hidden-xs.hidden-sm #{parentDict.caption}
         - each child in parentDict.childsInfo
           - if (child.wdict !== undefined) {
             li
-              a(href = "#") 
+              a(href = "##{child.wdict}", data-toggle = "tab") 
                 i(class = "fa fa-fw fa-lg #{child.fa_icon}")
                 span.hidden-xs.hidden-sm #{child.caption}
           - }
 
-  br
-  .row
-    .col-md-12
-      form.form-inline
-        .form-group.col-xs-12.col-md-6.col-lg-4
-          input.form-control(type = "search", placeholder = "search")
-        a.btn(href = "#") button
+      .tab-content
+        .tab-pane.active(id = "dddd")
 
-  .row
+          br
+          .row
+            .col-md-12
+              form.form-inline
+                .form-group.col-xs-12.col-md-6.col-lg-4
+                  input.form-control(type = "search", placeholder = "search")
+                a.btn(href = "#") button
 
-    .col-md-12
+          .row
 
-      #main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
-        //- .container
-        //-   .row
-        //-     .col-md-12
+            .col-md-12
 
-        table.table.table-condensed.table-striped.table-hover.dict
-          thead
-            tr
-              - each column in parentDict.columns
-                th(class = "#{column.hidden_class}") #{column.caption}
+              #main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
 
-          tbody
+                table.table.table-condensed.table-striped.table-hover.dict
+                  thead
+                    tr
+                      - each column in parentDict.columns
+                        th(class = "#{column.hidden_class}") #{column.caption}
+
+                  tbody
+
+        - each child in parentDict.childsInfo
+          - if (child.wdict !== undefined) {
+            .tab-pane(id = "#{child.wdict}")
+              span daksdsakl
+          - }

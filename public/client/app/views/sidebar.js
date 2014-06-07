@@ -10,20 +10,19 @@ module.exports = Backbone.View.extend({
     var _this = this,
       $content = $('#content'),
       $sidebar = $('#sidebar-left'),
-      $bottom = $('#bottom'),
       $brand = $('.navbar-brand');
 
-    $sidebar.on('transform', function() {
-      $sidebar.css({
-        height: $bottom.offset().top + $bottom.height() - $sidebar.offset().top
-      });
-    });
+    // $sidebar.on('transform', function() {
+    //   $sidebar.css({
+    //     height: $bottom.offset().top + $bottom.height() - $sidebar.offset().top
+    //   });
+    // });
 
-    $(window).on('resize', function() {
-      $sidebar.trigger('transform');
-    });
+    // $(window).on('resize', function() {
+    //   $sidebar.trigger('transform');
+    // });
 
-    $sidebar.trigger('transform');
+    // $sidebar.trigger('transform');
 
     this.$el.on('click', function() {
 
