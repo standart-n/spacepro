@@ -92,6 +92,10 @@ module.exports = Backbone.View.extend({
       }
     });
 
+    setTimeout(function() {
+      _this.sendRequest('scroll');
+    }, 1000);
+
     this.$el.on('mouseover', function() {
       $(this).css({
         'cursor': 'pointer'

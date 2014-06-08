@@ -1,5 +1,4 @@
 
-
 #content.col-sm-11.col-lg-10
 
   .row
@@ -8,13 +7,13 @@
         li.active
           a(href = "#dddd", data-toggle = "tab") 
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
-            span.hidden-xs.hidden-sm #{parentDict.caption}
-        - each child in parentDict.childsInfo
-          - if (child.wdict !== undefined) {
+            span.hidden-xs.hidden-sm #{parentDict.showcaption}
+        - each child in parentDict.childs
+          - if (child.sid !== undefined) {
             li
-              a(href = "##{child.wdict}", data-toggle = "tab") 
-                i(class = "fa fa-fw fa-lg #{child.fa_icon}")
-                span.hidden-xs.hidden-sm #{child.caption}
+              a(href = "##{child.sid}", data-toggle = "tab") 
+                i(class = "fa fa-fw fa-lg #{child.faIcon}")
+                span.hidden-xs.hidden-sm #{child.showcaption}
           - }
 
       .tab-content
@@ -42,8 +41,28 @@
 
                   tbody
 
-        - each child in parentDict.childsInfo
-          - if (child.wdict !== undefined) {
-            .tab-pane(id = "#{child.wdict}")
-              span daksdsakl
+        - each child in parentDict.childs
+          - if (child.sid !== undefined) {
+            .tab-pane(id = "#{child.sid}")
+              br
+              .row
+                .col-md-12
+                  form.form-inline
+                    .form-group.col-xs-12.col-md-6.col-lg-4
+                      input.form-control(type = "search", placeholder = "search")
+                    a.btn(href = "#") button
+
+              .row
+
+                .col-md-12
+
+                  div(data-view = "dict", data-dict-type = "childs", data-dict-sid = "#{child.sid}")
+
+                    table.table.table-condensed.table-striped.table-hover.dict
+                      thead
+                        tr
+                          - each column in child.columns
+                            th(class = "#{column.hidden_class}") #{column.caption}
+
+                      tbody
           - }
