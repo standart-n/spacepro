@@ -93,8 +93,10 @@ module.exports = Backbone.View.extend({
     });
 
     setTimeout(function() {
-      _this.sendRequest('scroll');
-    }, 1000);
+      if (_this.type === 'parent') {
+        _this.sendRequest('update');
+      }
+    }, 1);
 
     this.$el.on('mouseover', function() {
       $(this).css({
@@ -123,12 +125,12 @@ module.exports = Backbone.View.extend({
       _this.$el.trigger('add.line', line.toJSON());
     });
 
-    if (this.sid == 'WEB$DEVICE_DATA') {
-      window.addDeviceValue = new AddDeviceValue({
-        el:  this.el,
-        sid: this.sid
-      });
-    }    
+    // if (this.sid == 'WEB$DEVICE_DATA') {
+    //   window.addDeviceValue = new AddDeviceValue({
+    //     el:  this.el,
+    //     sid: this.sid
+    //   });
+    // }    
 
   },
 

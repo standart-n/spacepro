@@ -9,12 +9,10 @@
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
             span.hidden-xs.hidden-sm #{parentDict.showcaption}
         - each child in parentDict.childs
-          - if (child.sid !== undefined) {
-            li
-              a(href = "##{child.sid}", data-toggle = "tab") 
-                i(class = "fa fa-fw fa-lg #{child.faIcon}")
-                span.hidden-xs.hidden-sm #{child.showcaption}
-          - }
+          li
+            a(href = "##{child.sid}", data-toggle = "tab") 
+              i(class = "fa fa-fw fa-lg #{child.faIcon}")
+              span.hidden-xs.hidden-sm #{child.showcaption}
 
       .tab-content
         .tab-pane.active(id = "dddd")
@@ -42,27 +40,25 @@
                   tbody
 
         - each child in parentDict.childs
-          - if (child.sid !== undefined) {
-            .tab-pane(id = "#{child.sid}")
-              br
-              .row
-                .col-md-12
-                  form.form-inline
-                    .form-group.col-xs-12.col-md-6.col-lg-4
-                      input.form-control(type = "search", placeholder = "search")
-                    a.btn(href = "#") button
+          .tab-pane(id = "#{child.sid}")
+            br
+            .row
+              .col-md-12
+                form.form-inline
+                  .form-group.col-xs-12.col-md-6.col-lg-4
+                    input.form-control(type = "search", placeholder = "search")
+                  a.btn(href = "#") button
 
-              .row
+            .row
 
-                .col-md-12
+              .col-md-12
 
-                  div(data-view = "dict", data-dict-type = "childs", data-dict-sid = "#{child.sid}")
+                div(data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
 
-                    table.table.table-condensed.table-striped.table-hover.dict
-                      thead
-                        tr
-                          - each column in child.columns
-                            th(class = "#{column.hidden_class}") #{column.caption}
+                  table.table.table-condensed.table-striped.table-hover.dict
+                    thead
+                      tr
+                        - each column in child.columns
+                          th(class = "#{column.hidden_class}") #{column.caption}
 
-                      tbody
-          - }
+                    tbody

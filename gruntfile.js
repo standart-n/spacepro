@@ -121,6 +121,18 @@ module.exports = function(grunt) {
         },
         src: ['test/spec/*.js']
       }
+    },
+
+    dox: {
+      files: {
+        src: [
+          './lib/controllers/auth.js',
+          './lib/controllers/firebird.js',
+          './lib/controllers/dict.js',
+          './lib/controllers/grid.js'
+        ],
+        dest: './docs'
+      }
     }
 
   });
@@ -135,9 +147,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jade');
   grunt.loadNpmTasks('grunt-recess');
   grunt.loadNpmTasks('grunt-lmd');
+  grunt.loadNpmTasks('grunt-dox');
   
   grunt.registerTask('default',  ['clean:build', 'client', 'server']);
   grunt.registerTask('all',      ['default']);
+  grunt.registerTask('docs',     ['dox']);
   grunt.registerTask('test',     ['jshint:test', 'mochaTest']);
   grunt.registerTask('i18n',     ['clean:i18n', 'po2json']);
   grunt.registerTask('client',   ['jshint:client', 'recess:style', 'jade:client', 'lmd']);
