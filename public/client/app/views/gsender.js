@@ -3,8 +3,9 @@ var _, Backbone, Data, AddDeviceValue;
 _ =        require('underscore');
 Backbone = require('backbone');
 Data =     require('data');
+Dict =     require('dict');
 
-AddDeviceValue = require('addDeviceValue.pl');
+// AddDeviceValue = require('addDeviceValue.pl');
 
 module.exports = Backbone.View.extend({
 
@@ -24,14 +25,14 @@ module.exports = Backbone.View.extend({
     this.keys =        {};
     this.vals =        {};
 
-    this.conf =        this.sid + '_data';
-    this.columns =     window[this.conf].columns || {};
-    this.fields =      window[this.conf].fields  || {};
+    this.dict =        new Dict(window[this.sid + '_data']);
+    this.columns =     this.dict.get('columns');
+    this.fields =      this.dict.get('fields');
     
     this.data = new Data();
-    this.data.reset(window[this.conf].data);
+    this.data.reset(this.dict.get('data'));
 
-    this.selectRowUUID = window[this.conf].selectRowUUID || this.getUUIDbyFirstRecord();
+    this.selectRowUUID = this.dict.get('selectRowUUID') || this.getUUIDbyFirstRecord();
 
     this.colorActiveLine();
 
@@ -39,11 +40,12 @@ module.exports = Backbone.View.extend({
 
     if (this.type === 'parent') {
       this.child = this.$el.data("dict-child");
+      // console.log(this.conf);
     }
 
     if (this.type === 'child') {
-      this.keys = window[this.conf].keys || {};
-      this.vals = window[this.conf].vals || {};
+      this.keys = this.dict.get('keys');
+      this.vals = this.dict.get('vals');
     }
 
     this.on('update', function(vals) {
@@ -71,16 +73,28 @@ module.exports = Backbone.View.extend({
     });
 
     this.on('update.childs', function() {
-      var _this = this;
-      var model = _this.data.findWhere({'d$uuid': _this.selectRowUUID});
-      if ((_this.child != null) && (_this.data != null)) {
-        if (window[_this.child] != null) {
-          if (model != null) {
-            window[_this.child].trigger('update', model.toJSON() || {});
-          } else {
-            window[_this.child].trigger('clear');
+      var _this = this,
+        childs = _this.dict.get('childs'),
+        line = _this.data.findWhere({'d$uuid': _this.selectRowUUID});        
+      // if ((_this.child != null) && (_this.data != null)) {
+      //   if (window[_this.child] != null) {
+      //     if (line != null) {
+      //       window[_this.child].trigger('update', line.toJSON() || {});
+      //     } else {
+      //       window[_this.child].trigger('clear');
+      //     }
+      //   }
+      // }
+      if (_this.data !== null) {
+        _.each(childs, function(child) {
+          if (window[child.sid] !== null) {
+            if (line != null) {
+              window[child.sid].trigger('update', line.toJSON() || {});
+            } else {
+              window[child.sid].trigger('clear');
+            }
           }
-        }
+        });
       }
     });
 

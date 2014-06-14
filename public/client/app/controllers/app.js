@@ -1,7 +1,7 @@
-var Backbone, Dict, Search, Sidebar, Content;
+var Backbone, Gsender, Search, Sidebar, Content;
 
 Backbone =  require('backbone');
-Dict =      require('dict');
+Gsender =   require('gsender');
 Search =    require('search');
 Sidebar =   require('sidebar');
 Content =   require('content');
@@ -18,7 +18,7 @@ module.exports = Backbone.Router.extend({
     $('[data-view=\"dict\"]').each(function(i, el) {
       var sid = $(el).data("dict-sid");
 
-      window[sid] = new Dict({
+      window[sid] = new Gsender({
         el:  "[data-dict-sid=\"" + sid + "\"]",
         sid: sid
       });
