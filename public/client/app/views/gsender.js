@@ -1,4 +1,4 @@
-var _, Backbone, Data, AddDeviceValue;
+var _, Backbone, Data, AddDeviceValue, Gsender;
 
 _ =        require('underscore');
 Backbone = require('backbone');
@@ -7,7 +7,7 @@ Dict =     require('dict');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
-module.exports = Backbone.View.extend({
+Gsender = Backbone.View.extend({
 
   el: "[data-view=\"dict\"]",
 
@@ -76,15 +76,6 @@ module.exports = Backbone.View.extend({
       var _this = this,
         childs = _this.dict.get('childs'),
         line = _this.data.findWhere({'d$uuid': _this.selectRowUUID});        
-      // if ((_this.child != null) && (_this.data != null)) {
-      //   if (window[_this.child] != null) {
-      //     if (line != null) {
-      //       window[_this.child].trigger('update', line.toJSON() || {});
-      //     } else {
-      //       window[_this.child].trigger('clear');
-      //     }
-      //   }
-      // }
       if (_this.data !== null) {
         _.each(childs, function(child) {
           if (window[child.sid] !== null) {
@@ -146,191 +137,192 @@ module.exports = Backbone.View.extend({
     //   });
     // }    
 
-  },
-
-  setValsToLowerCase: function(ms) {
-    var tmp = {};
-    _.each(ms || {}, function(value, key) {
-      tmp[key] = value.toLowerCase();
-    });
-    return tmp;
-  },
-
-  setKeysToLowerCase: function(ms) {
-    var tmp = {};
-    _.each(ms || {}, function(value, key) {
-      tmp[key.toLowerCase()] = value;
-    });
-    return tmp;
-  },
-
-  cleanVals: function(new_vals) {
-    var keys, vals, 
-      tmp = {};
-
-    keys = this.keys || {};
-    vals = this.vals || {};
-
-    if ((new_vals != null) && (typeof new_vals === 'object')) {
-      vals = _.extend({}, vals, new_vals);
-    }
-
-    keys =  this.setValsToLowerCase(keys);
-    vals =  this.setKeysToLowerCase(vals);
-
-    _.each(keys, function(value, key) {
-      if (vals[value] != null) {
-        if (typeof vals[value] === 'string') {
-          tmp[value] = vals[value].trim();
-        } else {
-          tmp[value] = vals[value];
-        }
-      }
-    });
-
-    return tmp;
-  },
-
-  getUUIDbyFirstRecord: function() {
-    return this.$worksheet.find('tr:first').data('uuid') || '';
-  },
-
-  colorActiveLine: function(classname) {
-
-    if (classname == null) {
-      classname = 'active';
-    }
-
-    this.$worksheet.find('tr').removeClass(classname);
-    this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.selectRowUUID + "\"]");
-    if (this.$activeLine != null) {
-      this.$activeLine.addClass(classname);
-    }
-  },
-
-  showInformationNotFound: function() {
-    this.$worksheet.html(jade.templates.line_nothing({
-      columns: this.columns || {}
-    }));
-  },
-
-  hideInformationNotFound: function() {
-    this.$worksheet.find("[data-type=\"nothing\"]").remove();
-  },
-
-  showErrorOnServer: function() {
-    this.$worksheet.html(jade.templates.line_error({
-      columns: this.columns || {}
-    }));
-  },
-
-  hideErrorOnServer: function() {
-    this.$worksheet.find("[data-type=\"error\"]").remove();
-  },
-
-  showLoading: function(type) {
-
-    if (type == null) {
-      type = 'before';
-    }
-
-    if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
-      switch (type) {
-        case 'replace':
-          this.$worksheet.html(jade.templates.line_loading({
-            columns: this.columns || {}
-          }));
-        break;
-        case 'after':
-          this.$worksheet.append(jade.templates.line_loading({
-            columns: this.columns || {}
-          }));
-        break;
-        case 'before':
-          this.$worksheet.prepend(jade.templates.line_loading({
-            columns: this.columns || {}
-          }));
-        break;
-      }
-    }
-
-  },
-
-  hideLoading: function() {
-    this.$worksheet.find("[data-type=\"loading\"]").remove();
-  },
-
-  sendRequest: function(type) {
-    var _this = this;
-
-    if (type == null) {
-      type = 'scroll';
-    }
-
-    switch (type) {
-      case 'update':
-        this.$worksheet.empty();
-        this.data.reset();
-        this.showLoading();
-      break;
-      case 'search':
-        this.$worksheet.empty();
-        this.data.reset();
-        this.showLoading();
-      break;
-      case 'scroll':
-        this.showLoading('after');
-      break;
-    }
-
-    this.$el.trigger('request:' + type);
-
-    this.data.fetch({
-      url:     '/api/dict/' + this.sid,
-      timeout: 10000,
-      data: {
-        limit: this.limit  || null,
-        query: this.query  || '',
-        keys:  this.keys   || {},
-        vals:  this.vals   || {}
-      },
-      success: function() {
-        _this.hideLoading();
-        _this.hideErrorOnServer();
-        _this.hideInformationNotFound();
-        _this.checkResponse(type);
-      },
-      error: function() {
-        _this.hideLoading();
-        _this.showErrorOnServer();
-      }
-    });
-  },
-
-  checkResponse: function(type) {
-
-    if (type == null) {
-      type = "scroll";
-    }
-
-    switch (type) {
-      case 'update':
-        this.selectRowUUID = this.getUUIDbyFirstRecord();
-        this.colorActiveLine();
-      break;
-      case 'search':
-        this.selectRowUUID = this.getUUIDbyFirstRecord();
-        this.colorActiveLine();
-        this.trigger('update.childs');
-      break;      
-    }
-
-    if (this.data.length < 1) {
-      this.showInformationNotFound();
-    }
-
-    this.$el.trigger('response:' + type);
-
   }
 
 });
+
+Gsender.prototype.setValsToLowerCase = function(ms) {
+  var tmp = {};
+  _.each(ms || {}, function(value, key) {
+    tmp[key] = value.toLowerCase();
+  });
+  return tmp;
+};
+
+Gsender.prototype.setKeysToLowerCase = function(ms) {
+  var tmp = {};
+  _.each(ms || {}, function(value, key) {
+    tmp[key.toLowerCase()] = value;
+  });
+  return tmp;
+};
+
+Gsender.prototype.cleanVals = function(new_vals) {
+  var keys, vals, 
+    tmp = {};
+
+  keys = this.keys || {};
+  vals = this.vals || {};
+
+  if ((new_vals != null) && (typeof new_vals === 'object')) {
+    vals = _.extend({}, vals, new_vals);
+  }
+
+  keys =  this.setValsToLowerCase(keys);
+  vals =  this.setKeysToLowerCase(vals);
+
+  _.each(keys, function(value, key) {
+    if (vals[value] != null) {
+      if (typeof vals[value] === 'string') {
+        tmp[value] = vals[value].trim();
+      } else {
+        tmp[value] = vals[value];
+      }
+    }
+  });
+
+  return tmp;
+};
+
+Gsender.prototype.getUUIDbyFirstRecord = function() {
+  return this.$worksheet.find('tr:first').data('uuid') || '';
+};
+
+Gsender.prototype.colorActiveLine = function(classname) {
+
+  if (classname == null) {
+    classname = 'active';
+  }
+
+  this.$worksheet.find('tr').removeClass(classname);
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.selectRowUUID + "\"]");
+  if (this.$activeLine != null) {
+    this.$activeLine.addClass(classname);
+  }
+};
+
+Gsender.prototype.showInformationNotFound = function() {
+  this.$worksheet.html(jade.templates.line_nothing({
+    columns: this.columns || {}
+  }));
+};
+
+Gsender.prototype.hideInformationNotFound = function() {
+  this.$worksheet.find("[data-type=\"nothing\"]").remove();
+};
+
+Gsender.prototype.showErrorOnServer = function() {
+  this.$worksheet.html(jade.templates.line_error({
+    columns: this.columns || {}
+  }));
+};
+
+Gsender.prototype.hideErrorOnServer = function() {
+  this.$worksheet.find("[data-type=\"error\"]").remove();
+};
+
+Gsender.prototype.showLoading = function(type) {
+
+  if (type == null) {
+    type = 'before';
+  }
+
+  if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
+    switch (type) {
+      case 'replace':
+        this.$worksheet.html(jade.templates.line_loading({
+          columns: this.columns || {}
+        }));
+      break;
+      case 'after':
+        this.$worksheet.append(jade.templates.line_loading({
+          columns: this.columns || {}
+        }));
+      break;
+      case 'before':
+        this.$worksheet.prepend(jade.templates.line_loading({
+          columns: this.columns || {}
+        }));
+      break;
+    }
+  }
+
+};
+
+Gsender.prototype.hideLoading = function() {
+  this.$worksheet.find("[data-type=\"loading\"]").remove();
+};
+
+Gsender.prototype.sendRequest = function(type) {
+  var _this = this;
+
+  if (type == null) {
+    type = 'scroll';
+  }
+
+  switch (type) {
+    case 'update':
+      this.$worksheet.empty();
+      this.data.reset();
+      this.showLoading();
+    break;
+    case 'search':
+      this.$worksheet.empty();
+      this.data.reset();
+      this.showLoading();
+    break;
+    case 'scroll':
+      this.showLoading('after');
+    break;
+  }
+
+  this.$el.trigger('request:' + type);
+
+  this.data.fetch({
+    url:     '/api/dict/' + this.sid,
+    timeout: 10000,
+    data: {
+      limit: this.limit  || null,
+      query: this.query  || '',
+      keys:  this.keys   || {},
+      vals:  this.vals   || {}
+    },
+    success: function() {
+      _this.hideLoading();
+      _this.hideErrorOnServer();
+      _this.hideInformationNotFound();
+      _this.checkResponse(type);
+    },
+    error: function() {
+      _this.hideLoading();
+      _this.showErrorOnServer();
+    }
+  });
+};
+
+Gsender.prototype.checkResponse = function(type) {
+
+  if (type == null) {
+    type = "scroll";
+  }
+
+  switch (type) {
+    case 'update':
+      this.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.colorActiveLine();
+    break;
+    case 'search':
+      this.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.colorActiveLine();
+      this.trigger('update.childs');
+    break;      
+  }
+
+  if (this.data.length < 1) {
+    this.showInformationNotFound();
+  }
+
+  this.$el.trigger('response:' + type);
+};
+
+module.exports = Gsender;
