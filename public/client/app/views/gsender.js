@@ -95,6 +95,10 @@ Gsender = Common.extend({
         fields:  _this.fields,
         line:    line.toJSON()
       }));
+      _this.$worksheet.find("[data-uuid=\"" + line.get('d$uuid') + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
+        container: 'body',
+        placement: 'top'
+      });
       _this.$el.trigger('add.line', line.toJSON());
     });
 
@@ -107,6 +111,10 @@ Gsender = Common.extend({
       _this.sendRequest('onload');
     }
 
+    // this.$el.find('.tooltip-toggle').tooltip({
+    //   container: 'body'
+    // });
+    // this.$el.find('.tooltip-toggle').tooltip('show');
 
     // if (this.sid == 'WEB$DEVICE_DATA') {
     //   window.addDeviceValue = new AddDeviceValue({
