@@ -15,12 +15,12 @@
               span.hidden-xs.hidden-sm #{child.showcaption}
 
       .tab-content
-        .tab-pane.active(id = "dddd")
+        .tab-pane.active(id = "dddd", data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
 
           br
           .row
             .col-md-12
-              form.form-inline
+              form.form-inline(data-view = "search")
                 .form-group.col-xs-12.col-md-6.col-lg-4
                   input.form-control(type = "search", placeholder = "search")
                 a.btn(href = "#") button
@@ -29,22 +29,22 @@
 
             .col-md-12
 
-              #main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
+              //- #main(data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
 
-                table.table.table-condensed.table-striped.table-hover.dict
-                  thead
-                    tr
-                      - each column in parentDict.columns
-                        th(class = "#{column.hidden_class}") #{column.caption}
+              table.table.table-condensed.table-striped.table-hover.dict
+                thead
+                  tr
+                    - each column in parentDict.columns
+                      th(class = "#{column.hidden_class}") #{column.caption}
 
-                  tbody
+                tbody
 
         - each child in parentDict.childs
-          .tab-pane(id = "#{child.sid}")
+          .tab-pane(id = "#{child.sid}", data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
             br
             .row
               .col-md-12
-                form.form-inline
+                form.form-inline(data-view = "search")
                   .form-group.col-xs-12.col-md-6.col-lg-4
                     input.form-control(type = "search", placeholder = "search")
                   a.btn(href = "#") button
@@ -53,12 +53,12 @@
 
               .col-md-12
 
-                div(data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
+                //- div(data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
 
-                  table.table.table-condensed.table-striped.table-hover.dict
-                    thead
-                      tr
-                        - each column in child.columns
-                          th(class = "#{column.hidden_class}") #{column.caption}
+                table.table.table-condensed.table-striped.table-hover.dict
+                  thead
+                    tr
+                      - each column in child.columns
+                        th(class = "#{column.hidden_class}") #{column.caption}
 
-                    tbody
+                  tbody

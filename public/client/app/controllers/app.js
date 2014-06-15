@@ -1,8 +1,7 @@
-var Backbone, Gsender, Search, Sidebar, Content;
+var Backbone, Gsender, Sidebar, Content;
 
 Backbone =  require('backbone');
 Gsender =   require('gsender');
-Search =    require('search');
 Sidebar =   require('sidebar');
 Content =   require('content');
 
@@ -11,7 +10,6 @@ module.exports = Backbone.Router.extend({
   initialize: function() {
     var _this = this;
 
-    // this.search =  new Search();
     // this.sidebar = new Sidebar();
     // this.content = new Content();
     

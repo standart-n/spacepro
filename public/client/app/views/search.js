@@ -9,7 +9,6 @@ module.exports = Backbone.View.extend({
   initialize: function() {
     var _this = this;
 
-    this.dict =   this.$el.data("search-dict");
     this.$query = this.$el.find('input');
 
     this.$el.on('submit', function(e) {
@@ -24,13 +23,12 @@ module.exports = Backbone.View.extend({
 
   },
 
+  clean: function() {
+    this.$query.val('').focus();
+  },
+
   search: function() {
-    var dict = this.dict;
-    if (dict != null){
-      if (window[dict] != null) {
-        window[dict].trigger('search', this.$query.val());
-      }
-    }
+    this.trigger('search', this.$query.val());
   }
 
 

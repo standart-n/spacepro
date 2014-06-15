@@ -1,13 +1,14 @@
-var _, Backbone, Data, AddDeviceValue, Gsender;
+var _, Data, AddDeviceValue, Gsender, Common, Search;
 
 _ =        require('underscore');
-Backbone = require('backbone');
+Common =   require('common');
 Data =     require('data');
 Dict =     require('dict');
+Search =   require('search');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
-Gsender = Backbone.View.extend({
+Gsender = Common.extend({
 
   el: "[data-view=\"dict\"]",
 
@@ -34,8 +35,6 @@ Gsender = Backbone.View.extend({
 
     this.selectRowUUID = this.dict.get('selectRowUUID') || this.getUUIDbyFirstRecord();
 
-    this.colorActiveLine();
-
     this.vals = this.cleanVals();
 
     if (this.type === 'parent') {
@@ -48,46 +47,26 @@ Gsender = Backbone.View.extend({
       this.vals = this.dict.get('vals');
     }
 
-    this.on('update', function(vals) {
-      if (_this.type === 'child') {
-        _this.limit = 50;
-        _this.vals = _this.cleanVals(vals);
-        _this.$el.trigger('start.update');
-        _this.sendRequest('update');
-      }
+    this.search = new Search({
+      el: this.$el.find("[data-view=\"search\"]")
     });
 
-    this.on('clear', function() {
-      if (_this.type === 'child') {
-        _this.showInformationNotFound();
-      }
+    this.search.on('search', function(query) {
+      // alert('search');
+      // if (_this.type === 'parent') {
+      _this.limit = 50;
+      _this.query = query;
+      _this.$el.trigger('start.search');
+      _this.sendRequest('search');
+      // }
     });
 
-    this.on('search', function(query) {
-      if (_this.type === 'parent') {
-        _this.limit = 50;
-        _this.query = query;
-        _this.$el.trigger('start.search');
-        _this.sendRequest('search');
-      }
-    });
-
-    this.on('update.childs', function() {
-      var _this = this,
-        childs = _this.dict.get('childs'),
-        line = _this.data.findWhere({'d$uuid': _this.selectRowUUID});        
-      if (_this.data !== null) {
-        _.each(childs, function(child) {
-          if (window[child.sid] !== null) {
-            if (line != null) {
-              window[child.sid].trigger('update', line.toJSON() || {});
-            } else {
-              window[child.sid].trigger('clear');
-            }
-          }
-        });
-      }
-    });
+    // $('body').on('keyup', function(e) {
+    //   if (e.keyCode === 17) {
+    //     _this.search.clean();
+    //     _this.search.search();
+    //   }
+    // });    
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
@@ -96,12 +75,6 @@ Gsender = Backbone.View.extend({
         _this.sendRequest('scroll');
       }
     });
-
-    setTimeout(function() {
-      if (_this.type === 'parent') {
-        _this.sendRequest('update');
-      }
-    }, 1);
 
     this.$el.on('mouseover', function() {
       $(this).css({
@@ -113,7 +86,7 @@ Gsender = Backbone.View.extend({
       var $tr = $(this).parent();
       _this.selectRowUUID = $tr.data('uuid');
       _this.colorActiveLine();
-      _this.trigger('update.childs');
+      _this.updateChilds();
     });
 
     this.data.on('add', function(line) {
@@ -130,6 +103,11 @@ Gsender = Backbone.View.extend({
       _this.$el.trigger('add.line', line.toJSON());
     });
 
+    if (_this.type === 'parent') {
+      _this.sendRequest('onload');
+    }
+
+
     // if (this.sid == 'WEB$DEVICE_DATA') {
     //   window.addDeviceValue = new AddDeviceValue({
     //     el:  this.el,
@@ -138,51 +116,34 @@ Gsender = Backbone.View.extend({
     // }    
 
   }
-
 });
 
-Gsender.prototype.setValsToLowerCase = function(ms) {
-  var tmp = {};
-  _.each(ms || {}, function(value, key) {
-    tmp[key] = value.toLowerCase();
-  });
-  return tmp;
-};
-
-Gsender.prototype.setKeysToLowerCase = function(ms) {
-  var tmp = {};
-  _.each(ms || {}, function(value, key) {
-    tmp[key.toLowerCase()] = value;
-  });
-  return tmp;
-};
-
-Gsender.prototype.cleanVals = function(new_vals) {
-  var keys, vals, 
-    tmp = {};
-
-  keys = this.keys || {};
-  vals = this.vals || {};
-
-  if ((new_vals != null) && (typeof new_vals === 'object')) {
-    vals = _.extend({}, vals, new_vals);
+Gsender.prototype.update = function(vals) {
+  if (this.type === 'child') {
+    this.limit = 50;
+    this.vals = this.cleanVals(vals);
+    this.$el.trigger('start.update');
+    this.sendRequest('update');
   }
-
-  keys =  this.setValsToLowerCase(keys);
-  vals =  this.setKeysToLowerCase(vals);
-
-  _.each(keys, function(value, key) {
-    if (vals[value] != null) {
-      if (typeof vals[value] === 'string') {
-        tmp[value] = vals[value].trim();
-      } else {
-        tmp[value] = vals[value];
-      }
-    }
-  });
-
-  return tmp;
 };
+
+Gsender.prototype.updateChilds = function() {
+  var _this = this,
+    childs = this.dict.get('childs'),
+    line = this.data.findWhere({'d$uuid': this.selectRowUUID});
+  if (this.data !== null) {
+    _.each(childs, function(child) {
+      if (window[child.sid] !== null) {
+        if (line != null) {
+          window[child.sid].update(line.toJSON() || {});
+        } else {
+          window[child.sid].showInformationNotFound();
+        }
+      }
+    });
+  }
+};
+
 
 Gsender.prototype.getUUIDbyFirstRecord = function() {
   return this.$worksheet.find('tr:first').data('uuid') || '';
@@ -261,6 +222,11 @@ Gsender.prototype.sendRequest = function(type) {
   }
 
   switch (type) {
+    case 'onload':
+      this.$worksheet.empty();
+      this.data.reset();
+      this.showLoading();
+    break;
     case 'update':
       this.$worksheet.empty();
       this.data.reset();
@@ -311,10 +277,15 @@ Gsender.prototype.checkResponse = function(type) {
       this.selectRowUUID = this.getUUIDbyFirstRecord();
       this.colorActiveLine();
     break;
+    case 'onload':
+      this.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.colorActiveLine();
+      this.updateChilds();
+    break;      
     case 'search':
       this.selectRowUUID = this.getUUIDbyFirstRecord();
       this.colorActiveLine();
-      this.trigger('update.childs');
+      this.updateChilds();
     break;      
   }
 

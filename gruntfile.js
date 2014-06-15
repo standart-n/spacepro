@@ -128,6 +128,7 @@ module.exports = function(grunt) {
         src: [
           './lib/controllers/auth.js',
           './lib/controllers/firebird.js',
+          './lib/controllers/bar.js',
           './lib/controllers/dict.js',
           './lib/controllers/grid.js'
         ],
