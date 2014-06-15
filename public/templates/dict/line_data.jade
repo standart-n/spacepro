@@ -4,12 +4,9 @@ tr(data-uuid = "#{line.d$uuid}")
     td(data-col-field = "#{column.field}")
       - if ((line[column.field] != null) && (line[column.field] !== ''))        
         - if ((typeof(line[column.field]) === 'string') && (line[column.field].match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)))
-          //- div(title = "#{moment(line[column.field]).fromNow()}")
-          //- button.btn.btn-default.tooltip-toggle(type = "button", data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}") #{moment(line[column.field]).format('DD.MM.YYYY')}
           span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")
             span #{moment(line[column.field]).format('DD.MM.YYYY')}
             &nbsp;
             small #{moment(line[column.field]).format('HH:mm')}
-          //- small 
         - else
           span #{line[column.field]}
