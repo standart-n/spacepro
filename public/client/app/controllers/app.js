@@ -1,17 +1,15 @@
-var Backbone, Gsender, Sidebar, Content;
+var Backbone, Gsender, Sidebar;
 
 Backbone =  require('backbone');
 Gsender =   require('gsender');
 Sidebar =   require('sidebar');
-Content =   require('content');
 
 module.exports = Backbone.Router.extend({
 
   initialize: function() {
     var _this = this;
 
-    // this.sidebar = new Sidebar();
-    // this.content = new Content();
+    this.sidebar = new Sidebar();
     
     $('[data-view=\"dict\"]').each(function(i, el) {
       var sid = $(el).data("dict-sid");
