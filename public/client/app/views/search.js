@@ -1,8 +1,8 @@
-var Backbone;
+var Backbone, Search;
 
 Backbone = require('backbone');
 
-module.exports = Backbone.View.extend({
+Search = Backbone.View.extend({
 
   el: "[data-view=\"search\"]",
 
@@ -21,15 +21,23 @@ module.exports = Backbone.View.extend({
       }
     });
 
-  },
-
-  clean: function() {
-    this.$query.val('').focus();
-  },
-
-  search: function() {
-    this.trigger('search', this.$query.val());
   }
-
-
 });
+
+Search.prototype.getQuery = function() {
+  return this.$query.val();
+};
+
+Search.prototype.clean = function() {
+  this.$query.val('');
+};
+
+Search.prototype.focus = function() {
+  this.$query.focus();
+};
+
+Search.prototype.search = function() {
+  this.trigger('search', this.$query.val());
+};
+
+module.exports = Search;

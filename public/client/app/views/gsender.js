@@ -61,12 +61,13 @@ Gsender = Common.extend({
       // }
     });
 
-    // $('body').on('keyup', function(e) {
-    //   if (e.keyCode === 17) {
-    //     _this.search.clean();
-    //     _this.search.search();
-    //   }
-    // });    
+    $('body').on('keyup', function(e) {      
+      if ((e.keyCode === 17) && (_this.$el.hasClass('active'))) {
+        _this.search.clean();
+        _this.search.focus();
+        _this.search.search();
+      }
+    });    
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
@@ -143,6 +144,7 @@ Gsender.prototype.updateChilds = function() {
     _.each(childs, function(child) {
       if (window[child.sid] !== null) {
         if (line != null) {
+          window[child.sid].search.clean();
           window[child.sid].update(line.toJSON() || {});
         } else {
           window[child.sid].showInformationNotFound();
@@ -256,10 +258,10 @@ Gsender.prototype.sendRequest = function(type) {
     url:     '/api/dict/' + this.sid,
     timeout: 10000,
     data: {
-      limit: this.limit  || null,
-      query: this.query  || '',
-      keys:  this.keys   || {},
-      vals:  this.vals   || {}
+      limit: this.limit             || null,
+      query: this.search.getQuery() || '',
+      keys:  this.keys              || {},
+      vals:  this.vals              || {}
     },
     success: function() {
       _this.hideLoading();

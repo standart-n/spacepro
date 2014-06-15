@@ -1,5 +1,8 @@
 
 tr(data-uuid = "#{line.d$uuid}")
+  td
+    label
+      input(type = "checkbox")
   - each column in columns
     td(data-col-field = "#{column.field}")
       - if ((line[column.field] != null) && (line[column.field] !== ''))        
@@ -10,3 +13,9 @@ tr(data-uuid = "#{line.d$uuid}")
             small #{moment(line[column.field]).format('HH:mm')}
         - else
           span #{line[column.field]}
+  td
+    button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "Редактировать", type = "button")
+      i.fa.fa-lg.fa-edit
+    &nbsp;
+    button.btn.btn-danger.btn-xs(data-toggle = "tooltip", title = "Удалить", type = "button")
+      i.fa.fa-lg.fa-trash-o

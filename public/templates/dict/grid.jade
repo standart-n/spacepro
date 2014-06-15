@@ -23,7 +23,15 @@
               form.form-inline(data-view = "search")
                 .form-group.col-xs-12.col-md-6.col-lg-4
                   input.form-control(type = "search", placeholder = "search")
-                a.btn(href = "#") button
+                a.btn.btn-success(href = "#") 
+                  i.fa.fa-plus
+                  &nbsp;
+                  span Добавить
+                &nbsp;
+                a.btn.btn-danger(href = "#") 
+                  i.fa.fa-minus
+                  &nbsp;
+                  span Удалить
 
           .row
 
@@ -34,8 +42,10 @@
               table.table.table-condensed.table-striped.table-hover.dict
                 thead
                   tr
+                    th
                     - each column in parentDict.columns
                       th(class = "#{column.hidden_class}") #{column.caption}
+                    th
 
                 tbody
 
@@ -47,7 +57,15 @@
                 form.form-inline(data-view = "search")
                   .form-group.col-xs-12.col-md-6.col-lg-4
                     input.form-control(type = "search", placeholder = "search")
-                  a.btn(href = "#") button
+                  a.btn.btn-success(href = "#") 
+                    i.fa.fa-plus
+                    &nbsp;
+                    span Добавить
+                  &nbsp;
+                  a.btn.btn-danger(href = "#") 
+                    i.fa.fa-minus
+                    &nbsp;
+                    span Удалить
 
             .row
 
@@ -58,7 +76,9 @@
                 table.table.table-condensed.table-striped.table-hover.dict
                   thead
                     tr
-                      - each column in child.columns
+                      th
+                      -   each column in child.columns
                         th(class = "#{column.hidden_class}") #{column.caption}
+                      th
 
                   tbody
