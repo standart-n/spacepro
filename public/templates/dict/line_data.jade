@@ -6,13 +6,20 @@ tr(data-uuid = "#{line.d$uuid}")
   - each column in columns
     td(data-col-field = "#{column.field}")
       - if ((line[column.field] != null) && (line[column.field] !== ''))        
-        - if ((typeof(line[column.field]) === 'string') && (line[column.field].match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)))
+        - if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
           span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")
             span #{moment(line[column.field]).format('DD.MM.YYYY')}
             &nbsp;
             small #{moment(line[column.field]).format('HH:mm')}
         - else
-          span #{line[column.field]}
+          - if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+            - var groups = window.parseGroupLine(line[column.field]);
+            - each group in groups
+              - console.log(group);
+              span.badge(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") #{group.id}
+              &nbsp;
+          - else
+            span #{line[column.field]}
   td
     button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "Редактировать", type = "button")
       i.fa.fa-lg.fa-edit

@@ -50,6 +50,24 @@ $(function() {
     return msgstr;
   };
 
+  window.colorToHex = function(c) {
+    var x='00000'+(((c&0xff)<<16)+(c&0xff00)+(c>>16)).toString(16);
+    return x.slice(-6);               
+  };
+
+  window.parseGroupLine = function(gr) {
+    var groups = [];
+    gr.replace(/(-?\d+)=\{(\d+)\|(-?\d+)\}([\D]+)/ig, function(text, id, color, icon, title) {
+      groups.push({
+        id:       id                       || 0,
+        color:    window.colorToHex(color) || "#ccc",
+        icon:     icon                     || -1,
+        title:    title                    || ''
+      });
+    });
+    return groups;
+  };
+
   window.aid = function() {
     return Math.floor(Math.random() * Math.pow(10, 10));
   };
