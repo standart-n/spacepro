@@ -39,7 +39,8 @@
     "validate": "~0.2.4",
     "MD5": "~1.1.0",
     "zip": "~1.1.1",
-    "iconv-lite": "~0.2.11"
+    "iconv-lite": "~0.2.11",
+    "memcached": "~0.2.8"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.9",

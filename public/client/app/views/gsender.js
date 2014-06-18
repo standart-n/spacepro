@@ -61,13 +61,13 @@ Gsender = Common.extend({
       // }
     });
 
-    $('body').on('keyup', function(e) {      
-      if ((e.keyCode === 17) && (_this.$el.hasClass('active'))) {
-        _this.search.clean();
-        _this.search.focus();
-        _this.search.search();
-      }
-    });    
+    // $('body').on('keyup', function(e) {      
+    //   if ((e.keyCode === 17) && (_this.$el.hasClass('active'))) {
+    //     _this.search.clean();
+    //     _this.search.focus();
+    //     _this.search.search();
+    //   }
+    // });    
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
