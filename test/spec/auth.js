@@ -1,15 +1,24 @@
 
-var Auth, assert, fb_test_data, user_test_data, user_id, session_id, workstation_id;
+var Auth, assert, user_id, session_id, workstation_id, mongoose, Memcached,
+  fb_json, user_json, mongo_json, memcached_json;
 
 process.env.APP_DIR = '../..';
 
-fb_test_data =    require(process.env.APP_DIR + '/test/conf/fb.json');
-user_test_data =  require(process.env.APP_DIR + '/test/conf/user.json');
+mongoose =  require('mongoose');
+Memcached = require('memcached');
 
-process.env.FIREBIRD_HOST =         fb_test_data.host;
-process.env.FIREBIRD_PATH =         fb_test_data.path;
-process.env.FIREBIRD_USER =         fb_test_data.user;
-process.env.FIREBIRD_PASSWORD =     fb_test_data.password;
+fb_json =          require(process.env.APP_DIR + '/test/conf/fb.json');
+user_json =        require(process.env.APP_DIR + '/test/conf/user.json');
+mongo_json =       require(process.env.APP_DIR + '/test/conf/mongo.json');
+memcached_json =   require(process.env.APP_DIR + '/test/conf/memcached.json');
+
+process.env.FIREBIRD_HOST =         fb_json.host;
+process.env.FIREBIRD_PATH =         fb_json.path;
+process.env.FIREBIRD_USER =         fb_json.user;
+process.env.FIREBIRD_PASSWORD =     fb_json.password;
+
+mongoose.connect(mongo_json.host);
+global.memcached = new Memcached(memcached_json.host);
 
 assert = require('chai').assert;
 
@@ -95,7 +104,7 @@ describe('Auth:', function() {
       var auth;
 
       auth = new Auth({
-        user_login:       user_test_data.worker.login,
+        user_login:       user_json.worker.login,
         user_password:    'password',
         hide_errors:      true
       });
@@ -120,8 +129,8 @@ describe('Auth:', function() {
       var auth;
   
       auth = new Auth({
-        user_login:      user_test_data.worker.login,
-        user_password:   user_test_data.worker.password,
+        user_login:      user_json.worker.login,
+        user_password:   user_json.worker.password,
         web_group_id:    '-9999',
         hide_errors:     true
       });
@@ -146,8 +155,8 @@ describe('Auth:', function() {
       var auth;
 
       auth = new Auth({
-        user_login:       user_test_data.worker.login,
-        user_password:    user_test_data.worker.password,
+        user_login:       user_json.worker.login,
+        user_password:    user_json.worker.password,
         hide_errors:      true
       });
 
