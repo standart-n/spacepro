@@ -166,7 +166,7 @@ Gsender.prototype.colorActiveLine = function(classname) {
   }
 
   this.$worksheet.find('tr').removeClass(classname);
-  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.selectRowUUID + "\"]");
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.selectRowUUID + "\"]").first();
   if (this.$activeLine != null) {
     this.$activeLine.addClass(classname);
   }
