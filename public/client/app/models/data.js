@@ -1,4 +1,3 @@
-
 var Backbone, Line;
 
 Backbone = require('backbone');

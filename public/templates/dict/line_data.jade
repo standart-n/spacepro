@@ -21,8 +21,8 @@ tr(data-uuid = "#{line.d$uuid}")
           - else
             span #{line[column.field]}
   td
-    button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "Редактировать", type = "button")
+    button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "Редактировать", type = "button", data-action = "edit")
       i.fa.fa-lg.fa-edit
     &nbsp;
-    button.btn.btn-danger.btn-xs(data-toggle = "tooltip", title = "Удалить", type = "button")
+    button.btn.btn-danger.btn-xs(data-toggle = "tooltip", title = "Удалить", type = "button", data-action = "delete")
       i.fa.fa-lg.fa-trash-o

@@ -1,4 +1,3 @@
-
 var Backbone, App, AddDeviceValues;
 
 window.JSON = require('json2');
@@ -79,8 +78,8 @@ $(function() {
     moment.lang(window.lang);
   }
 
-  Backbone.emulateHTTP = true;
-  Backbone.emulateJSON = true;
+  // Backbone.emulateHTTP = true;
+  // Backbone.emulateJSON = true;
 
   window.app = new App();
 

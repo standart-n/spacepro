@@ -3,7 +3,6 @@ var _, Data, AddDeviceValue, Gsender, Common, Search;
 _ =        require('underscore');
 Common =   require('common');
 Data =     require('data');
-Dict =     require('dict');
 Search =   require('search');
 
 // AddDeviceValue = require('addDeviceValue.pl');
@@ -13,39 +12,36 @@ Gsender = Common.extend({
   el: "[data-view=\"dict\"]",
 
   initialize: function() {
-    var model,
+    var def,
+      model,
       _this = this;
 
-    this.$worksheet =  this.$el.find('tbody');
+    def = {
+      sid:             '',
+      caption:         '',
+      showcaption:     '',
+      limit:           50,
+      step:            20,
+      query:           '',
+      selectRowUUID:   '',
+      keys:            {},
+      vals:            {},
+      columns:         {},
+      privileges:      {},
+      childsInfo:      {}
+    };
 
-    this.sid =         this.options.sid  || this.$el.data("dict-sid")  || '';
-    this.type =        this.options.type || this.$el.data("dict-type") || '';
-    this.limit =       50;
-    this.step =        20;
-    this.query =       '';
-    this.keys =        {};
-    this.vals =        {};
+    this.$worksheet = this.$el.find('tbody');
 
-    this.dict =        new Dict(window[this.sid + '_data']);
-    this.columns =     this.dict.get('columns');
-    this.fields =      this.dict.get('fields');
+    this.options = _.defaults(this.options, def);
+
+    if (!this.options.type) {
+      this.options.type = this.$el.data("dict-type") || 'parent';
+    }
     
     this.data = new Data();
-    this.data.reset(this.dict.get('data'));
 
-    this.selectRowUUID = this.dict.get('selectRowUUID') || this.getUUIDbyFirstRecord();
-
-    this.vals = this.cleanVals();
-
-    if (this.type === 'parent') {
-      this.child = this.$el.data("dict-child");
-      // console.log(this.conf);
-    }
-
-    if (this.type === 'child') {
-      this.keys = this.dict.get('keys');
-      this.vals = this.dict.get('vals');
-    }
+    this.options.vals = this.cleanVals();
 
     this.search = new Search({
       el: this.$el.find("[data-view=\"search\"]")
@@ -53,9 +49,9 @@ Gsender = Common.extend({
 
     this.search.on('search', function(query) {
       // alert('search');
-      // if (_this.type === 'parent') {
-      _this.limit = 50;
-      _this.query = query;
+      // if (_this.options.type === 'parent') {
+      _this.options.limit = 50;
+      _this.options.query = query;
       _this.$el.trigger('start.search');
       _this.sendRequest('search');
       // }
@@ -71,7 +67,7 @@ Gsender = Common.extend({
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-        _this.limit = _this.data.length + _this.step;
+        _this.options.limit = _this.data.length + _this.options.step;
         _this.$el.trigger('start.scroll');
         _this.sendRequest('scroll');
       }
@@ -85,15 +81,20 @@ Gsender = Common.extend({
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
-      _this.selectRowUUID = $tr.data('uuid');
+      _this.options.selectRowUUID = $tr.data('uuid');
       _this.colorActiveLine();
       _this.updateChilds();
     });
 
+    this.$el.on('click', "[data-action=\"delete\"]", function() {
+      var $tr = $(this).parent().parent();
+      _this.options.selectRowUUID = $tr.data('uuid');
+      _this.sendRequest('delele');
+    });
+
     this.data.on('add', function(line) {
       _this.$worksheet.append(jade.templates.line_data({
-        columns: _this.columns,
-        fields:  _this.fields,
+        columns: _this.options.columns,
         line:    line.toJSON()
       }));
       _this.$worksheet.find("[data-uuid=\"" + line.get('d$uuid') + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
@@ -108,7 +109,7 @@ Gsender = Common.extend({
       _this.$el.trigger('add.line', line.toJSON());
     });
 
-    if (_this.type === 'parent') {
+    if (_this.options.type === 'parent') {
       _this.sendRequest('onload');
     }
 
@@ -117,10 +118,10 @@ Gsender = Common.extend({
     // });
     // this.$el.find('.tooltip-toggle').tooltip('show');
 
-    // if (this.sid == 'WEB$DEVICE_DATA') {
+    // if (this.options.sid == 'WEB$DEVICE_DATA') {
     //   window.addDeviceValue = new AddDeviceValue({
     //     el:  this.el,
-    //     sid: this.sid
+    //     sid: this.options.sid
     //   });
     // }    
 
@@ -128,8 +129,8 @@ Gsender = Common.extend({
 });
 
 Gsender.prototype.update = function(vals) {
-  if (this.type === 'child') {
-    this.limit = 50;
+  if (this.options.type === 'child') {
+    this.options.limit = 50;
     this.vals = this.cleanVals(vals);
     this.$el.trigger('start.update');
     this.sendRequest('update');
@@ -138,8 +139,8 @@ Gsender.prototype.update = function(vals) {
 
 Gsender.prototype.updateChilds = function() {
   var _this = this,
-    childs = this.dict.get('childs'),
-    line = this.data.findWhere({'d$uuid': this.selectRowUUID});
+    childs = this.options.childs,
+    line = this.data.findWhere({'d$uuid': this.options.selectRowUUID});
   if (this.data !== null) {
     _.each(childs, function(child) {
       if (window[child.sid] !== null) {
@@ -166,7 +167,7 @@ Gsender.prototype.colorActiveLine = function(classname) {
   }
 
   this.$worksheet.find('tr').removeClass(classname);
-  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.selectRowUUID + "\"]").first();
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.options.selectRowUUID + "\"]").first();
   if (this.$activeLine != null) {
     this.$activeLine.addClass(classname);
   }
@@ -174,7 +175,7 @@ Gsender.prototype.colorActiveLine = function(classname) {
 
 Gsender.prototype.showInformationNotFound = function() {
   this.$worksheet.html(jade.templates.line_nothing({
-    columns: this.columns || {}
+    columns: this.options.columns || {}
   }));
 };
 
@@ -184,7 +185,7 @@ Gsender.prototype.hideInformationNotFound = function() {
 
 Gsender.prototype.showErrorOnServer = function() {
   this.$worksheet.html(jade.templates.line_error({
-    columns: this.columns || {}
+    columns: this.options.columns || {}
   }));
 };
 
@@ -202,17 +203,17 @@ Gsender.prototype.showLoading = function(type) {
     switch (type) {
       case 'replace':
         this.$worksheet.html(jade.templates.line_loading({
-          columns: this.columns || {}
+          columns: this.options.columns || {}
         }));
       break;
       case 'after':
         this.$worksheet.append(jade.templates.line_loading({
-          columns: this.columns || {}
+          columns: this.options.columns || {}
         }));
       break;
       case 'before':
         this.$worksheet.prepend(jade.templates.line_loading({
-          columns: this.columns || {}
+          columns: this.options.columns || {}
         }));
       break;
     }
@@ -225,7 +226,8 @@ Gsender.prototype.hideLoading = function() {
 };
 
 Gsender.prototype.sendRequest = function(type) {
-  var _this = this;
+  var method,
+    _this = this;
 
   if (type == null) {
     type = 'scroll';
@@ -233,35 +235,43 @@ Gsender.prototype.sendRequest = function(type) {
 
   switch (type) {
     case 'onload':
+      method = 'GET';
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'update':
+      method = 'GET';
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'search':
+      method = 'GET';
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'scroll':
+      method = 'GET';
       this.showLoading('after');
+    break;
+    case 'delete':
+      method = 'DELETE';
     break;
   }
 
   this.$el.trigger('request:' + type);
 
   this.data.fetch({
-    url:     '/api/dict/' + this.sid,
+    url:     '/api/dict/' + this.options.sid,
+    type:    method,
     timeout: 10000,
     data: {
-      limit: this.limit             || null,
-      query: this.search.getQuery() || '',
-      keys:  this.keys              || {},
-      vals:  this.vals              || {}
+      limit: this.options.limit         || null,
+      query: this.search.getQuery()     || '',
+      keys:  this.options.keys          || {},
+      vals:  this.options.vals          || {}
     },
     success: function() {
       _this.hideLoading();
@@ -284,16 +294,16 @@ Gsender.prototype.checkResponse = function(type) {
 
   switch (type) {
     case 'update':
-      this.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.options.selectRowUUID = this.getUUIDbyFirstRecord();
       this.colorActiveLine();
     break;
     case 'onload':
-      this.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.options.selectRowUUID = this.getUUIDbyFirstRecord();
       this.colorActiveLine();
       this.updateChilds();
     break;      
     case 'search':
-      this.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.options.selectRowUUID = this.getUUIDbyFirstRecord();
       this.colorActiveLine();
       this.updateChilds();
     break;      

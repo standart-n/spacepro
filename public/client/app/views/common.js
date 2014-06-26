@@ -28,8 +28,8 @@ Common.prototype.cleanVals = function(new_vals) {
   var keys, vals, 
     tmp = {};
 
-  keys = this.keys || {};
-  vals = this.vals || {};
+  keys = this.options.keys || {};
+  vals = this.options.vals || {};
 
   if ((new_vals != null) && (typeof new_vals === 'object')) {
     vals = _.extend({}, vals, new_vals);
