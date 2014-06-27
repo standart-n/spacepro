@@ -17,18 +17,27 @@ Gsender = Common.extend({
       _this = this;
 
     def = {
-      sid:             '',
-      caption:         '',
-      showcaption:     '',
-      limit:           50,
-      step:            20,
-      query:           '',
-      selectRowUUID:   '',
-      keys:            {},
-      vals:            {},
-      columns:         {},
-      privileges:      {},
-      childsInfo:      {}
+      sid:                 '',
+      caption:             '',
+      showcaption:         '',
+      limit:               50,
+      step:                20,
+      query:               '',
+      selectRowUUID:       '',
+      returnfieldname:     'd$uuid',
+      captionfieldname:    'd$uuid',
+      keyfieldname:        'd$uuid',
+      keys:                {},
+      vals:                {},
+      columns:             {},
+      childsInfo:          {},
+      privileges: {
+        I: false,
+        S: false,
+        U: [],
+        D: false,
+        F: false
+      }
     };
 
     this.$worksheet = this.$el.find('tbody');
@@ -93,11 +102,13 @@ Gsender = Common.extend({
     });
 
     this.data.on('add', function(line) {
+      var key = _this.options.keyfieldname;
       _this.$worksheet.append(jade.templates.line_data({
-        columns: _this.options.columns,
-        line:    line.toJSON()
+        keyfieldname: key,
+        columns:      _this.options.columns,
+        line:         line.toJSON()
       }));
-      _this.$worksheet.find("[data-uuid=\"" + line.get('d$uuid') + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
+      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
         container: 'body',
         placement: 'top'
       });
@@ -105,7 +116,8 @@ Gsender = Common.extend({
     });
 
     this.data.on('remove', function(line) {
-      _this.$worksheet.find("[data-uuid=\"" + line.get('d$uuid') + "\"]").remove();
+      var key = _this.options.keyfieldname;
+      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
       _this.$el.trigger('add.line', line.toJSON());
     });
 
@@ -131,16 +143,22 @@ Gsender = Common.extend({
 Gsender.prototype.update = function(vals) {
   if (this.options.type === 'child') {
     this.options.limit = 50;
-    this.vals = this.cleanVals(vals);
+    this.options.vals = this.cleanVals(vals);
     this.$el.trigger('start.update');
     this.sendRequest('update');
   }
 };
 
 Gsender.prototype.updateChilds = function() {
-  var _this = this,
-    childs = this.options.childs,
-    line = this.data.findWhere({'d$uuid': this.options.selectRowUUID});
+  var key,
+    childs,
+    line,
+    _this = this;
+  key =     this.options.keyfieldname;
+  childs =  this.options.childs;
+  line =    this.data.find(function(s) {
+    return s.get(key) === _this.options.selectRowUUID;
+  });
   if (this.data !== null) {
     _.each(childs, function(child) {
       if (window[child.sid] !== null) {
@@ -154,7 +172,6 @@ Gsender.prototype.updateChilds = function() {
     });
   }
 };
-
 
 Gsender.prototype.getUUIDbyFirstRecord = function() {
   return this.$worksheet.find('tr:first').data('uuid') || '';
@@ -226,8 +243,7 @@ Gsender.prototype.hideLoading = function() {
 };
 
 Gsender.prototype.sendRequest = function(type) {
-  var method,
-    _this = this;
+  var _this = this;
 
   if (type == null) {
     type = 'scroll';
@@ -235,29 +251,24 @@ Gsender.prototype.sendRequest = function(type) {
 
   switch (type) {
     case 'onload':
-      method = 'GET';
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'update':
-      method = 'GET';
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'search':
-      method = 'GET';
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'scroll':
-      method = 'GET';
       this.showLoading('after');
     break;
     case 'delete':
-      method = 'DELETE';
     break;
   }
 
@@ -265,7 +276,6 @@ Gsender.prototype.sendRequest = function(type) {
 
   this.data.fetch({
     url:     '/api/dict/' + this.options.sid,
-    type:    method,
     timeout: 10000,
     data: {
       limit: this.options.limit         || null,
