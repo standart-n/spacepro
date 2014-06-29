@@ -1,9 +1,10 @@
-var _, Data, AddDeviceValue, Gsender, Common, Search;
+var _, Backbone, Data, AddDeviceValue, Gsender, Common, Search;
 
-_ =        require('underscore');
-Common =   require('common');
-Data =     require('data');
-Search =   require('search');
+_ =          require('underscore');
+Backbone =   require('backbone');
+Common =     require('common');
+Data =       require('data');
+Search =     require('search');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
@@ -49,6 +50,7 @@ Gsender = Common.extend({
     }
     
     this.data = new Data();
+    this.data.url = '/api/dict/' + this.options.sid;
 
     this.options.vals = this.cleanVals();
 
@@ -98,7 +100,8 @@ Gsender = Common.extend({
     this.$el.on('click', "[data-action=\"delete\"]", function() {
       var $tr = $(this).parent().parent();
       _this.options.selectRowUUID = $tr.data('uuid');
-      _this.sendRequest('delele');
+      console.log(_this.getSelectLine());
+      _this.sendRequest('remove', _this.getSelectLine());
     });
 
     this.data.on('add', function(line) {
@@ -150,17 +153,11 @@ Gsender.prototype.update = function(vals) {
 };
 
 Gsender.prototype.updateChilds = function() {
-  var key,
-    childs,
-    line,
+  var line,
     _this = this;
-  key =     this.options.keyfieldname;
-  childs =  this.options.childs;
-  line =    this.data.find(function(s) {
-    return s.get(key) === _this.options.selectRowUUID;
-  });
+  line = this.getSelectLine();
   if (this.data !== null) {
-    _.each(childs, function(child) {
+    _.each(this.options.childs, function(child) {
       if (window[child.sid] !== null) {
         if (line != null) {
           window[child.sid].search.clean();
@@ -175,6 +172,13 @@ Gsender.prototype.updateChilds = function() {
 
 Gsender.prototype.getUUIDbyFirstRecord = function() {
   return this.$worksheet.find('tr:first').data('uuid') || '';
+};
+
+Gsender.prototype.getSelectLine = function() {
+  var _this = this;
+  return this.data.find(function(s) {
+    return s.get(_this.options.keyfieldname) === _this.options.selectRowUUID;
+  });
 };
 
 Gsender.prototype.colorActiveLine = function(classname) {
@@ -242,8 +246,13 @@ Gsender.prototype.hideLoading = function() {
   this.$worksheet.find("[data-type=\"loading\"]").remove();
 };
 
-Gsender.prototype.sendRequest = function(type) {
-  var _this = this;
+Gsender.prototype.sendRequest = function(type, model) {
+  var method,
+    url,
+    timeout,
+    success,
+    error,
+    _this = this;
 
   if (type == null) {
     type = 'scroll';
@@ -251,49 +260,85 @@ Gsender.prototype.sendRequest = function(type) {
 
   switch (type) {
     case 'onload':
+      method = "fetch";
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'update':
+      method = "fetch";
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'search':
+      method = "fetch";
       this.$worksheet.empty();
       this.data.reset();
       this.showLoading();
     break;
     case 'scroll':
+      method = "fetch";
       this.showLoading('after');
     break;
-    case 'delete':
+    case 'remove':
+      method = "remove";
     break;
   }
 
   this.$el.trigger('request:' + type);
 
-  this.data.fetch({
-    url:     '/api/dict/' + this.options.sid,
-    timeout: 10000,
-    data: {
-      limit: this.options.limit         || null,
-      query: this.search.getQuery()     || '',
-      keys:  this.options.keys          || {},
-      vals:  this.options.vals          || {}
-    },
-    success: function() {
-      _this.hideLoading();
-      _this.hideErrorOnServer();
-      _this.hideInformationNotFound();
-      _this.checkResponse(type);
-    },
-    error: function() {
-      _this.hideLoading();
-      _this.showErrorOnServer();
-    }
-  });
+  timeout = 10000;
+
+  success = function() {
+    _this.hideLoading();
+    _this.hideErrorOnServer();
+    _this.hideInformationNotFound();
+    _this.checkResponse(type);
+  };
+
+  error = function() {
+    _this.hideLoading();
+    _this.showErrorOnServer();
+  };
+
+  if (method === 'fetch') {
+    this.data.fetch({
+      // url:     url,
+      timeout: timeout,
+      data: {
+        limit: this.options.limit         || null,
+        query: this.search.getQuery()     || '',
+        keys:  this.options.keys          || {},
+        vals:  this.options.vals          || {}
+      },
+      success: success,
+      error:   error
+    });
+  }
+
+  if (method === 'remove') {
+    $.ajax({
+      url: '/api/dict/' + this.options.sid,
+      type: 'GET',
+      data: {
+        _method: 'DELETE',
+        line:    model.toJSON(),
+        keys:    this.options.keys          || {},
+        vals:    this.options.vals          || {}
+      },
+      timeout: timeout,
+      success: success,
+      error: error
+    });
+    // model.destroy({
+    //   timeout: timeout,
+    //   // data:    data,
+    //   success: success,
+    //   error:   error
+    // });
+  }
+
 };
 
 Gsender.prototype.checkResponse = function(type) {
