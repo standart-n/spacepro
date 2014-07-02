@@ -21,6 +21,7 @@ Gsender = Common.extend({
       sid:                 '',
       caption:             '',
       showcaption:         '',
+      timeout:             10000,
       limit:               50,
       step:                20,
       query:               '',
@@ -55,7 +56,11 @@ Gsender = Common.extend({
     this.options.vals = this.cleanVals();
 
     this.search = new Search({
-      el: this.$el.find("[data-view=\"search\"]")
+      sid:           this.options.sid,
+      keys:          this.options.keys,
+      vals:          this.options.vals,
+      el:            this.$el.find("[data-view=\"search\"]"),
+      keyfieldname:  this.options.keyfieldname
     });
 
     this.search.on('search', function(query) {
@@ -239,7 +244,6 @@ Gsender.prototype.showLoading = function(type) {
       break;
     }
   }
-
 };
 
 Gsender.prototype.hideLoading = function() {
@@ -249,7 +253,6 @@ Gsender.prototype.hideLoading = function() {
 Gsender.prototype.sendRequest = function(type, model) {
   var method,
     url,
-    timeout,
     success,
     error,
     _this = this;
@@ -288,8 +291,6 @@ Gsender.prototype.sendRequest = function(type, model) {
 
   this.$el.trigger('request:' + type);
 
-  timeout = 10000;
-
   success = function() {
     _this.hideLoading();
     _this.hideErrorOnServer();
@@ -304,8 +305,7 @@ Gsender.prototype.sendRequest = function(type, model) {
 
   if (method === 'fetch') {
     this.data.fetch({
-      // url:     url,
-      timeout: timeout,
+      timeout: this.options.timeout,
       data: {
         limit: this.options.limit         || null,
         query: this.search.getQuery()     || '',

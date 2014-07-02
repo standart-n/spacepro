@@ -21,17 +21,20 @@
           .row
             .col-md-12
               form.form-inline(data-view = "search")
-                .form-group.col-xs-12.col-md-6.col-lg-4
-                  input.form-control(type = "search", placeholder = "search")
-                a.btn.btn-success(href = "#") 
-                  i.fa.fa-plus
+                - if (parentDict.toolbar.search === true)
+                  .form-group.col-xs-12.col-md-6.col-lg-4
+                    input.form-control(width = "100%", type = "search", placeholder = "search")
+                - if (parentDict.toolbar.insert === true)
+                  a.btn.btn-success(href = "#") 
+                    i.fa.fa-plus
+                    &nbsp;
+                    span Добавить
+                - if (parentDict.toolbar.remove === true)
                   &nbsp;
-                  span Добавить
-                &nbsp;
-                a.btn.btn-danger(href = "#") 
-                  i.fa.fa-minus
-                  &nbsp;
-                  span Удалить
+                  a.btn.btn-danger(href = "#") 
+                    i.fa.fa-minus
+                    &nbsp;
+                    span Удалить
 
           .row
 
@@ -53,17 +56,20 @@
             .row
               .col-md-12
                 form.form-inline(data-view = "search")
-                  .form-group.col-xs-12.col-md-6.col-lg-4
-                    input.form-control(type = "search", placeholder = "search")
-                  a.btn.btn-success(href = "#") 
-                    i.fa.fa-plus
+                  - if (child.toolbar.search === true)
+                    .form-group.col-xs-12.col-md-6.col-lg-4
+                      input.form-control.typeahead(type = "search", placeholder = "search")
+                  - if (child.toolbar.insert === true)
+                    a.btn.btn-success(href = "#") 
+                      i.fa.fa-plus
+                      &nbsp;
+                      span Добавить
+                  - if (child.toolbar.remove === true)
                     &nbsp;
-                    span Добавить
-                  &nbsp;
-                  a.btn.btn-danger(href = "#") 
-                    i.fa.fa-minus
-                    &nbsp;
-                    span Удалить
+                    a.btn.btn-danger(href = "#") 
+                      i.fa.fa-minus
+                      &nbsp;
+                      span Удалить
 
             .row
 
