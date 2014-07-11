@@ -17,6 +17,8 @@
       .tab-content
         .tab-pane.active(id = "dddd", data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
 
+          include insert
+
           br
           .row
             .col-md-12
@@ -25,13 +27,13 @@
                   .form-group.col-xs-12.col-md-6.col-lg-4
                     input.form-control(width = "100%", type = "search", placeholder = "search")
                 - if (parentDict.toolbar.insert === true)
-                  a.btn.btn-success(href = "#") 
+                  a.btn.btn-success(href = "#", data-action = "insert") 
                     i.fa.fa-plus
                     &nbsp;
                     span Добавить
                 - if (parentDict.toolbar.remove === true)
                   &nbsp;
-                  a.btn.btn-danger(href = "#") 
+                  a.btn.btn-danger(href = "#", data-action = "delete_many") 
                     i.fa.fa-minus
                     &nbsp;
                     span Удалить

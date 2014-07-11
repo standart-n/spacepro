@@ -18,21 +18,27 @@ Gsender = Common.extend({
       _this = this;
 
     def = {
-      sid:                 '',
-      caption:             '',
-      showcaption:         '',
-      timeout:             10000,
-      limit:               50,
-      step:                20,
-      query:               '',
-      selectRowUUID:       '',
-      returnfieldname:     'd$uuid',
-      captionfieldname:    'd$uuid',
-      keyfieldname:        'd$uuid',
-      keys:                {},
-      vals:                {},
-      columns:             {},
-      childsInfo:          {},
+      sid:                     '',
+      caption:                 '',
+      showcaption:             '',
+      timeout:                 10000,
+      limit:                   50,
+      step:                    20,
+      query:                   '',
+      selectRowUUID:           '',
+      returnfieldname:         'd$uuid',
+      captionfieldname:        'd$uuid',
+      keyfieldname:            'd$uuid',
+      keys:                    {},
+      vals:                    {},
+      columns:                 {},
+      childsInfo:              {},
+      cfselect: {
+        selectfieldexpression: '',
+        allwayspartial:        true
+      },
+      renderItemSearch:       null,
+      renderOptionSearch:     null,
       privileges: {
         I: false,
         S: false,
@@ -43,6 +49,7 @@ Gsender = Common.extend({
     };
 
     this.$worksheet = this.$el.find('tbody');
+    this.$modal = this.$el.find("[data-type=\"modal\"]");
 
     this.options = _.defaults(this.options, def);
 
@@ -53,14 +60,17 @@ Gsender = Common.extend({
     this.data = new Data();
     this.data.url = '/api/dict/' + this.options.sid;
 
-    this.options.vals = this.cleanVals();
+    this.cleanVals();
 
     this.search = new Search({
-      sid:           this.options.sid,
-      keys:          this.options.keys,
-      vals:          this.options.vals,
-      el:            this.$el.find("[data-view=\"search\"]"),
-      keyfieldname:  this.options.keyfieldname
+      el:                 this.$el.find("[data-view=\"search\"]"),
+      sid:                this.options.sid,
+      keys:               this.options.keys,
+      vals:               this.options.vals,
+      keyfieldname:       this.options.keyfieldname,
+      selectfield:        this.options.cfselect.selectfieldexpression,
+      renderItemSearch:   this.options.renderItemSearch,
+      renderOptionSearch: this.options.renderOptionSearch
     });
 
     this.search.on('search', function(query) {
@@ -109,6 +119,10 @@ Gsender = Common.extend({
       _this.sendRequest('remove', _this.getSelectLine());
     });
 
+    this.$el.on('click', "[data-action=\"insert\"]", function() {
+      _this.$modal.modal('show');
+    });
+
     this.data.on('add', function(line) {
       var key = _this.options.keyfieldname;
       _this.$worksheet.append(jade.templates.line_data({
@@ -151,7 +165,10 @@ Gsender = Common.extend({
 Gsender.prototype.update = function(vals) {
   if (this.options.type === 'child') {
     this.options.limit = 50;
-    this.options.vals = this.cleanVals(vals);
+    this.cleanVals(vals);
+    if (this.search != null) {
+      this.search.cleanVals(vals);
+    }
     this.$el.trigger('start.update');
     this.sendRequest('update');
   }
@@ -165,7 +182,6 @@ Gsender.prototype.updateChilds = function() {
     _.each(this.options.childs, function(child) {
       if (window[child.sid] !== null) {
         if (line != null) {
-          window[child.sid].search.clean();
           window[child.sid].update(line.toJSON() || {});
         } else {
           window[child.sid].showInformationNotFound();
@@ -338,7 +354,6 @@ Gsender.prototype.sendRequest = function(type, model) {
     //   error:   error
     // });
   }
-
 };
 
 Gsender.prototype.checkResponse = function(type) {
