@@ -1,10 +1,11 @@
-var _, Backbone, Data, AddDeviceValue, Gsender, Common, Search;
+var _, Backbone, Data, AddDeviceValue, Gsender, Common, Search, Insert;
 
 _ =          require('underscore');
 Backbone =   require('backbone');
 Common =     require('common');
 Data =       require('data');
 Search =     require('search');
+Insert =     require('insert');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
@@ -29,16 +30,18 @@ Gsender = Common.extend({
       returnfieldname:         'd$uuid',
       captionfieldname:        'd$uuid',
       keyfieldname:            'd$uuid',
+      addfields:               {},
+      editfields:              {},
       keys:                    {},
       vals:                    {},
       columns:                 {},
       childsInfo:              {},
+      renderItemSearch:        null,
+      renderOptionSearch:      null,
       cfselect: {
         selectfieldexpression: '',
         allwayspartial:        true
       },
-      renderItemSearch:       null,
-      renderOptionSearch:     null,
       privileges: {
         I: false,
         S: false,
@@ -81,6 +84,11 @@ Gsender = Common.extend({
       _this.$el.trigger('start.search');
       _this.sendRequest('search');
       // }
+    });
+
+    this.insert = new Insert({
+      el:                 this.$el.find("[data-view=\"search\"]"),
+      addfields:          this.options.addfields
     });
 
     // $('body').on('keyup', function(e) {      
@@ -324,7 +332,7 @@ Gsender.prototype.sendRequest = function(type, model) {
       timeout: this.options.timeout,
       data: {
         limit: this.options.limit         || null,
-        query: this.search.getQuery()     || '',
+        query: this.options.query         || '',
         keys:  this.options.keys          || {},
         vals:  this.options.vals          || {}
       },
@@ -354,6 +362,7 @@ Gsender.prototype.sendRequest = function(type, model) {
     //   error:   error
     // });
   }
+  
 };
 
 Gsender.prototype.checkResponse = function(type) {

@@ -21,7 +21,9 @@ describe('Ini:', function() {
             "insertsql" : "select D$UUID from pr_add_device(:vid,:building_d$uuid,:APARTMENT)"
         };
 
-      assert.deepEqual(json, ini.parse(text));
+      assert.deepEqual(json, ini.parse(text, {
+        textFields: ['insertsql']
+      }));
     });
 
     it('Simple string with "="', function() {
@@ -33,7 +35,9 @@ describe('Ini:', function() {
             "deletesql_selected" : "update VW_DEVICE set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )"
         };
 
-      assert.deepEqual(json, ini.parse(text));
+      assert.deepEqual(json, ini.parse(text, {
+        textFields: ['deletesql_selected']
+      }));
     });
 
     it('One string and empty part', function() {
@@ -49,7 +53,9 @@ describe('Ini:', function() {
             "selectsql": {}
         };
 
-      assert.deepEqual(json, ini.parse(text));
+      assert.deepEqual(json, ini.parse(text, {
+        textFields: ['refreshsql']
+      }));
     });
 
     it('Key-value', function() {
@@ -95,7 +101,9 @@ describe('Ini:', function() {
             "selectsql": "select * from VW_DEVICE where status=0 order by street, sortedcaptionb, sortedcaptiona,d$uuid"
         };
 
-      assert.deepEqual(json, ini.parse(text));
+      assert.deepEqual(json, ini.parse(text, {
+        textFields: ['selectsql']
+      }));
     });
 
 
