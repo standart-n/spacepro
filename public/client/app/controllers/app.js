@@ -12,11 +12,18 @@ module.exports = Backbone.Router.extend({
     this.sidebar = new Sidebar();
     
     $('[data-view=\"dict\"]').each(function(i, el) {
-      var sid = $(el).data("dict-sid"),
-          conf = sid + '_data';
+      var sid, conf, data;
 
-      window[sid] = new Gsender(window[conf] || {});
-    });  
+      sid = $(el).data("dict-sid");
+      conf = sid + '_data';
+      data = window[conf] || {};
+
+      window[sid] = new Gsender({
+        el:   data.el,
+        dict: data
+      });
+
+    });     
   }
 
 });

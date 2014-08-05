@@ -60,7 +60,7 @@
                 form.form-inline(data-view = "search")
                   - if (child.toolbar.search === true)
                     .form-group.col-xs-12.col-md-6.col-lg-4
-                      input.form-control.typeahead(type = "search", placeholder = "search")
+                      input.form-control(type = "search", placeholder = "search")
                   - if (child.toolbar.insert === true)
                     a.btn.btn-success(href = "#") 
                       i.fa.fa-plus

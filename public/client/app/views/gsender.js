@@ -1,9 +1,10 @@
-var _, Backbone, Data, AddDeviceValue, Gsender, Common, Search, Insert;
+var _, Backbone, Data, Dict, AddDeviceValue, Gsender, Common, Search, Insert;
 
 _ =          require('underscore');
 Backbone =   require('backbone');
 Common =     require('common');
 Data =       require('data');
+Dict =       require('dict');
 Search =     require('search');
 Insert =     require('insert');
 
@@ -14,94 +15,42 @@ Gsender = Common.extend({
   el: "[data-view=\"dict\"]",
 
   initialize: function() {
-    var def,
-      model,
+    var model,
       _this = this;
 
-    def = {
-      sid:                     '',
-      caption:                 '',
-      showcaption:             '',
-      timeout:                 10000,
-      limit:                   50,
-      step:                    20,
-      query:                   '',
-      selectRowUUID:           '',
-      returnfieldname:         'd$uuid',
-      captionfieldname:        'd$uuid',
-      keyfieldname:            'd$uuid',
-      addfields:               {},
-      editfields:              {},
-      keys:                    {},
-      vals:                    {},
-      columns:                 {},
-      childsInfo:              {},
-      renderItemSearch:        null,
-      renderOptionSearch:      null,
-      cfselect: {
-        selectfieldexpression: '',
-        allwayspartial:        true
-      },
-      privileges: {
-        I: false,
-        S: false,
-        U: [],
-        D: false,
-        F: false
-      }
-    };
+    this.dict = new Dict(this.options.dict || {});
 
     this.$worksheet = this.$el.find('tbody');
     this.$modal = this.$el.find("[data-type=\"modal\"]");
 
-    this.options = _.defaults(this.options, def);
+    this.dict.set('type', this.$el.data("dict-type") || 'parent');   
+    this.dict.cleanVals();
 
-    if (!this.options.type) {
-      this.options.type = this.$el.data("dict-type") || 'parent';
-    }
-    
     this.data = new Data();
-    this.data.url = '/api/dict/' + this.options.sid;
-
-    this.cleanVals();
+    this.data.url = '/api/dict/' + this.dict.get('sid');
 
     this.search = new Search({
-      el:                 this.$el.find("[data-view=\"search\"]"),
-      sid:                this.options.sid,
-      keys:               this.options.keys,
-      vals:               this.options.vals,
-      keyfieldname:       this.options.keyfieldname,
-      selectfield:        this.options.cfselect.selectfieldexpression,
-      renderItemSearch:   this.options.renderItemSearch,
-      renderOptionSearch: this.options.renderOptionSearch
+      el:    this.$el.find("[data-view=\"search\"]"),
+      dict:  this.dict.toJSON()
     });
 
     this.search.on('search', function(query) {
-      // alert('search');
-      // if (_this.options.type === 'parent') {
-      _this.options.limit = 50;
-      _this.options.query = query;
+      _this.dict.set({
+        limit: 50,
+        query: query
+      });
       _this.$el.trigger('start.search');
       _this.sendRequest('search');
-      // }
     });
 
     this.insert = new Insert({
-      el:                 this.$el.find("[data-view=\"search\"]"),
-      addfields:          this.options.addfields
+      el:         this.$el.find("[data-view=\"search\"]"),
+      addfields:  this.dict.get('addfields')
     });
-
-    // $('body').on('keyup', function(e) {      
-    //   if ((e.keyCode === 17) && (_this.$el.hasClass('active'))) {
-    //     _this.search.clean();
-    //     _this.search.focus();
-    //     _this.search.search();
-    //   }
-    // });    
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-        _this.options.limit = _this.data.length + _this.options.step;
+        _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
         _this.$el.trigger('start.scroll');
         _this.sendRequest('scroll');
       }
@@ -115,15 +64,14 @@ Gsender = Common.extend({
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
-      _this.options.selectRowUUID = $tr.data('uuid');
+      _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.colorActiveLine();
       _this.updateChilds();
     });
 
     this.$el.on('click', "[data-action=\"delete\"]", function() {
       var $tr = $(this).parent().parent();
-      _this.options.selectRowUUID = $tr.data('uuid');
-      console.log(_this.getSelectLine());
+      _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.sendRequest('remove', _this.getSelectLine());
     });
 
@@ -132,10 +80,10 @@ Gsender = Common.extend({
     });
 
     this.data.on('add', function(line) {
-      var key = _this.options.keyfieldname;
+      var key = _this.dict.get('keyfieldname');
       _this.$worksheet.append(jade.templates.line_data({
         keyfieldname: key,
-        columns:      _this.options.columns,
+        columns:      _this.dict.get('columns'),
         line:         line.toJSON()
       }));
       _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
@@ -146,36 +94,24 @@ Gsender = Common.extend({
     });
 
     this.data.on('remove', function(line) {
-      var key = _this.options.keyfieldname;
+      var key = _this.dict.get('keyfieldname');
       _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
       _this.$el.trigger('add.line', line.toJSON());
     });
 
-    if (_this.options.type === 'parent') {
+    if (_this.dict.get('type') === 'parent') {
       _this.sendRequest('onload');
     }
-
-    // this.$el.find('.tooltip-toggle').tooltip({
-    //   container: 'body'
-    // });
-    // this.$el.find('.tooltip-toggle').tooltip('show');
-
-    // if (this.options.sid == 'WEB$DEVICE_DATA') {
-    //   window.addDeviceValue = new AddDeviceValue({
-    //     el:  this.el,
-    //     sid: this.options.sid
-    //   });
-    // }    
 
   }
 });
 
 Gsender.prototype.update = function(vals) {
-  if (this.options.type === 'child') {
-    this.options.limit = 50;
-    this.cleanVals(vals);
-    if (this.search != null) {
-      this.search.cleanVals(vals);
+  if (this.dict.get('type') === 'child') {
+    this.dict.set('limit', 50);
+    this.dict.cleanVals(vals);
+    if (this.search != null) {      
+      this.search.dict.cleanVals(vals);
     }
     this.$el.trigger('start.update');
     this.sendRequest('update');
@@ -187,7 +123,7 @@ Gsender.prototype.updateChilds = function() {
     _this = this;
   line = this.getSelectLine();
   if (this.data !== null) {
-    _.each(this.options.childs, function(child) {
+    _.each(this.dict.get('childs'), function(child) {
       if (window[child.sid] !== null) {
         if (line != null) {
           window[child.sid].update(line.toJSON() || {});
@@ -206,7 +142,7 @@ Gsender.prototype.getUUIDbyFirstRecord = function() {
 Gsender.prototype.getSelectLine = function() {
   var _this = this;
   return this.data.find(function(s) {
-    return s.get(_this.options.keyfieldname) === _this.options.selectRowUUID;
+    return s.get(_this.dict.get('keyfieldname')) === _this.dict.get('selectRowUUID');
   });
 };
 
@@ -217,7 +153,7 @@ Gsender.prototype.colorActiveLine = function(classname) {
   }
 
   this.$worksheet.find('tr').removeClass(classname);
-  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.options.selectRowUUID + "\"]").first();
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
   if (this.$activeLine != null) {
     this.$activeLine.addClass(classname);
   }
@@ -225,7 +161,7 @@ Gsender.prototype.colorActiveLine = function(classname) {
 
 Gsender.prototype.showInformationNotFound = function() {
   this.$worksheet.html(jade.templates.line_nothing({
-    columns: this.options.columns || {}
+    columns: this.dict.get('columns') || {}
   }));
 };
 
@@ -235,7 +171,7 @@ Gsender.prototype.hideInformationNotFound = function() {
 
 Gsender.prototype.showErrorOnServer = function() {
   this.$worksheet.html(jade.templates.line_error({
-    columns: this.options.columns || {}
+    columns: this.dict.get('columns') || {}
   }));
 };
 
@@ -253,17 +189,17 @@ Gsender.prototype.showLoading = function(type) {
     switch (type) {
       case 'replace':
         this.$worksheet.html(jade.templates.line_loading({
-          columns: this.options.columns || {}
+          columns: this.dict.get('columns') || {}
         }));
       break;
       case 'after':
         this.$worksheet.append(jade.templates.line_loading({
-          columns: this.options.columns || {}
+          columns: this.dict.get('columns') || {}
         }));
       break;
       case 'before':
         this.$worksheet.prepend(jade.templates.line_loading({
-          columns: this.options.columns || {}
+          columns: this.dict.get('columns') || {}
         }));
       break;
     }
@@ -329,12 +265,12 @@ Gsender.prototype.sendRequest = function(type, model) {
 
   if (method === 'fetch') {
     this.data.fetch({
-      timeout: this.options.timeout,
+      timeout: this.dict.get('timeout'),
       data: {
-        limit: this.options.limit         || null,
-        query: this.options.query         || '',
-        keys:  this.options.keys          || {},
-        vals:  this.options.vals          || {}
+        limit: this.dict.get('limit')         || null,
+        query: this.dict.get('query')         || '',
+        keys:  this.dict.get('keys')          || {},
+        vals:  this.dict.get('vals')          || {}
       },
       success: success,
       error:   error
@@ -343,17 +279,17 @@ Gsender.prototype.sendRequest = function(type, model) {
 
   if (method === 'remove') {
     $.ajax({
-      url: '/api/dict/' + this.options.sid,
+      url: '/api/dict/' + this.dict.get('sid'),
       type: 'GET',
       data: {
         _method: 'DELETE',
         line:    model.toJSON(),
-        keys:    this.options.keys          || {},
-        vals:    this.options.vals          || {}
+        keys:    this.dict.get('keys')        || {},
+        vals:    this.dict.get('vals')        || {}
       },
       timeout: timeout,
       success: success,
-      error: error
+      error:   error
     });
     // model.destroy({
     //   timeout: timeout,
@@ -373,16 +309,16 @@ Gsender.prototype.checkResponse = function(type) {
 
   switch (type) {
     case 'update':
-      this.options.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
       this.colorActiveLine();
     break;
     case 'onload':
-      this.options.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
       this.colorActiveLine();
       this.updateChilds();
     break;      
     case 'search':
-      this.options.selectRowUUID = this.getUUIDbyFirstRecord();
+      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
       this.colorActiveLine();
       this.updateChilds();
     break;      

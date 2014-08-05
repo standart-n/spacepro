@@ -1,6 +1,7 @@
 
-var Common, Search, Select;
+var Common, Search, Select, Dict;
 
+Dict =     require('dict');
 Common =   require('common');
 Select =   require('select');
 
@@ -11,20 +12,14 @@ Search = Common.extend({
   initialize: function() {
     var def, _this;
 
-    def = {
-      sid:                 '',
-      keyfieldname:        'd$uuid',
-      selectfield:         '',
-      renderItemSearch:    null,
-      renderOptionSearch:  null
-    };
-
     this.$query = this.$el.find('input');
 
-    this.options =     _.defaults(this.options, def);
-    this.options.el =  this.$query;
+    this.dict = new Dict(this.options.dict || {});
 
-    this.select = new Select(this.options);
+    this.select = new Select({
+      el:   this.$query,
+      dict: this.dict.toJSON()
+    });
 
     _this = this;
 
