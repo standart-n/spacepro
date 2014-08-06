@@ -1,14 +1,15 @@
 
-var _, Common, Data, Dict, Search;
+var _, Common, Data, Dict, Search, Select;
 
 Common =   require('common');
 Data =     require('data');
 Dict =     require('dict');
+Select =   require('select');
 _ =        require('underscore');
 
 Insert = Common.extend({
 
-  el: "[data-view=\"search\"]",
+  el: "[data-view=\"insert\"]",
 
   initialize: function() {
     var _this;
@@ -23,22 +24,29 @@ Insert = Common.extend({
 });
 
 Insert.prototype.checkFields = function() {
-  var controls, fields;
+  var controls, fields, _this;
 
+  _this = this;
   controls = {};
-  fields = this.options.addfields || {};
+  fields = this.dict.get('addfields') || {};
 
   _.each(fields, function(value, key) {
-    var sid, template;
-    if (value.toString().match(/WDICTS\./i)) {
+    var id, sid, dict, select;
+    if (value.toString().match(/WDICTS\./i)) {      
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
-      controls.key = window[sid + '_data'] || {};
-      controls.key.sid =  sid;
-      // this.$body.append(jade.templates.insert_control(controls.key));
+      id = _this.dict.get('sid') + "_" + sid;
+      dict = new Dict(window[sid + '_data'] || {});
+      _this.$body.append(jade.templates.insert_control({
+        id:   id,
+        dict: dict.toJSON()
+      }));
+      select = new Select({
+        el:   "[data-control=\"" + id + "\"]",
+        dict: dict.toJSON()
+      });
     }
   });
 };
-
 
 module.exports = Insert;
 

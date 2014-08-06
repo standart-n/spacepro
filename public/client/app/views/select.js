@@ -10,7 +10,7 @@ Select = Common.extend({
   el: "[data-view=\"select\"]",
 
   initialize: function() {
-    var selectfield, cfselect, _this;
+    var selectfield, selectize, cfselect, _this;
 
     this.dict = new Dict(this.options.dict || {});
 
@@ -25,9 +25,7 @@ Select = Common.extend({
       selectfield = selectfield.toString().toLowerCase();
     }
 
-    console.log('>>>>', selectfield);
-
-    this.$selectize = this.$el.selectize({
+    this.$select = this.$el.selectize({
       maxItems:          1,
       maxOptions:        100,
       delimeter:         ',',
@@ -37,7 +35,6 @@ Select = Common.extend({
       persist:           false,
       addPrecedence:     true,
       create: function(input) {
-        console.log('create', input);
         return {
           value:         input,
           text:          input,
@@ -46,7 +43,6 @@ Select = Common.extend({
       },
       render: {
         item: function (item, escape) {
-          console.log('---', item);
           if (item[_this.dict.get('keyfieldname')]) {
             if ((_this.dict.get('renderItemSearch')) && (_this.dict.get('renderItemSearch') !== selectfield)) {
               return _this.dict.setLineVals(_this.dict.get('renderItemSearch'), item, escape);
@@ -62,7 +58,6 @@ Select = Common.extend({
           }
         },
         option: function (item, escape) {
-          console.log('---', item);
           if (item[_this.dict.get('keyfieldname')]) {
             if ((_this.dict.get('renderOptionSearch')) && (_this.dict.get('renderOptionSearch') !== selectfield)) {
               return _this.dict.setLineVals(_this.dict.get('renderOptionSearch'), item, escape);
@@ -80,16 +75,26 @@ Select = Common.extend({
       }
     });
 
-    $(document).on('submit', this.el, function(e) {
-      e.preventDefault();
-      _this.trigger('submit', _this.$el.val());
-    });
+    if (this.$select[0]) {
+      this.selectize = this.$select[0].selectize;
+    }
 
-    $(document).on('keyup', this.el, function(e) {
-      if (e.keyCode === 13) {
-        _this.trigger('search', _this.$el.val());
-      }
-    });
+    _this = this;
+
+    // $(document).on('submit', this.el, function(e) {
+    //   e.preventDefault();
+    //   _this.trigger('submit', _this.$el.val());
+    // });
+
+    // $(document).on('keyup', this.$el, function(e) {
+
+    if (this.selectize) {
+      this.selectize.on('change', function(e) {
+        alert('select! ' + _this.selectize.getValue());
+        _this.trigger('search', _this.selectize.getValue());
+      });
+    }
+
   }
 });
 
@@ -126,9 +131,9 @@ Select.prototype.load = function(_this) {
 };
 
 Select.prototype.clearOptions = function() {
-  var selectize;
-  selectize = this.$selectize[0].selectize;
-  selectize.clearOptions();    
+  if (this.selectize) {
+    this.selectize.clearOptions();    
+  }
 };
 
 module.exports = Select;

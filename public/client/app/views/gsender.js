@@ -44,8 +44,8 @@ Gsender = Common.extend({
     });
 
     this.insert = new Insert({
-      el:         this.$el.find("[data-view=\"search\"]"),
-      addfields:  this.dict.get('addfields')
+      el:    this.$el.find("[data-view=\"insert\"]"),
+      dict:  this.dict.toJSON()
     });
 
     this.$el.on('scroll', function() {
@@ -75,7 +75,8 @@ Gsender = Common.extend({
       _this.sendRequest('remove', _this.getSelectLine());
     });
 
-    this.$el.on('click', "[data-action=\"insert\"]", function() {
+    this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+      e.preventDefault();
       _this.$modal.modal('show');
     });
 
