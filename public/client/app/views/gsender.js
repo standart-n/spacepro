@@ -26,27 +26,37 @@ Gsender = Common.extend({
     this.dict.set('type', this.$el.data("dict-type") || 'parent');   
     this.dict.cleanVals();
 
+    this.toolbar = this.dict.get('toolbar');
+
     this.data = new Data();
     this.data.url = '/api/dict/' + this.dict.get('sid');
 
-    this.search = new Search({
-      el:    this.$el.find("[data-view=\"search\"]"),
-      dict:  this.dict.toJSON()
-    });
-
-    this.search.on('search', function(query) {
-      _this.dict.set({
-        limit: 50,
-        query: query
+  if (this.toolbar.search === true) {
+      this.search = new Search({
+        el:   this.$el.find("[data-view=\"search\"]"),
+        dict:  this.dict.toJSON()
       });
-      _this.$el.trigger('start.search');
-      _this.sendRequest('search');
-    });
 
-    this.insert = new Insert({
-      el:    this.$el.find("[data-view=\"insert\"]"),
-      dict:  this.dict.toJSON()
-    });
+      this.data.on('add', function(data) {
+        _this.search.select.addOption(data.toJSON());
+      });
+
+      this.search.on('search', function(query) {
+        _this.dict.set({
+          limit: 50,
+          query: query
+        });
+        _this.$el.trigger('start.search');
+        _this.sendRequest('search');
+      });
+    }
+
+    if (this.toolbar.insert === true) {
+      this.insert = new Insert({
+        el:    this.$el.find("[data-view=\"insert\"]"),
+        dict:  this.dict.toJSON()
+      });
+    }
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
@@ -112,7 +122,7 @@ Gsender.prototype.update = function(vals) {
     this.dict.set('limit', 50);
     this.dict.cleanVals(vals);
     if (this.search != null) {      
-      this.search.dict.cleanVals(vals);
+      this.search.select.dict.cleanVals(vals);
     }
     this.$el.trigger('start.update');
     this.sendRequest('update');

@@ -14,17 +14,16 @@ Search = Common.extend({
 
     this.$query = this.$el.find('input');
 
-    this.dict = new Dict(this.options.dict || {});
-
     this.select = new Select({
       el:   this.$query,
-      dict: this.dict.toJSON()
+      type: 'search',
+      dict: this.options.dict || {}
     });
 
     _this = this;
 
-    this.select.on('search', function() {
-      _this.search();
+    this.select.on('search', function(query) {
+      _this.search(query);
     });
 
   }
@@ -42,9 +41,9 @@ Search.prototype.focus = function() {
   this.$query.focus();
 };
 
-Search.prototype.search = function() {
+Search.prototype.search = function(query) {
   var value, selectize;
-  value = this.$query.val();
+  value = query || this.$query.val();
   this.select.clearOptions();
   this.trigger('search', value);
 };

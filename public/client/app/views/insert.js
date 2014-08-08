@@ -31,19 +31,26 @@ Insert.prototype.checkFields = function() {
   fields = this.dict.get('addfields') || {};
 
   _.each(fields, function(value, key) {
-    var id, sid, dict, select;
-    if (value.toString().match(/WDICTS\./i)) {      
+    var id, sid, dict, conf, select;
+    if (value.toString().match(/WDICTS\./i)) {
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = _this.dict.get('sid') + "_" + sid;
-      dict = new Dict(window[sid + '_data'] || {});
-      _this.$body.append(jade.templates.insert_control({
-        id:   id,
-        dict: dict.toJSON()
-      }));
-      select = new Select({
-        el:   "[data-control=\"" + id + "\"]",
-        dict: dict.toJSON()
-      });
+      conf = window[sid + '_data'];
+      if ((conf !== null) && (conf.privileges.S !== false)) {
+        dict = new Dict(conf);
+        _this.$body.append(jade.templates.insert_control({
+          id:   id,
+          dict: dict.toJSON()
+        }));
+        select = new Select({
+          el:   "[data-control=\"" + id + "\"]",
+          type: 'select',
+          dict: dict.toJSON()
+        });
+        select.on('select', function(value) {
+          alert(dict.get('sid') + ' ' + value);
+        });
+      }
     }
   });
 };

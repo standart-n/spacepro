@@ -10,7 +10,7 @@ Select = Common.extend({
   el: "[data-view=\"select\"]",
 
   initialize: function() {
-    var selectfield, selectize, cfselect, _this;
+    var selectfield, valuefield, selectize, cfselect, load, _this;
 
     this.dict = new Dict(this.options.dict || {});
 
@@ -25,11 +25,13 @@ Select = Common.extend({
       selectfield = selectfield.toString().toLowerCase();
     }
 
+    valuefield = this.options.type === 'search' ? selectfield : this.dict.get('returnfieldname');
+
     this.$select = this.$el.selectize({
       maxItems:          1,
       maxOptions:        100,
       delimeter:         ',',
-      valueField:        selectfield,
+      valueField:        valuefield,
       searchField:       selectfield,
       load:              this.load(this),
       persist:           false,
@@ -81,22 +83,44 @@ Select = Common.extend({
 
     _this = this;
 
-    // $(document).on('submit', this.el, function(e) {
-    //   e.preventDefault();
-    //   _this.trigger('submit', _this.$el.val());
-    // });
-
-    // $(document).on('keyup', this.$el, function(e) {
-
     if (this.selectize) {
-      this.selectize.on('change', function(e) {
-        alert('select! ' + _this.selectize.getValue());
-        _this.trigger('search', _this.selectize.getValue());
-      });
-    }
+      if (this.options.type === 'select') {
+        this.updateOptions();
 
+        this.selectize.on('change', function(value) {
+          _this.trigger('select', value);
+        });
+      }
+
+      if (this.options.type === 'search') {
+        this.selectize.on('item_add', function(value) {
+          _this.trigger('search', value);
+        });
+
+        this.selectize.on('item_remove', function() {
+          _this.trigger('search', '');
+        });
+      }
+    }
   }
 });
+
+Select.prototype.addOption = function(data) {
+  if ((data) && (this.selectize)) {
+    this.selectize.addOption(data);
+  }
+};
+
+Select.prototype.updateOptions = function() {
+  var load, _this;
+  _this = this;
+  load = this.load(this);
+  load('***', function(data) {
+    if ((data) && (_this.selectize)) {
+      _this.selectize.addOption(data);
+    }
+  });
+};
 
 Select.prototype.load = function(_this) {
   return function (query, fn) {
@@ -105,34 +129,36 @@ Select.prototype.load = function(_this) {
     }
 
     if (!query) {
-      fn();
-    } else {
-
-      _this.dict.set('query', query);
-
-      _this.data.fetch({
-        timeout: _this.dict.get('timeout'),
-        data: {
-          query: _this.dict.get('query')     || '',
-          limit: _this.dict.get('limit')     || null,
-          keys:  _this.dict.get('keys')      || {},
-          vals:  _this.dict.get('vals')      || {}
-        },
-        success: function() {
-          fn(_this.data.toJSON());
-        },
-        error: function() {
-          fn();
-        }
-      });
-
+      return fn();
     }
+
+    if (query === '***') {
+      query = '';
+    }
+
+    _this.dict.set('query', query);
+
+    _this.data.fetch({
+      timeout: _this.dict.get('timeout'),
+      data: {
+        query: _this.dict.get('query')     || '',
+        limit: _this.dict.get('limit')     || null,
+        keys:  _this.dict.get('keys')      || {},
+        vals:  _this.dict.get('vals')      || {}
+      },
+      success: function() {
+        fn(_this.data.toJSON());
+      },
+      error: function() {
+        fn();
+      }
+    });
   };
 };
 
 Select.prototype.clearOptions = function() {
   if (this.selectize) {
-    this.selectize.clearOptions();    
+    // this.selectize.clearOptions();
   }
 };
 
