@@ -1,5 +1,4 @@
 
-
 # /public/templates/signin/form.jade
 
 msgid "Signin"
@@ -37,6 +36,39 @@ msgstr "Поиск"
 
 msgid "Logout"
 msgstr "Выход"
+
+
+# /public/templates/dict/grid.jade
+
+msgid "Toolbar search"
+msgstr "Поиск"
+
+msgid "Toolbar insert"
+msgstr "Добавить"
+
+msgid "Toolbar remove"
+msgstr "Удалить"
+
+
+# /public/templates/dict/insert.jade
+
+msgid "Add new record"
+msgstr "Добавление новой записи"
+
+msgid "Save new record"
+msgstr "Сохранить"
+
+msgid "Cancel new record"
+msgstr "Отмена"
+
+
+# /public/templates/dict/line_data.jade
+
+msgid "Line data edit"
+msgstr "Редактировать"
+
+msgid "Line data remove"
+msgstr "Удалить"
 
 
 # /public/templates/dict/line_nothing.jade

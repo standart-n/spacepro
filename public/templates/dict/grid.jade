@@ -25,18 +25,18 @@
               form.form-inline(data-view = "search")
                 - if (parentDict.toolbar.search === true)
                   .form-group.col-xs-12.col-md-6.col-lg-4
-                    input.form-control(width = "100%", type = "search", placeholder = "search")
+                    input.form-control(width = "100%", type = "search", placeholder = "#{gettext('Toolbar search')}")
                 - if (parentDict.toolbar.insert === true)
                   a.btn.btn-success(href = "#", data-action = "insert") 
                     i.fa.fa-plus
                     &nbsp;
-                    span Добавить
+                    span #{gettext('Toolbar insert')}
                 - if (parentDict.toolbar.remove === true)
                   &nbsp;
                   a.btn.btn-danger(href = "#", data-action = "delete_many") 
                     i.fa.fa-minus
                     &nbsp;
-                    span Удалить
+                    span #{gettext('Toolbar remove')}
 
           .row
 

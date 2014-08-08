@@ -39,6 +39,39 @@ msgid "Logout"
 msgstr "Logout"
 
 
+# /public/templates/dict/grid.jade
+
+msgid "Toolbar search"
+msgstr "Search"
+
+msgid "Toolbar insert"
+msgstr "Add"
+
+msgid "Toolbar remove"
+msgstr "Remove"
+
+
+# /public/templates/dict/insert.jade
+
+msgid "Add new record"
+msgstr "Add new record"
+
+msgid "Save new record"
+msgstr "Save"
+
+msgid "Cancel new record"
+msgstr "Cancel"
+
+
+# /public/templates/dict/line_data.jade
+
+msgid "Line data edit"
+msgstr "Edit"
+
+msgid "Line data remove"
+msgstr "Remove"
+
+
 # /public/templates/dict/line_nothing.jade
 
 msgid "Information not found"

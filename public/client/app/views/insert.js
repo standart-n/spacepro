@@ -16,29 +16,36 @@ Insert = Common.extend({
 
     this.dict = new Dict(this.options.dict || {});
 
-    this.$body = this.$el.find("[data-type=\"modal-body\"]");
+    this.$body =   this.$el.find("[data-type=\"modal-body\"]");
+    this.$form =   this.$el.find("[data-view=\"form\"]");
+    this.$button = this.$el.find("[data-type=\"button\"]");
 
+    this.$button.on('click', function() {
+      alert('submit');
+    });
+
+    this.controls = {};
     this.checkFields();
   }
 
 });
 
 Insert.prototype.checkFields = function() {
-  var controls, fields, _this;
+  var fields, _this;
 
   _this = this;
-  controls = {};
   fields = this.dict.get('addfields') || {};
 
   _.each(fields, function(value, key) {
     var id, sid, dict, conf, select;
-    if (value.toString().match(/WDICTS\./i)) {
+    _this.controls[key] = 'none';
+    if (value.toString().match(/^WDICTS\./i)) {
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = _this.dict.get('sid') + "_" + sid;
       conf = window[sid + '_data'];
       if ((conf !== null) && (conf.privileges.S !== false)) {
         dict = new Dict(conf);
-        _this.$body.append(jade.templates.insert_control({
+        _this.$form.append(jade.templates.insert_control({
           id:   id,
           dict: dict.toJSON()
         }));
@@ -48,11 +55,34 @@ Insert.prototype.checkFields = function() {
           dict: dict.toJSON()
         });
         select.on('select', function(value) {
-          alert(dict.get('sid') + ' ' + value);
+          _this.controls[key] = value;
+          if (_this.checkCompleteFields()) {
+            _this.$button.removeAttr('disabled');
+          }
         });
+      }
+    } else {
+      if (value.toString().match(/^select/i)) {
+        _this.controls[key] = value;
       }
     }
   });
+};
+
+Insert.prototype.request = function() {
+  // $.ajax({
+  //   url
+  // });
+};
+
+Insert.prototype.checkCompleteFields = function() {
+  var result = true;
+  _.each(this.controls, function(value, key) {
+    if (value === 'none') {
+      result = false;
+    }
+  });
+  return result;
 };
 
 module.exports = Insert;

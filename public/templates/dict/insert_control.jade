@@ -1,6 +1,6 @@
 
-p
- | #{dict.sid}
- | #{dict.showcaption}
-select(type = "control", placeholder = "control", data-control = "#{id}")
+.form-group
+  label.col-sm-2.control-label #{dict.showcaption}
+  .col-sm-10
+    select.form-control(placeholder = "#{dict.showcaption}", data-control = "#{id}")
 

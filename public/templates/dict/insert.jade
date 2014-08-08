@@ -4,10 +4,11 @@
     .modal-content
       .modal-header
         button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;     
-        h4.modal-title Insert!
+        h4.modal-title #{gettext('Add new record')}
 
       .modal-body(data-type = "modal-body")
+        form.form-horizontal(role = "form", data-view = "form")
           
       .modal-footer
-        button.btn.btn-primary(type = "button", data-type = "force", data-dismiss = "modal") Yes
-        button.btn.btn-default(type = "button", data-dismiss = "modal") Cancel
+        button.btn.btn-success(data-type = "button", type = "button", disabled = "disabled") #{gettext('Save new record')}
+        button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel new record')}
