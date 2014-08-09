@@ -20,14 +20,15 @@ Insert = Common.extend({
     this.$form =   this.$el.find("[data-view=\"form\"]");
     this.$button = this.$el.find("[data-type=\"button\"]");
 
-    this.$button.on('click', function() {
-      alert('submit');
-    });
-
     this.controls = {};
     this.checkFields();
-  }
 
+    _this = this;
+
+    this.$button.on('click', function() {
+      _this.request();
+    });
+  }
 });
 
 Insert.prototype.checkFields = function() {
@@ -70,9 +71,21 @@ Insert.prototype.checkFields = function() {
 };
 
 Insert.prototype.request = function() {
-  // $.ajax({
-  //   url
-  // });
+  $.ajax({
+    url: '/api/dict/' + this.dict.get('sid'),
+    type: 'GET',
+    data: {
+      _method: 'PUT',
+      controls: this.controls
+    },
+    timeout: this.dict.get('timeout'),
+    success: function() {
+      alert('success');
+    },
+    error: function() {
+      alert('error');
+    }
+  });
 };
 
 Insert.prototype.checkCompleteFields = function() {
