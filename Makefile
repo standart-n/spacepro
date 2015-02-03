@@ -4,7 +4,8 @@ DATE = $(shell date +%I:%M%p)
 install: 
 	@mkdir -p ./lib/
 	@npm install
-	@./node_modules/.bin/grunt all
+	@./node_modules/.bin/grunt all --force --verbose
+	@./node_modules/.bin/gulp po2json
 
 
 build:

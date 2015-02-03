@@ -1,28 +1,30 @@
 
-var Auth, assert, user_id, session_id, workstation_id, mongoose, Memcached,
-  fb_json, user_json, mongo_json, memcached_json;
-
+var Auth, assert, user_id, session_id, workstation_id, mongoose, Memcached, conf;
 process.env.APP_DIR = '../..';
 
 mongoose =  require('mongoose');
 Memcached = require('memcached');
 
-fb_json =          require(process.env.APP_DIR + '/test/conf/fb.json');
-user_json =        require(process.env.APP_DIR + '/test/conf/user.json');
-mongo_json =       require(process.env.APP_DIR + '/test/conf/mongo.json');
-memcached_json =   require(process.env.APP_DIR + '/test/conf/memcached.json');
+conf = {
+  fb:          require(process.env.APP_DIR + '/test/conf/fb.json'),
+  user:        require(process.env.APP_DIR + '/test/conf/user.json'),
+  mongo:       require(process.env.APP_DIR + '/test/conf/mongo.json'),
+  memcached:   require(process.env.APP_DIR + '/test/conf/memcached.json')
+};
 
-process.env.FIREBIRD_HOST =         fb_json.host;
-process.env.FIREBIRD_PATH =         fb_json.path;
-process.env.FIREBIRD_USER =         fb_json.user;
-process.env.FIREBIRD_PASSWORD =     fb_json.password;
+process.env.FIREBIRD_HOST =         conf.fb.host;
+process.env.FIREBIRD_PATH =         conf.fb.path;
+process.env.FIREBIRD_USER =         conf.fb.user;
+process.env.FIREBIRD_PASSWORD =     conf.fb.password;
 
-mongoose.connect(mongo_json.host);
-global.memcached = new Memcached(memcached_json.host);
+process.env.MEMCACHED_CONNECTION =  conf.memcached.host;
+
+mongoose.connect(conf.mongo.host);
 
 assert = require('chai').assert;
 
-Auth = require(process.env.APP_DIR + '/lib/controllers/auth');
+Auth =      require(process.env.APP_DIR + '/lib/controllers/auth');
+Memcached = require(process.env.APP_DIR + '/lib/controllers/memcached');
 
 describe('Auth:', function() {
 
@@ -104,7 +106,7 @@ describe('Auth:', function() {
       var auth;
 
       auth = new Auth({
-        user_login:       user_json.worker.login,
+        user_login:       conf.user.worker.login,
         user_password:    'password',
         hide_errors:      true
       });
@@ -129,8 +131,8 @@ describe('Auth:', function() {
       var auth;
   
       auth = new Auth({
-        user_login:      user_json.worker.login,
-        user_password:   user_json.worker.password,
+        user_login:      conf.user.worker.login,
+        user_password:   conf.user.worker.password,
         web_group_id:    '-9999',
         hide_errors:     true
       });
@@ -155,13 +157,15 @@ describe('Auth:', function() {
       var auth;
 
       auth = new Auth({
-        user_login:       user_json.worker.login,
-        user_password:    user_json.worker.password,
+        user_login:       conf.user.worker.login,
+        user_password:    conf.user.worker.password,
         hide_errors:      true
       });
 
       auth.login(function() {
-        
+
+        console.log(auth.toJSON());
+
         assert.notEqual(null,     auth.get('session_success'), 'session_success');
         assert.equal(null,        auth.get('fb_transaction'),  'fb_transaction');
         assert.notEqual(null,     auth.get('user_id'),         'user_id');

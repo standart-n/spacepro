@@ -1,14 +1,14 @@
 
-var Firebird, assert, fb_test_data;
+var Firebird, assert, conf;
 
 process.env.APP_DIR = '../..';
 
-fb_test_data =    require(process.env.APP_DIR + '/test/conf/fb.json');
+conf =    require(process.env.APP_DIR + '/test/conf/fb.json');
 
-process.env.FIREBIRD_HOST =         fb_test_data.host;
-process.env.FIREBIRD_PATH =         fb_test_data.path;
-process.env.FIREBIRD_USER =         fb_test_data.user;
-process.env.FIREBIRD_PASSWORD =     fb_test_data.password;
+process.env.FIREBIRD_HOST =         conf.host;
+process.env.FIREBIRD_PATH =         conf.path;
+process.env.FIREBIRD_USER =         conf.user;
+process.env.FIREBIRD_PASSWORD =     conf.password;
 
 assert = require('chai').assert;
 

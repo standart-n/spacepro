@@ -103,14 +103,38 @@ module.exports = function(grunt) {
       }
     },
 
-    po2json: {
+/*    po2json: {
       en: {
-        src: ['./public/locale/en/*.po'],
+        src: './public/locale/en/*.po',
         dest: './public/i18n/en'
       },
       ru: {
-        src: ['./public/locale/ru/*.po'],
+        src: './public/locale/ru/*.po',
         dest: './public/i18n/ru'
+      }
+    },
+*/
+
+    po2json: {
+      en1: {
+        options: {
+          original: 'en',
+          filename: 'locale.json',
+          format:   'json'
+        },
+        files: {
+          'public/i18n/en': 'public/locale/**/messages.po'
+        }
+      },
+      ru1: {
+        options: {
+          original: 'en',
+          filename: 'locale.json',
+          format:   'json'
+        },
+        files: {
+          'public/i18n/ru': ['public/locale/ru/**/messages.po']
+        }
       }
     },
 
@@ -144,7 +168,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.loadNpmTasks('grunt-po2json');
+  grunt.loadNpmTasks('grunt-po2json-simple');
   grunt.loadNpmTasks('grunt-jade');
   grunt.loadNpmTasks('grunt-recess');
   grunt.loadNpmTasks('grunt-lmd');

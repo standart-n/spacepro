@@ -9,7 +9,6 @@ lib-cov
 
 pids
 logs
-docs
 results
 
 npm-debug.log
@@ -17,11 +16,7 @@ node_modules
 
 /bower_components
 
-/public/css
-/public/js
-/public/i18n
-/public/themes
-
+/docs
+/dicts
 /grids
-
-/test/conf
+/users
