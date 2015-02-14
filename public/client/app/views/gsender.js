@@ -31,7 +31,7 @@ Gsender = Common.extend({
     this.data = new Data();
     this.data.url = '/api/dict/' + this.dict.get('sid');
 
-  if (this.toolbar.search === true) {
+    if (this.toolbar.search === true) {
       this.search = new Search({
         el:   this.$el.find("[data-view=\"search\"]"),
         dict:  this.dict.toJSON()

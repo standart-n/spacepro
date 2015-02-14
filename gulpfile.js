@@ -8,6 +8,9 @@ gulp.task('default', function() {
 
 gulp.task('po2json', function() {
 	return gulp.src(['public/locale/**/messages.po'])
-	  .pipe(po2json())
+	  .pipe(po2json({
+	  	pretty: true,
+	  	format: 'mf'
+	  }))
 	  .pipe(gulp.dest('public/i18n/'));
 })

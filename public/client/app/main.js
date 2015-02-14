@@ -42,8 +42,12 @@ $(function() {
     data = json_locale_data || window.json_locale_data || {};
     if (data.messages != null) {
       if (data.messages[msgid] != null) {
-        if (data.messages[msgid].length > 1) {
-          msgstr = data.messages[msgid][1];
+        if (typeof(data.messages[msgid]) == 'string') {
+          msgstr = data.messages[msgid];
+        } else {
+          if (data.messages[msgid].length > 1) {
+            msgstr = data.messages[msgid][1];
+          }
         }
       }
     }

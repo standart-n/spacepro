@@ -353,8 +353,12 @@ $(function() {
     data = json_locale_data || window.json_locale_data || {};
     if (data.messages != null) {
       if (data.messages[msgid] != null) {
-        if (data.messages[msgid].length > 1) {
-          msgstr = data.messages[msgid][1];
+        if (typeof(data.messages[msgid]) == 'string') {
+          msgstr = data.messages[msgid];
+        } else {
+          if (data.messages[msgid].length > 1) {
+            msgstr = data.messages[msgid][1];
+          }
         }
       }
     }
@@ -4180,7 +4184,7 @@ Gsender = Common.extend({
     this.data = new Data();
     this.data.url = '/api/dict/' + this.dict.get('sid');
 
-  if (this.toolbar.search === true) {
+    if (this.toolbar.search === true) {
       this.search = new Search({
         el:   this.$el.find("[data-view=\"search\"]"),
         dict:  this.dict.toJSON()

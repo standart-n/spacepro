@@ -6,7 +6,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<!DOCTYPE html><html');
-buf.push(attrs({ terse: true, 'lang':("" + (lang) + ""), 'lang_dir':("" + (lang_dir) + "") }, {"lang":true,"lang_dir":true}));
+buf.push(attrs({ terse: true, 'lang':("" + (lang) + ""), 'dir':("" + (lang_dir) + "") }, {"lang":true,"dir":true}));
 buf.push('><head><title>' + escape((interp = title) == null ? '' : interp) + '</title><base href="/"><meta');
 buf.push(attrs({ terse: true, 'name':("description"), 'content':("" + (description) + "") }, {"name":true,"content":true}));
 buf.push('><meta');

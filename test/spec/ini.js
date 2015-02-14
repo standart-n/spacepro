@@ -18,7 +18,7 @@ describe('Ini:', function() {
                 "select D$UUID from pr_add_device(:vid,:building_d$uuid,:APARTMENT)\r\n",
 
         json = {
-            "insertsql" : "select D$UUID from pr_add_device(:vid,:building_d$uuid,:APARTMENT)"
+            "insertsql" : "select d$uuid from pr_add_device(:vid,:building_d$uuid,:apartment)"
         };
 
       assert.deepEqual(json, ini.parse(text, {
@@ -32,7 +32,7 @@ describe('Ini:', function() {
                 "update VW_DEVICE set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )\r\n",
 
         json = {
-            "deletesql_selected" : "update VW_DEVICE set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )"
+            "deletesql_selected" : "update vw_device set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )"
         };
 
       assert.deepEqual(json, ini.parse(text, {
@@ -49,7 +49,7 @@ describe('Ini:', function() {
                 "\r\n",
 
         json = {
-            "refreshsql" : "select * from VW_DEVICE where d$uuid=:d$uuid",
+            "refreshsql" : "select * from vw_device where d$uuid=:d$uuid",
             "selectsql": {}
         };
 
@@ -71,7 +71,7 @@ describe('Ini:', function() {
 
         json = {
             "cfselect": {
-              "selectfieldexpression": "SELECTCAPTION",
+              "selectfieldexpression": "selectcaption",
               "allwayspartial": "1"
             },
             "form_show": {
@@ -98,11 +98,12 @@ describe('Ini:', function() {
               "selectfieldexpression": "SELECTCAPTION",
               "allwayspartial": "1"
             },
-            "selectsql": "select * from VW_DEVICE where status=0 order by street, sortedcaptionb, sortedcaptiona,d$uuid"
+            "selectsql": "select * from vw_device where status=0 order by street, sortedcaptionb, sortedcaptiona,d$uuid"
         };
 
       assert.deepEqual(json, ini.parse(text, {
-        textFields: ['selectsql']
+        textFields:       ['selectsql'],
+        registerFields:   ['selectfieldexpression']
       }));
     });
 
@@ -115,7 +116,7 @@ describe('Ini:', function() {
                 "where d$uuid in (:selected_ids: )\r\n",
 
         json = {
-            "deletesql_selected" : "update VW_DEVICE set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )"
+            "deletesql_selected" : "update vw_device set status=iif(status=1,0,1) where d$uuid in (:selected_ids: )"
         };
 
       assert.deepEqual(json, ini.parse(text, {textFields: ['deletesql_selected']}));
@@ -130,8 +131,8 @@ describe('Ini:', function() {
 
         json = {
             "cfselect": {
-              "select": "field=expression=SELECTCAPTION",
-              "allways": "Partial=1"
+              "select": "field=expression=selectcaption",
+              "allways": "partial=1"
             }
         };
 

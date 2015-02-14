@@ -1,0 +1,8 @@
+{
+  "apps": [{
+  	"name":       "spacepro",
+  	"script":     "./spacepro.js",
+  	"args":       ["run"],
+  	"exec_mode":  "cluster"
+  }]
+}
