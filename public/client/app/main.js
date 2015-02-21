@@ -17,8 +17,6 @@ require('line_error.jade');
 require('line_loading.jade');
 require('insert_control.jade');
 
-// alert('loading_' + typeof(jade.templates.line_loading));
-
 Backbone =    require('backbone');
 App =         require('app');
 

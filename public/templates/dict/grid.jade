@@ -27,27 +27,22 @@
                   .form-group.col-xs-12.col-md-6.col-lg-4
                     input.form-control(width = "100%", type = "search", placeholder = "#{gettext('Toolbar search')}")
                 - if (parentDict.toolbar.insert === true)
-                  a.btn.btn-success(href = "#", data-action = "insert") 
+                  a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}") 
                     i.fa.fa-plus
-                    &nbsp;
-                    span #{gettext('Toolbar insert')}
                 - if (parentDict.toolbar.remove === true)
                   &nbsp;
-                  a.btn.btn-danger(href = "#", data-action = "delete_many") 
+                  a.btn.btn-danger(href = "#", data-action = "delete_many", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
                     i.fa.fa-minus
-                    &nbsp;
-                    span #{gettext('Toolbar remove')}
 
           .row
-
             .col-md-12
-
               table.table.table-condensed.table-striped.table-hover.dict
                 thead
                   tr
                     th
                     - each column in parentDict.columns
-                      th(class = "#{column.hidden_class}") #{column.caption}
+                      th(class = "#{column.hidden_class}")
+                        span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
                     th
 
                 tbody
@@ -62,16 +57,12 @@
                     .form-group.col-xs-12.col-md-6.col-lg-4
                       input.form-control(type = "search", placeholder = "search")
                   - if (child.toolbar.insert === true)
-                    a.btn.btn-success(href = "#") 
+                    a.btn.btn-success(href = "#", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}")
                       i.fa.fa-plus
-                      &nbsp;
-                      span Добавить
                   - if (child.toolbar.remove === true)
                     &nbsp;
-                    a.btn.btn-danger(href = "#") 
+                    a.btn.btn-danger(href = "#", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
                       i.fa.fa-minus
-                      &nbsp;
-                      span Удалить
 
             .row
 
@@ -82,7 +73,8 @@
                     tr
                       th
                       -   each column in child.columns
-                        th(class = "#{column.hidden_class}") #{column.caption}
+                        th(class = "#{column.hidden_class}")
+                          span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
                       th
 
                   tbody

@@ -16,8 +16,8 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
       var column = columns[$index];
 
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + "") }, {"data-col-field":true}));
-buf.push('>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
+buf.push('>     ');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
  if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
@@ -74,8 +74,8 @@ buf.push('</td>');
       $$l++;      var column = columns[$index];
 
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + "") }, {"data-col-field":true}));
-buf.push('>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
+buf.push('>     ');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
  if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))

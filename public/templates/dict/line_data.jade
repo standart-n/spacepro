@@ -4,7 +4,7 @@ tr(data-uuid = "#{line[keyfieldname]}")
     label
       input(type = "checkbox")
   - each column in columns
-    td(data-col-field = "#{column.field}")
+    td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")      
       - if ((line[column.field] != null) && (line[column.field] !== ''))        
         - if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
           span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")

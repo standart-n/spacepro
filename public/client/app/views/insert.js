@@ -21,6 +21,7 @@ Insert = Common.extend({
     this.$button = this.$el.find("[data-type=\"button\"]");
 
     this.controls = {};
+    this.autoinsert = true;
     this.checkFields();
 
     _this = this;
@@ -32,15 +33,14 @@ Insert = Common.extend({
 });
 
 Insert.prototype.checkFields = function() {
-  var fields, _this;
-
-  _this = this;
-  fields = this.dict.get('addfields') || {};
+  var _this = this;
+  var fields = this.dict.get('addfields') || {};
 
   _.each(fields, function(value, key) {
     var id, sid, dict, conf, select;
     _this.controls[key] = 'none';
     if (value.toString().match(/^WDICTS\./i)) {
+      _this.autoinsert = false;
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = _this.dict.get('sid') + "_" + sid;
       conf = window[sid + '_data'];

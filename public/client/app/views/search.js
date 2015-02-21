@@ -26,6 +26,11 @@ Search = Common.extend({
       _this.search(query);
     });
 
+    this.$el.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
+    
   }
 });
 

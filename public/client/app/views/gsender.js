@@ -20,8 +20,10 @@ Gsender = Common.extend({
 
     this.dict = new Dict(this.options.dict || {});
 
+    this.$thead = this.$el.find('thead');
     this.$worksheet = this.$el.find('tbody');
-    this.$modal = this.$el.find("[data-type=\"modal\"]");
+    this.$search = this.$el.find("[data-view=\"search\"]");
+    this.$insert = this.$el.find("[data-view=\"insert\"]");
 
     this.dict.set('type', this.$el.data("dict-type") || 'parent');   
     this.dict.cleanVals();
@@ -33,7 +35,7 @@ Gsender = Common.extend({
 
     if (this.toolbar.search === true) {
       this.search = new Search({
-        el:   this.$el.find("[data-view=\"search\"]"),
+        el:   this.$search,
         dict:  this.dict.toJSON()
       });
 
@@ -53,10 +55,24 @@ Gsender = Common.extend({
 
     if (this.toolbar.insert === true) {
       this.insert = new Insert({
-        el:    this.$el.find("[data-view=\"insert\"]"),
+        el:    this.$insert,
         dict:  this.dict.toJSON()
       });
+
+      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        e.preventDefault();
+        if (_this.insert.autoinsert === true) {
+          _this.insert.request();
+        } else {
+          _this.$insert.modal('show');
+        }
+      });
     }
+
+    this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
@@ -79,15 +95,10 @@ Gsender = Common.extend({
       _this.updateChilds();
     });
 
-    this.$el.on('click', "[data-action=\"delete\"]", function() {
+    this.$el.on('click', "[data-action=\"delete\"]", function() {      
       var $tr = $(this).parent().parent();
       _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.sendRequest('remove', _this.getSelectLine());
-    });
-
-    this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-      e.preventDefault();
-      _this.$modal.modal('show');
     });
 
     this.data.on('add', function(line) {
@@ -136,7 +147,7 @@ Gsender.prototype.updateChilds = function() {
   if (this.data !== null) {
     _.each(this.dict.get('childs'), function(child) {
       if (window[child.sid] !== null) {
-        if (line != null) {
+        if ((line != null) && (window[child.sid])) {
           window[child.sid].update(line.toJSON() || {});
         } else {
           window[child.sid].showInformationNotFound();
@@ -260,7 +271,7 @@ Gsender.prototype.sendRequest = function(type, model) {
     break;
   }
 
-  this.$el.trigger('request:' + type);
+  // this.$el.trigger('request:' + type);
 
   success = function() {
     _this.hideLoading();
@@ -298,7 +309,7 @@ Gsender.prototype.sendRequest = function(type, model) {
         keys:    this.dict.get('keys')        || {},
         vals:    this.dict.get('vals')        || {}
       },
-      timeout: timeout,
+      timeout: this.dict.get('timeout'),
       success: success,
       error:   error
     });

@@ -328,8 +328,6 @@ require('line_error.jade');
 require('line_loading.jade');
 require('insert_control.jade');
 
-// alert('loading_' + typeof(jade.templates.line_loading));
-
 Backbone =    require('backbone');
 App =         require('app');
 
@@ -4173,8 +4171,10 @@ Gsender = Common.extend({
 
     this.dict = new Dict(this.options.dict || {});
 
+    this.$thead = this.$el.find('thead');
     this.$worksheet = this.$el.find('tbody');
-    this.$modal = this.$el.find("[data-type=\"modal\"]");
+    this.$search = this.$el.find("[data-view=\"search\"]");
+    this.$insert = this.$el.find("[data-view=\"insert\"]");
 
     this.dict.set('type', this.$el.data("dict-type") || 'parent');   
     this.dict.cleanVals();
@@ -4186,7 +4186,7 @@ Gsender = Common.extend({
 
     if (this.toolbar.search === true) {
       this.search = new Search({
-        el:   this.$el.find("[data-view=\"search\"]"),
+        el:   this.$search,
         dict:  this.dict.toJSON()
       });
 
@@ -4206,10 +4206,24 @@ Gsender = Common.extend({
 
     if (this.toolbar.insert === true) {
       this.insert = new Insert({
-        el:    this.$el.find("[data-view=\"insert\"]"),
+        el:    this.$insert,
         dict:  this.dict.toJSON()
       });
+
+      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        e.preventDefault();
+        if (_this.insert.autoinsert === true) {
+          _this.insert.request();
+        } else {
+          _this.$insert.modal('show');
+        }
+      });
     }
+
+    this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
 
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
@@ -4232,15 +4246,10 @@ Gsender = Common.extend({
       _this.updateChilds();
     });
 
-    this.$el.on('click', "[data-action=\"delete\"]", function() {
+    this.$el.on('click', "[data-action=\"delete\"]", function() {      
       var $tr = $(this).parent().parent();
       _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.sendRequest('remove', _this.getSelectLine());
-    });
-
-    this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-      e.preventDefault();
-      _this.$modal.modal('show');
     });
 
     this.data.on('add', function(line) {
@@ -4289,7 +4298,7 @@ Gsender.prototype.updateChilds = function() {
   if (this.data !== null) {
     _.each(this.dict.get('childs'), function(child) {
       if (window[child.sid] !== null) {
-        if (line != null) {
+        if ((line != null) && (window[child.sid])) {
           window[child.sid].update(line.toJSON() || {});
         } else {
           window[child.sid].showInformationNotFound();
@@ -4413,7 +4422,7 @@ Gsender.prototype.sendRequest = function(type, model) {
     break;
   }
 
-  this.$el.trigger('request:' + type);
+  // this.$el.trigger('request:' + type);
 
   success = function() {
     _this.hideLoading();
@@ -4451,7 +4460,7 @@ Gsender.prototype.sendRequest = function(type, model) {
         keys:    this.dict.get('keys')        || {},
         vals:    this.dict.get('vals')        || {}
       },
-      timeout: timeout,
+      timeout: this.dict.get('timeout'),
       success: success,
       error:   error
     });
@@ -4522,6 +4531,7 @@ Insert = Common.extend({
     this.$button = this.$el.find("[data-type=\"button\"]");
 
     this.controls = {};
+    this.autoinsert = true;
     this.checkFields();
 
     _this = this;
@@ -4533,15 +4543,14 @@ Insert = Common.extend({
 });
 
 Insert.prototype.checkFields = function() {
-  var fields, _this;
-
-  _this = this;
-  fields = this.dict.get('addfields') || {};
+  var _this = this;
+  var fields = this.dict.get('addfields') || {};
 
   _.each(fields, function(value, key) {
     var id, sid, dict, conf, select;
     _this.controls[key] = 'none';
     if (value.toString().match(/^WDICTS\./i)) {
+      _this.autoinsert = false;
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = _this.dict.get('sid') + "_" + sid;
       conf = window[sid + '_data'];
@@ -4632,6 +4641,11 @@ Search = Common.extend({
       _this.search(query);
     });
 
+    this.$el.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
+    
   }
 });
 
@@ -5098,8 +5112,8 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
       var column = columns[$index];
 
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + "") }, {"data-col-field":true}));
-buf.push('>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
+buf.push('>     ');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
  if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
@@ -5156,8 +5170,8 @@ buf.push('</td>');
       $$l++;      var column = columns[$index];
 
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + "") }, {"data-col-field":true}));
-buf.push('>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
+buf.push('>     ');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
  if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))

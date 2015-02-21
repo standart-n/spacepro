@@ -173,6 +173,7 @@ describe('Auth:', function() {
         assert.equal(null,        auth.get('error'),           'error');
         assert.equal('success',   auth.get('result'),          'result');
 
+        console.log(auth.get('session_success'));
         if (auth.get('session_success') === 1) {
 
           user_id =           auth.get('user_id');

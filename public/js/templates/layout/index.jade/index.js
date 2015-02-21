@@ -17,7 +17,7 @@ buf.push('><meta');
 buf.push(attrs({ terse: true, 'name':("Copyright"), 'Lang':("ru"), 'content':("2013 " + (author) + "") }, {"name":true,"Lang":true,"content":true}));
 buf.push('><meta name="robots" content="all"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta');
 buf.push(attrs({ terse: true, 'http-equiv':("Content-Language"), 'content':("" + (lang) + "") }, {"http-equiv":true,"content":true}));
-buf.push('><meta http-equiv="Content-Type" content="text/html; charset = utf-8">');
+buf.push('><meta http-equiv="Content-Type" content="text/html; charset = utf-8"><link href="/img/favicon.ico" rel="shortcut icon" type="image/x-icon">');
  css.forEach(function(file){
 {
 buf.push('<link');
@@ -156,11 +156,15 @@ buf.push('></div>');
 }
  if (parentDict.toolbar.insert === true)
 {
-buf.push('<a href="#" data-action="insert" class="btn btn-success"> <i class="fa fa-plus"></i>&nbsp;<span>' + escape((interp = gettext('Toolbar insert')) == null ? '' : interp) + '</span></a>');
+buf.push('<a');
+buf.push(attrs({ terse: true, 'href':("#"), 'data-action':("insert"), 'data-toggle':("tooltip"), 'title':("" + (gettext('Toolbar insert')) + ""), "class": ('btn') + ' ' + ('btn-success') }, {"href":true,"data-action":true,"data-toggle":true,"title":true}));
+buf.push('> <i class="fa fa-plus"></i></a>');
 }
  if (parentDict.toolbar.remove === true)
 {
-buf.push('&nbsp;<a href="#" data-action="delete_many" class="btn btn-danger"> <i class="fa fa-minus"></i>&nbsp;<span>' + escape((interp = gettext('Toolbar remove')) == null ? '' : interp) + '</span></a>');
+buf.push('&nbsp;<a');
+buf.push(attrs({ terse: true, 'href':("#"), 'data-action':("delete_many"), 'data-toggle':("tooltip"), 'title':("" + (gettext('Toolbar remove')) + ""), "class": ('btn') + ' ' + ('btn-danger') }, {"href":true,"data-action":true,"data-toggle":true,"title":true}));
+buf.push('><i class="fa fa-minus"></i></a>');
 }
 buf.push('</form></div></div><div class="row"><div class="col-md-12"><table class="table table-condensed table-striped table-hover dict"><thead><tr><th></th>');
 // iterate parentDict.columns
@@ -172,7 +176,9 @@ buf.push('</form></div></div><div class="row"><div class="col-md-12"><table clas
 
 buf.push('<th');
 buf.push(attrs({ terse: true, "class": ("" + (column.hidden_class) + "") }, {"class":true}));
-buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>');
+buf.push('><span');
+buf.push(attrs({ terse: true, 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
+buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
     }
 
   } else {
@@ -182,7 +188,9 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>'
 
 buf.push('<th');
 buf.push(attrs({ terse: true, "class": ("" + (column.hidden_class) + "") }, {"class":true}));
-buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>');
+buf.push('><span');
+buf.push(attrs({ terse: true, 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
+buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
     }
 
   }
@@ -205,11 +213,15 @@ buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input type="searc
 }
  if (child.toolbar.insert === true)
 {
-buf.push('<a href="#" class="btn btn-success"> <i class="fa fa-plus"></i>&nbsp;<span>Добавить</span></a>');
+buf.push('<a');
+buf.push(attrs({ terse: true, 'href':("#"), 'data-toggle':("tooltip"), 'title':("" + (gettext('Toolbar insert')) + ""), "class": ('btn') + ' ' + ('btn-success') }, {"href":true,"data-toggle":true,"title":true}));
+buf.push('><i class="fa fa-plus"></i></a>');
 }
  if (child.toolbar.remove === true)
 {
-buf.push('&nbsp;<a href="#" class="btn btn-danger"> <i class="fa fa-minus"></i>&nbsp;<span>Удалить</span></a>');
+buf.push('&nbsp;<a');
+buf.push(attrs({ terse: true, 'href':("#"), 'data-toggle':("tooltip"), 'title':("" + (gettext('Toolbar remove')) + ""), "class": ('btn') + ' ' + ('btn-danger') }, {"href":true,"data-toggle":true,"title":true}));
+buf.push('><i class="fa fa-minus"></i></a>');
 }
 buf.push('</form></div></div><div class="row"><div class="col-md-12"><table class="table table-condensed table-striped table-hover dict"><thead><tr><th></th>');
 // iterate child.columns
@@ -221,7 +233,9 @@ buf.push('</form></div></div><div class="row"><div class="col-md-12"><table clas
 
 buf.push('<th');
 buf.push(attrs({ terse: true, "class": ("" + (column.hidden_class) + "") }, {"class":true}));
-buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>');
+buf.push('><span');
+buf.push(attrs({ terse: true, 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
+buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
     }
 
   } else {
@@ -231,7 +245,9 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>'
 
 buf.push('<th');
 buf.push(attrs({ terse: true, "class": ("" + (column.hidden_class) + "") }, {"class":true}));
-buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>');
+buf.push('><span');
+buf.push(attrs({ terse: true, 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
+buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
     }
 
   }
@@ -254,11 +270,15 @@ buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input type="searc
 }
  if (child.toolbar.insert === true)
 {
-buf.push('<a href="#" class="btn btn-success"> <i class="fa fa-plus"></i>&nbsp;<span>Добавить</span></a>');
+buf.push('<a');
+buf.push(attrs({ terse: true, 'href':("#"), 'data-toggle':("tooltip"), 'title':("" + (gettext('Toolbar insert')) + ""), "class": ('btn') + ' ' + ('btn-success') }, {"href":true,"data-toggle":true,"title":true}));
+buf.push('><i class="fa fa-plus"></i></a>');
 }
  if (child.toolbar.remove === true)
 {
-buf.push('&nbsp;<a href="#" class="btn btn-danger"> <i class="fa fa-minus"></i>&nbsp;<span>Удалить</span></a>');
+buf.push('&nbsp;<a');
+buf.push(attrs({ terse: true, 'href':("#"), 'data-toggle':("tooltip"), 'title':("" + (gettext('Toolbar remove')) + ""), "class": ('btn') + ' ' + ('btn-danger') }, {"href":true,"data-toggle":true,"title":true}));
+buf.push('><i class="fa fa-minus"></i></a>');
 }
 buf.push('</form></div></div><div class="row"><div class="col-md-12"><table class="table table-condensed table-striped table-hover dict"><thead><tr><th></th>');
 // iterate child.columns
@@ -270,7 +290,9 @@ buf.push('</form></div></div><div class="row"><div class="col-md-12"><table clas
 
 buf.push('<th');
 buf.push(attrs({ terse: true, "class": ("" + (column.hidden_class) + "") }, {"class":true}));
-buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>');
+buf.push('><span');
+buf.push(attrs({ terse: true, 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
+buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
     }
 
   } else {
@@ -280,7 +302,9 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>'
 
 buf.push('<th');
 buf.push(attrs({ terse: true, "class": ("" + (column.hidden_class) + "") }, {"class":true}));
-buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</th>');
+buf.push('><span');
+buf.push(attrs({ terse: true, 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
+buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
     }
 
   }
