@@ -326,7 +326,8 @@ require('line_data.jade');
 require('line_nothing.jade');
 require('line_error.jade');
 require('line_loading.jade');
-require('insert_control.jade');
+require('insert_select.jade');
+require('insert_default.jade');
 
 Backbone =    require('backbone');
 App =         require('app');
@@ -442,6 +443,1544 @@ var underscore = require("_"),
 
 /* added by builder */
 return Backbone;
+}),
+"bootstrap": (function (require) { /* wrapped by builder */
+/* added by builder */
+var jQuery = require("$");
+
+/**
+* bootstrap.js v3.0.0 by @fat and @mdo
+* Copyright 2013 Twitter Inc.
+* http://www.apache.org/licenses/LICENSE-2.0
+*/
+if(!jQuery)throw new Error("Bootstrap requires jQuery");+function(a){"use strict";function b(){var a=document.createElement("bootstrap"),b={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"};for(var c in b)if(void 0!==a.style[c])return{end:b[c]}}a.fn.emulateTransitionEnd=function(b){var c=!1,d=this;a(this).one(a.support.transition.end,function(){c=!0});var e=function(){c||a(d).trigger(a.support.transition.end)};return setTimeout(e,b),this},a(function(){a.support.transition=b()})}(window.jQuery),+function(a){"use strict";var b='[data-dismiss="alert"]',c=function(c){a(c).on("click",b,this.close)};c.prototype.close=function(b){function c(){f.trigger("closed.bs.alert").remove()}var d=a(this),e=d.attr("data-target");e||(e=d.attr("href"),e=e&&e.replace(/.*(?=#[^\s]*$)/,""));var f=a(e);b&&b.preventDefault(),f.length||(f=d.hasClass("alert")?d:d.parent()),f.trigger(b=a.Event("close.bs.alert")),b.isDefaultPrevented()||(f.removeClass("in"),a.support.transition&&f.hasClass("fade")?f.one(a.support.transition.end,c).emulateTransitionEnd(150):c())};var d=a.fn.alert;a.fn.alert=function(b){return this.each(function(){var d=a(this),e=d.data("bs.alert");e||d.data("bs.alert",e=new c(this)),"string"==typeof b&&e[b].call(d)})},a.fn.alert.Constructor=c,a.fn.alert.noConflict=function(){return a.fn.alert=d,this},a(document).on("click.bs.alert.data-api",b,c.prototype.close)}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.$element=a(c),this.options=a.extend({},b.DEFAULTS,d)};b.DEFAULTS={loadingText:"loading..."},b.prototype.setState=function(a){var b="disabled",c=this.$element,d=c.is("input")?"val":"html",e=c.data();a+="Text",e.resetText||c.data("resetText",c[d]()),c[d](e[a]||this.options[a]),setTimeout(function(){"loadingText"==a?c.addClass(b).attr(b,b):c.removeClass(b).removeAttr(b)},0)},b.prototype.toggle=function(){var a=this.$element.closest('[data-toggle="buttons"]');if(a.length){var b=this.$element.find("input").prop("checked",!this.$element.hasClass("active")).trigger("change");"radio"===b.prop("type")&&a.find(".active").removeClass("active")}this.$element.toggleClass("active")};var c=a.fn.button;a.fn.button=function(c){return this.each(function(){var d=a(this),e=d.data("bs.button"),f="object"==typeof c&&c;e||d.data("bs.button",e=new b(this,f)),"toggle"==c?e.toggle():c&&e.setState(c)})},a.fn.button.Constructor=b,a.fn.button.noConflict=function(){return a.fn.button=c,this},a(document).on("click.bs.button.data-api","[data-toggle^=button]",function(b){var c=a(b.target);c.hasClass("btn")||(c=c.closest(".btn")),c.button("toggle"),b.preventDefault()})}(window.jQuery),+function(a){"use strict";var b=function(b,c){this.$element=a(b),this.$indicators=this.$element.find(".carousel-indicators"),this.options=c,this.paused=this.sliding=this.interval=this.$active=this.$items=null,"hover"==this.options.pause&&this.$element.on("mouseenter",a.proxy(this.pause,this)).on("mouseleave",a.proxy(this.cycle,this))};b.DEFAULTS={interval:5e3,pause:"hover",wrap:!0},b.prototype.cycle=function(b){return b||(this.paused=!1),this.interval&&clearInterval(this.interval),this.options.interval&&!this.paused&&(this.interval=setInterval(a.proxy(this.next,this),this.options.interval)),this},b.prototype.getActiveIndex=function(){return this.$active=this.$element.find(".item.active"),this.$items=this.$active.parent().children(),this.$items.index(this.$active)},b.prototype.to=function(b){var c=this,d=this.getActiveIndex();return b>this.$items.length-1||0>b?void 0:this.sliding?this.$element.one("slid",function(){c.to(b)}):d==b?this.pause().cycle():this.slide(b>d?"next":"prev",a(this.$items[b]))},b.prototype.pause=function(b){return b||(this.paused=!0),this.$element.find(".next, .prev").length&&a.support.transition.end&&(this.$element.trigger(a.support.transition.end),this.cycle(!0)),this.interval=clearInterval(this.interval),this},b.prototype.next=function(){return this.sliding?void 0:this.slide("next")},b.prototype.prev=function(){return this.sliding?void 0:this.slide("prev")},b.prototype.slide=function(b,c){var d=this.$element.find(".item.active"),e=c||d[b](),f=this.interval,g="next"==b?"left":"right",h="next"==b?"first":"last",i=this;if(!e.length){if(!this.options.wrap)return;e=this.$element.find(".item")[h]()}this.sliding=!0,f&&this.pause();var j=a.Event("slide.bs.carousel",{relatedTarget:e[0],direction:g});if(!e.hasClass("active")){if(this.$indicators.length&&(this.$indicators.find(".active").removeClass("active"),this.$element.one("slid",function(){var b=a(i.$indicators.children()[i.getActiveIndex()]);b&&b.addClass("active")})),a.support.transition&&this.$element.hasClass("slide")){if(this.$element.trigger(j),j.isDefaultPrevented())return;e.addClass(b),e[0].offsetWidth,d.addClass(g),e.addClass(g),d.one(a.support.transition.end,function(){e.removeClass([b,g].join(" ")).addClass("active"),d.removeClass(["active",g].join(" ")),i.sliding=!1,setTimeout(function(){i.$element.trigger("slid")},0)}).emulateTransitionEnd(600)}else{if(this.$element.trigger(j),j.isDefaultPrevented())return;d.removeClass("active"),e.addClass("active"),this.sliding=!1,this.$element.trigger("slid")}return f&&this.cycle(),this}};var c=a.fn.carousel;a.fn.carousel=function(c){return this.each(function(){var d=a(this),e=d.data("bs.carousel"),f=a.extend({},b.DEFAULTS,d.data(),"object"==typeof c&&c),g="string"==typeof c?c:f.slide;e||d.data("bs.carousel",e=new b(this,f)),"number"==typeof c?e.to(c):g?e[g]():f.interval&&e.pause().cycle()})},a.fn.carousel.Constructor=b,a.fn.carousel.noConflict=function(){return a.fn.carousel=c,this},a(document).on("click.bs.carousel.data-api","[data-slide], [data-slide-to]",function(b){var c,d=a(this),e=a(d.attr("data-target")||(c=d.attr("href"))&&c.replace(/.*(?=#[^\s]+$)/,"")),f=a.extend({},e.data(),d.data()),g=d.attr("data-slide-to");g&&(f.interval=!1),e.carousel(f),(g=d.attr("data-slide-to"))&&e.data("bs.carousel").to(g),b.preventDefault()}),a(window).on("load",function(){a('[data-ride="carousel"]').each(function(){var b=a(this);b.carousel(b.data())})})}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.$element=a(c),this.options=a.extend({},b.DEFAULTS,d),this.transitioning=null,this.options.parent&&(this.$parent=a(this.options.parent)),this.options.toggle&&this.toggle()};b.DEFAULTS={toggle:!0},b.prototype.dimension=function(){var a=this.$element.hasClass("width");return a?"width":"height"},b.prototype.show=function(){if(!this.transitioning&&!this.$element.hasClass("in")){var b=a.Event("show.bs.collapse");if(this.$element.trigger(b),!b.isDefaultPrevented()){var c=this.$parent&&this.$parent.find("> .panel > .in");if(c&&c.length){var d=c.data("bs.collapse");if(d&&d.transitioning)return;c.collapse("hide"),d||c.data("bs.collapse",null)}var e=this.dimension();this.$element.removeClass("collapse").addClass("collapsing")[e](0),this.transitioning=1;var f=function(){this.$element.removeClass("collapsing").addClass("in")[e]("auto"),this.transitioning=0,this.$element.trigger("shown.bs.collapse")};if(!a.support.transition)return f.call(this);var g=a.camelCase(["scroll",e].join("-"));this.$element.one(a.support.transition.end,a.proxy(f,this)).emulateTransitionEnd(350)[e](this.$element[0][g])}}},b.prototype.hide=function(){if(!this.transitioning&&this.$element.hasClass("in")){var b=a.Event("hide.bs.collapse");if(this.$element.trigger(b),!b.isDefaultPrevented()){var c=this.dimension();this.$element[c](this.$element[c]())[0].offsetHeight,this.$element.addClass("collapsing").removeClass("collapse").removeClass("in"),this.transitioning=1;var d=function(){this.transitioning=0,this.$element.trigger("hidden.bs.collapse").removeClass("collapsing").addClass("collapse")};return a.support.transition?(this.$element[c](0).one(a.support.transition.end,a.proxy(d,this)).emulateTransitionEnd(350),void 0):d.call(this)}}},b.prototype.toggle=function(){this[this.$element.hasClass("in")?"hide":"show"]()};var c=a.fn.collapse;a.fn.collapse=function(c){return this.each(function(){var d=a(this),e=d.data("bs.collapse"),f=a.extend({},b.DEFAULTS,d.data(),"object"==typeof c&&c);e||d.data("bs.collapse",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.collapse.Constructor=b,a.fn.collapse.noConflict=function(){return a.fn.collapse=c,this},a(document).on("click.bs.collapse.data-api","[data-toggle=collapse]",function(b){var c,d=a(this),e=d.attr("data-target")||b.preventDefault()||(c=d.attr("href"))&&c.replace(/.*(?=#[^\s]+$)/,""),f=a(e),g=f.data("bs.collapse"),h=g?"toggle":d.data(),i=d.attr("data-parent"),j=i&&a(i);g&&g.transitioning||(j&&j.find('[data-toggle=collapse][data-parent="'+i+'"]').not(d).addClass("collapsed"),d[f.hasClass("in")?"addClass":"removeClass"]("collapsed")),f.collapse(h)})}(window.jQuery),+function(a){"use strict";function b(){a(d).remove(),a(e).each(function(b){var d=c(a(this));d.hasClass("open")&&(d.trigger(b=a.Event("hide.bs.dropdown")),b.isDefaultPrevented()||d.removeClass("open").trigger("hidden.bs.dropdown"))})}function c(b){var c=b.attr("data-target");c||(c=b.attr("href"),c=c&&/#/.test(c)&&c.replace(/.*(?=#[^\s]*$)/,""));var d=c&&a(c);return d&&d.length?d:b.parent()}var d=".dropdown-backdrop",e="[data-toggle=dropdown]",f=function(b){a(b).on("click.bs.dropdown",this.toggle)};f.prototype.toggle=function(d){var e=a(this);if(!e.is(".disabled, :disabled")){var f=c(e),g=f.hasClass("open");if(b(),!g){if("ontouchstart"in document.documentElement&&!f.closest(".navbar-nav").length&&a('<div class="dropdown-backdrop"/>').insertAfter(a(this)).on("click",b),f.trigger(d=a.Event("show.bs.dropdown")),d.isDefaultPrevented())return;f.toggleClass("open").trigger("shown.bs.dropdown"),e.focus()}return!1}},f.prototype.keydown=function(b){if(/(38|40|27)/.test(b.keyCode)){var d=a(this);if(b.preventDefault(),b.stopPropagation(),!d.is(".disabled, :disabled")){var f=c(d),g=f.hasClass("open");if(!g||g&&27==b.keyCode)return 27==b.which&&f.find(e).focus(),d.click();var h=a("[role=menu] li:not(.divider):visible a",f);if(h.length){var i=h.index(h.filter(":focus"));38==b.keyCode&&i>0&&i--,40==b.keyCode&&i<h.length-1&&i++,~i||(i=0),h.eq(i).focus()}}}};var g=a.fn.dropdown;a.fn.dropdown=function(b){return this.each(function(){var c=a(this),d=c.data("dropdown");d||c.data("dropdown",d=new f(this)),"string"==typeof b&&d[b].call(c)})},a.fn.dropdown.Constructor=f,a.fn.dropdown.noConflict=function(){return a.fn.dropdown=g,this},a(document).on("click.bs.dropdown.data-api",b).on("click.bs.dropdown.data-api",".dropdown form",function(a){a.stopPropagation()}).on("click.bs.dropdown.data-api",e,f.prototype.toggle).on("keydown.bs.dropdown.data-api",e+", [role=menu]",f.prototype.keydown)}(window.jQuery),+function(a){"use strict";var b=function(b,c){this.options=c,this.$element=a(b),this.$backdrop=this.isShown=null,this.options.remote&&this.$element.load(this.options.remote)};b.DEFAULTS={backdrop:!0,keyboard:!0,show:!0},b.prototype.toggle=function(a){return this[this.isShown?"hide":"show"](a)},b.prototype.show=function(b){var c=this,d=a.Event("show.bs.modal",{relatedTarget:b});this.$element.trigger(d),this.isShown||d.isDefaultPrevented()||(this.isShown=!0,this.escape(),this.$element.on("click.dismiss.modal",'[data-dismiss="modal"]',a.proxy(this.hide,this)),this.backdrop(function(){var d=a.support.transition&&c.$element.hasClass("fade");c.$element.parent().length||c.$element.appendTo(document.body),c.$element.show(),d&&c.$element[0].offsetWidth,c.$element.addClass("in").attr("aria-hidden",!1),c.enforceFocus();var e=a.Event("shown.bs.modal",{relatedTarget:b});d?c.$element.find(".modal-dialog").one(a.support.transition.end,function(){c.$element.focus().trigger(e)}).emulateTransitionEnd(300):c.$element.focus().trigger(e)}))},b.prototype.hide=function(b){b&&b.preventDefault(),b=a.Event("hide.bs.modal"),this.$element.trigger(b),this.isShown&&!b.isDefaultPrevented()&&(this.isShown=!1,this.escape(),a(document).off("focusin.bs.modal"),this.$element.removeClass("in").attr("aria-hidden",!0).off("click.dismiss.modal"),a.support.transition&&this.$element.hasClass("fade")?this.$element.one(a.support.transition.end,a.proxy(this.hideModal,this)).emulateTransitionEnd(300):this.hideModal())},b.prototype.enforceFocus=function(){a(document).off("focusin.bs.modal").on("focusin.bs.modal",a.proxy(function(a){this.$element[0]===a.target||this.$element.has(a.target).length||this.$element.focus()},this))},b.prototype.escape=function(){this.isShown&&this.options.keyboard?this.$element.on("keyup.dismiss.bs.modal",a.proxy(function(a){27==a.which&&this.hide()},this)):this.isShown||this.$element.off("keyup.dismiss.bs.modal")},b.prototype.hideModal=function(){var a=this;this.$element.hide(),this.backdrop(function(){a.removeBackdrop(),a.$element.trigger("hidden.bs.modal")})},b.prototype.removeBackdrop=function(){this.$backdrop&&this.$backdrop.remove(),this.$backdrop=null},b.prototype.backdrop=function(b){var c=this.$element.hasClass("fade")?"fade":"";if(this.isShown&&this.options.backdrop){var d=a.support.transition&&c;if(this.$backdrop=a('<div class="modal-backdrop '+c+'" />').appendTo(document.body),this.$element.on("click.dismiss.modal",a.proxy(function(a){a.target===a.currentTarget&&("static"==this.options.backdrop?this.$element[0].focus.call(this.$element[0]):this.hide.call(this))},this)),d&&this.$backdrop[0].offsetWidth,this.$backdrop.addClass("in"),!b)return;d?this.$backdrop.one(a.support.transition.end,b).emulateTransitionEnd(150):b()}else!this.isShown&&this.$backdrop?(this.$backdrop.removeClass("in"),a.support.transition&&this.$element.hasClass("fade")?this.$backdrop.one(a.support.transition.end,b).emulateTransitionEnd(150):b()):b&&b()};var c=a.fn.modal;a.fn.modal=function(c,d){return this.each(function(){var e=a(this),f=e.data("bs.modal"),g=a.extend({},b.DEFAULTS,e.data(),"object"==typeof c&&c);f||e.data("bs.modal",f=new b(this,g)),"string"==typeof c?f[c](d):g.show&&f.show(d)})},a.fn.modal.Constructor=b,a.fn.modal.noConflict=function(){return a.fn.modal=c,this},a(document).on("click.bs.modal.data-api",'[data-toggle="modal"]',function(b){var c=a(this),d=c.attr("href"),e=a(c.attr("data-target")||d&&d.replace(/.*(?=#[^\s]+$)/,"")),f=e.data("modal")?"toggle":a.extend({remote:!/#/.test(d)&&d},e.data(),c.data());b.preventDefault(),e.modal(f,this).one("hide",function(){c.is(":visible")&&c.focus()})}),a(document).on("show.bs.modal",".modal",function(){a(document.body).addClass("modal-open")}).on("hidden.bs.modal",".modal",function(){a(document.body).removeClass("modal-open")})}(window.jQuery),+function(a){"use strict";var b=function(a,b){this.type=this.options=this.enabled=this.timeout=this.hoverState=this.$element=null,this.init("tooltip",a,b)};b.DEFAULTS={animation:!0,placement:"top",selector:!1,template:'<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,container:!1},b.prototype.init=function(b,c,d){this.enabled=!0,this.type=b,this.$element=a(c),this.options=this.getOptions(d);for(var e=this.options.trigger.split(" "),f=e.length;f--;){var g=e[f];if("click"==g)this.$element.on("click."+this.type,this.options.selector,a.proxy(this.toggle,this));else if("manual"!=g){var h="hover"==g?"mouseenter":"focus",i="hover"==g?"mouseleave":"blur";this.$element.on(h+"."+this.type,this.options.selector,a.proxy(this.enter,this)),this.$element.on(i+"."+this.type,this.options.selector,a.proxy(this.leave,this))}}this.options.selector?this._options=a.extend({},this.options,{trigger:"manual",selector:""}):this.fixTitle()},b.prototype.getDefaults=function(){return b.DEFAULTS},b.prototype.getOptions=function(b){return b=a.extend({},this.getDefaults(),this.$element.data(),b),b.delay&&"number"==typeof b.delay&&(b.delay={show:b.delay,hide:b.delay}),b},b.prototype.getDelegateOptions=function(){var b={},c=this.getDefaults();return this._options&&a.each(this._options,function(a,d){c[a]!=d&&(b[a]=d)}),b},b.prototype.enter=function(b){var c=b instanceof this.constructor?b:a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type);return clearTimeout(c.timeout),c.hoverState="in",c.options.delay&&c.options.delay.show?(c.timeout=setTimeout(function(){"in"==c.hoverState&&c.show()},c.options.delay.show),void 0):c.show()},b.prototype.leave=function(b){var c=b instanceof this.constructor?b:a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type);return clearTimeout(c.timeout),c.hoverState="out",c.options.delay&&c.options.delay.hide?(c.timeout=setTimeout(function(){"out"==c.hoverState&&c.hide()},c.options.delay.hide),void 0):c.hide()},b.prototype.show=function(){var b=a.Event("show.bs."+this.type);if(this.hasContent()&&this.enabled){if(this.$element.trigger(b),b.isDefaultPrevented())return;var c=this.tip();this.setContent(),this.options.animation&&c.addClass("fade");var d="function"==typeof this.options.placement?this.options.placement.call(this,c[0],this.$element[0]):this.options.placement,e=/\s?auto?\s?/i,f=e.test(d);f&&(d=d.replace(e,"")||"top"),c.detach().css({top:0,left:0,display:"block"}).addClass(d),this.options.container?c.appendTo(this.options.container):c.insertAfter(this.$element);var g=this.getPosition(),h=c[0].offsetWidth,i=c[0].offsetHeight;if(f){var j=this.$element.parent(),k=d,l=document.documentElement.scrollTop||document.body.scrollTop,m="body"==this.options.container?window.innerWidth:j.outerWidth(),n="body"==this.options.container?window.innerHeight:j.outerHeight(),o="body"==this.options.container?0:j.offset().left;d="bottom"==d&&g.top+g.height+i-l>n?"top":"top"==d&&g.top-l-i<0?"bottom":"right"==d&&g.right+h>m?"left":"left"==d&&g.left-h<o?"right":d,c.removeClass(k).addClass(d)}var p=this.getCalculatedOffset(d,g,h,i);this.applyPlacement(p,d),this.$element.trigger("shown.bs."+this.type)}},b.prototype.applyPlacement=function(a,b){var c,d=this.tip(),e=d[0].offsetWidth,f=d[0].offsetHeight,g=parseInt(d.css("margin-top"),10),h=parseInt(d.css("margin-left"),10);isNaN(g)&&(g=0),isNaN(h)&&(h=0),a.top=a.top+g,a.left=a.left+h,d.offset(a).addClass("in");var i=d[0].offsetWidth,j=d[0].offsetHeight;if("top"==b&&j!=f&&(c=!0,a.top=a.top+f-j),/bottom|top/.test(b)){var k=0;a.left<0&&(k=-2*a.left,a.left=0,d.offset(a),i=d[0].offsetWidth,j=d[0].offsetHeight),this.replaceArrow(k-e+i,i,"left")}else this.replaceArrow(j-f,j,"top");c&&d.offset(a)},b.prototype.replaceArrow=function(a,b,c){this.arrow().css(c,a?50*(1-a/b)+"%":"")},b.prototype.setContent=function(){var a=this.tip(),b=this.getTitle();a.find(".tooltip-inner")[this.options.html?"html":"text"](b),a.removeClass("fade in top bottom left right")},b.prototype.hide=function(){function b(){"in"!=c.hoverState&&d.detach()}var c=this,d=this.tip(),e=a.Event("hide.bs."+this.type);return this.$element.trigger(e),e.isDefaultPrevented()?void 0:(d.removeClass("in"),a.support.transition&&this.$tip.hasClass("fade")?d.one(a.support.transition.end,b).emulateTransitionEnd(150):b(),this.$element.trigger("hidden.bs."+this.type),this)},b.prototype.fixTitle=function(){var a=this.$element;(a.attr("title")||"string"!=typeof a.attr("data-original-title"))&&a.attr("data-original-title",a.attr("title")||"").attr("title","")},b.prototype.hasContent=function(){return this.getTitle()},b.prototype.getPosition=function(){var b=this.$element[0];return a.extend({},"function"==typeof b.getBoundingClientRect?b.getBoundingClientRect():{width:b.offsetWidth,height:b.offsetHeight},this.$element.offset())},b.prototype.getCalculatedOffset=function(a,b,c,d){return"bottom"==a?{top:b.top+b.height,left:b.left+b.width/2-c/2}:"top"==a?{top:b.top-d,left:b.left+b.width/2-c/2}:"left"==a?{top:b.top+b.height/2-d/2,left:b.left-c}:{top:b.top+b.height/2-d/2,left:b.left+b.width}},b.prototype.getTitle=function(){var a,b=this.$element,c=this.options;return a=b.attr("data-original-title")||("function"==typeof c.title?c.title.call(b[0]):c.title)},b.prototype.tip=function(){return this.$tip=this.$tip||a(this.options.template)},b.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".tooltip-arrow")},b.prototype.validate=function(){this.$element[0].parentNode||(this.hide(),this.$element=null,this.options=null)},b.prototype.enable=function(){this.enabled=!0},b.prototype.disable=function(){this.enabled=!1},b.prototype.toggleEnabled=function(){this.enabled=!this.enabled},b.prototype.toggle=function(b){var c=b?a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type):this;c.tip().hasClass("in")?c.leave(c):c.enter(c)},b.prototype.destroy=function(){this.hide().$element.off("."+this.type).removeData("bs."+this.type)};var c=a.fn.tooltip;a.fn.tooltip=function(c){return this.each(function(){var d=a(this),e=d.data("bs.tooltip"),f="object"==typeof c&&c;e||d.data("bs.tooltip",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.tooltip.Constructor=b,a.fn.tooltip.noConflict=function(){return a.fn.tooltip=c,this}}(window.jQuery),+function(a){"use strict";var b=function(a,b){this.init("popover",a,b)};if(!a.fn.tooltip)throw new Error("Popover requires tooltip.js");b.DEFAULTS=a.extend({},a.fn.tooltip.Constructor.DEFAULTS,{placement:"right",trigger:"click",content:"",template:'<div class="popover"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),b.prototype=a.extend({},a.fn.tooltip.Constructor.prototype),b.prototype.constructor=b,b.prototype.getDefaults=function(){return b.DEFAULTS},b.prototype.setContent=function(){var a=this.tip(),b=this.getTitle(),c=this.getContent();a.find(".popover-title")[this.options.html?"html":"text"](b),a.find(".popover-content")[this.options.html?"html":"text"](c),a.removeClass("fade top bottom left right in"),a.find(".popover-title").html()||a.find(".popover-title").hide()},b.prototype.hasContent=function(){return this.getTitle()||this.getContent()},b.prototype.getContent=function(){var a=this.$element,b=this.options;return a.attr("data-content")||("function"==typeof b.content?b.content.call(a[0]):b.content)},b.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".arrow")},b.prototype.tip=function(){return this.$tip||(this.$tip=a(this.options.template)),this.$tip};var c=a.fn.popover;a.fn.popover=function(c){return this.each(function(){var d=a(this),e=d.data("bs.popover"),f="object"==typeof c&&c;e||d.data("bs.popover",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.popover.Constructor=b,a.fn.popover.noConflict=function(){return a.fn.popover=c,this}}(window.jQuery),+function(a){"use strict";function b(c,d){var e,f=a.proxy(this.process,this);this.$element=a(c).is("body")?a(window):a(c),this.$body=a("body"),this.$scrollElement=this.$element.on("scroll.bs.scroll-spy.data-api",f),this.options=a.extend({},b.DEFAULTS,d),this.selector=(this.options.target||(e=a(c).attr("href"))&&e.replace(/.*(?=#[^\s]+$)/,"")||"")+" .nav li > a",this.offsets=a([]),this.targets=a([]),this.activeTarget=null,this.refresh(),this.process()}b.DEFAULTS={offset:10},b.prototype.refresh=function(){var b=this.$element[0]==window?"offset":"position";this.offsets=a([]),this.targets=a([]);var c=this;this.$body.find(this.selector).map(function(){var d=a(this),e=d.data("target")||d.attr("href"),f=/^#\w/.test(e)&&a(e);return f&&f.length&&[[f[b]().top+(!a.isWindow(c.$scrollElement.get(0))&&c.$scrollElement.scrollTop()),e]]||null}).sort(function(a,b){return a[0]-b[0]}).each(function(){c.offsets.push(this[0]),c.targets.push(this[1])})},b.prototype.process=function(){var a,b=this.$scrollElement.scrollTop()+this.options.offset,c=this.$scrollElement[0].scrollHeight||this.$body[0].scrollHeight,d=c-this.$scrollElement.height(),e=this.offsets,f=this.targets,g=this.activeTarget;if(b>=d)return g!=(a=f.last()[0])&&this.activate(a);for(a=e.length;a--;)g!=f[a]&&b>=e[a]&&(!e[a+1]||b<=e[a+1])&&this.activate(f[a])},b.prototype.activate=function(b){this.activeTarget=b,a(this.selector).parents(".active").removeClass("active");var c=this.selector+'[data-target="'+b+'"],'+this.selector+'[href="'+b+'"]',d=a(c).parents("li").addClass("active");d.parent(".dropdown-menu").length&&(d=d.closest("li.dropdown").addClass("active")),d.trigger("activate")};var c=a.fn.scrollspy;a.fn.scrollspy=function(c){return this.each(function(){var d=a(this),e=d.data("bs.scrollspy"),f="object"==typeof c&&c;e||d.data("bs.scrollspy",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.scrollspy.Constructor=b,a.fn.scrollspy.noConflict=function(){return a.fn.scrollspy=c,this},a(window).on("load",function(){a('[data-spy="scroll"]').each(function(){var b=a(this);b.scrollspy(b.data())})})}(window.jQuery),+function(a){"use strict";var b=function(b){this.element=a(b)};b.prototype.show=function(){var b=this.element,c=b.closest("ul:not(.dropdown-menu)"),d=b.attr("data-target");if(d||(d=b.attr("href"),d=d&&d.replace(/.*(?=#[^\s]*$)/,"")),!b.parent("li").hasClass("active")){var e=c.find(".active:last a")[0],f=a.Event("show.bs.tab",{relatedTarget:e});if(b.trigger(f),!f.isDefaultPrevented()){var g=a(d);this.activate(b.parent("li"),c),this.activate(g,g.parent(),function(){b.trigger({type:"shown.bs.tab",relatedTarget:e})})}}},b.prototype.activate=function(b,c,d){function e(){f.removeClass("active").find("> .dropdown-menu > .active").removeClass("active"),b.addClass("active"),g?(b[0].offsetWidth,b.addClass("in")):b.removeClass("fade"),b.parent(".dropdown-menu")&&b.closest("li.dropdown").addClass("active"),d&&d()}var f=c.find("> .active"),g=d&&a.support.transition&&f.hasClass("fade");g?f.one(a.support.transition.end,e).emulateTransitionEnd(150):e(),f.removeClass("in")};var c=a.fn.tab;a.fn.tab=function(c){return this.each(function(){var d=a(this),e=d.data("bs.tab");e||d.data("bs.tab",e=new b(this)),"string"==typeof c&&e[c]()})},a.fn.tab.Constructor=b,a.fn.tab.noConflict=function(){return a.fn.tab=c,this},a(document).on("click.bs.tab.data-api",'[data-toggle="tab"], [data-toggle="pill"]',function(b){b.preventDefault(),a(this).tab("show")})}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.options=a.extend({},b.DEFAULTS,d),this.$window=a(window).on("scroll.bs.affix.data-api",a.proxy(this.checkPosition,this)).on("click.bs.affix.data-api",a.proxy(this.checkPositionWithEventLoop,this)),this.$element=a(c),this.affixed=this.unpin=null,this.checkPosition()};b.RESET="affix affix-top affix-bottom",b.DEFAULTS={offset:0},b.prototype.checkPositionWithEventLoop=function(){setTimeout(a.proxy(this.checkPosition,this),1)},b.prototype.checkPosition=function(){if(this.$element.is(":visible")){var c=a(document).height(),d=this.$window.scrollTop(),e=this.$element.offset(),f=this.options.offset,g=f.top,h=f.bottom;"object"!=typeof f&&(h=g=f),"function"==typeof g&&(g=f.top()),"function"==typeof h&&(h=f.bottom());var i=null!=this.unpin&&d+this.unpin<=e.top?!1:null!=h&&e.top+this.$element.height()>=c-h?"bottom":null!=g&&g>=d?"top":!1;this.affixed!==i&&(this.unpin&&this.$element.css("top",""),this.affixed=i,this.unpin="bottom"==i?e.top-d:null,this.$element.removeClass(b.RESET).addClass("affix"+(i?"-"+i:"")),"bottom"==i&&this.$element.offset({top:document.body.offsetHeight-h-this.$element.height()}))}};var c=a.fn.affix;a.fn.affix=function(c){return this.each(function(){var d=a(this),e=d.data("bs.affix"),f="object"==typeof c&&c;e||d.data("bs.affix",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.affix.Constructor=b,a.fn.affix.noConflict=function(){return a.fn.affix=c,this},a(window).on("load",function(){a('[data-spy="affix"]').each(function(){var b=a(this),c=b.data();c.offset=c.offset||{},c.offsetBottom&&(c.offset.bottom=c.offsetBottom),c.offsetTop&&(c.offset.top=c.offsetTop),b.affix(c)})})}(window.jQuery);
+}),
+"moment": (function (require, exports, module) { /* wrapped by builder */
+// moment.js
+// version : 2.1.0
+// author : Tim Wood
+// license : MIT
+// momentjs.com
+!function(t){function e(t,e){return function(n){return u(t.call(this,n),e)}}function n(t,e){return function(n){return this.lang().ordinal(t.call(this,n),e)}}function s(){}function i(t){a(this,t)}function r(t){var e=t.years||t.year||t.y||0,n=t.months||t.month||t.M||0,s=t.weeks||t.week||t.w||0,i=t.days||t.day||t.d||0,r=t.hours||t.hour||t.h||0,a=t.minutes||t.minute||t.m||0,o=t.seconds||t.second||t.s||0,u=t.milliseconds||t.millisecond||t.ms||0;this._input=t,this._milliseconds=u+1e3*o+6e4*a+36e5*r,this._days=i+7*s,this._months=n+12*e,this._data={},this._bubble()}function a(t,e){for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t}function o(t){return 0>t?Math.ceil(t):Math.floor(t)}function u(t,e){for(var n=t+"";n.length<e;)n="0"+n;return n}function h(t,e,n,s){var i,r,a=e._milliseconds,o=e._days,u=e._months;a&&t._d.setTime(+t._d+a*n),(o||u)&&(i=t.minute(),r=t.hour()),o&&t.date(t.date()+o*n),u&&t.month(t.month()+u*n),a&&!s&&H.updateOffset(t),(o||u)&&(t.minute(i),t.hour(r))}function d(t){return"[object Array]"===Object.prototype.toString.call(t)}function c(t,e){var n,s=Math.min(t.length,e.length),i=Math.abs(t.length-e.length),r=0;for(n=0;s>n;n++)~~t[n]!==~~e[n]&&r++;return r+i}function f(t){return t?ie[t]||t.toLowerCase().replace(/(.)s$/,"$1"):t}function l(t,e){return e.abbr=t,x[t]||(x[t]=new s),x[t].set(e),x[t]}function _(t){if(!t)return H.fn._lang;if(!x[t]&&A)try{require("./lang/"+t)}catch(e){return H.fn._lang}return x[t]}function m(t){return t.match(/\[.*\]/)?t.replace(/^\[|\]$/g,""):t.replace(/\\/g,"")}function y(t){var e,n,s=t.match(E);for(e=0,n=s.length;n>e;e++)s[e]=ue[s[e]]?ue[s[e]]:m(s[e]);return function(i){var r="";for(e=0;n>e;e++)r+=s[e]instanceof Function?s[e].call(i,t):s[e];return r}}function M(t,e){function n(e){return t.lang().longDateFormat(e)||e}for(var s=5;s--&&N.test(e);)e=e.replace(N,n);return re[e]||(re[e]=y(e)),re[e](t)}function g(t,e){switch(t){case"DDDD":return V;case"YYYY":return X;case"YYYYY":return $;case"S":case"SS":case"SSS":case"DDD":return I;case"MMM":case"MMMM":case"dd":case"ddd":case"dddd":return R;case"a":case"A":return _(e._l)._meridiemParse;case"X":return B;case"Z":case"ZZ":return j;case"T":return q;case"MM":case"DD":case"YY":case"HH":case"hh":case"mm":case"ss":case"M":case"D":case"d":case"H":case"h":case"m":case"s":return J;default:return new RegExp(t.replace("\\",""))}}function p(t){var e=(j.exec(t)||[])[0],n=(e+"").match(ee)||["-",0,0],s=+(60*n[1])+~~n[2];return"+"===n[0]?-s:s}function D(t,e,n){var s,i=n._a;switch(t){case"M":case"MM":i[1]=null==e?0:~~e-1;break;case"MMM":case"MMMM":s=_(n._l).monthsParse(e),null!=s?i[1]=s:n._isValid=!1;break;case"D":case"DD":case"DDD":case"DDDD":null!=e&&(i[2]=~~e);break;case"YY":i[0]=~~e+(~~e>68?1900:2e3);break;case"YYYY":case"YYYYY":i[0]=~~e;break;case"a":case"A":n._isPm=_(n._l).isPM(e);break;case"H":case"HH":case"h":case"hh":i[3]=~~e;break;case"m":case"mm":i[4]=~~e;break;case"s":case"ss":i[5]=~~e;break;case"S":case"SS":case"SSS":i[6]=~~(1e3*("0."+e));break;case"X":n._d=new Date(1e3*parseFloat(e));break;case"Z":case"ZZ":n._useUTC=!0,n._tzm=p(e)}null==e&&(n._isValid=!1)}function Y(t){var e,n,s=[];if(!t._d){for(e=0;7>e;e++)t._a[e]=s[e]=null==t._a[e]?2===e?1:0:t._a[e];s[3]+=~~((t._tzm||0)/60),s[4]+=~~((t._tzm||0)%60),n=new Date(0),t._useUTC?(n.setUTCFullYear(s[0],s[1],s[2]),n.setUTCHours(s[3],s[4],s[5],s[6])):(n.setFullYear(s[0],s[1],s[2]),n.setHours(s[3],s[4],s[5],s[6])),t._d=n}}function w(t){var e,n,s=t._f.match(E),i=t._i;for(t._a=[],e=0;e<s.length;e++)n=(g(s[e],t).exec(i)||[])[0],n&&(i=i.slice(i.indexOf(n)+n.length)),ue[s[e]]&&D(s[e],n,t);i&&(t._il=i),t._isPm&&t._a[3]<12&&(t._a[3]+=12),t._isPm===!1&&12===t._a[3]&&(t._a[3]=0),Y(t)}function k(t){var e,n,s,r,o,u=99;for(r=0;r<t._f.length;r++)e=a({},t),e._f=t._f[r],w(e),n=new i(e),o=c(e._a,n.toArray()),n._il&&(o+=n._il.length),u>o&&(u=o,s=n);a(t,s)}function v(t){var e,n=t._i,s=K.exec(n);if(s){for(t._f="YYYY-MM-DD"+(s[2]||" "),e=0;4>e;e++)if(te[e][1].exec(n)){t._f+=te[e][0];break}j.exec(n)&&(t._f+=" Z"),w(t)}else t._d=new Date(n)}function T(e){var n=e._i,s=G.exec(n);n===t?e._d=new Date:s?e._d=new Date(+s[1]):"string"==typeof n?v(e):d(n)?(e._a=n.slice(0),Y(e)):e._d=n instanceof Date?new Date(+n):new Date(n)}function b(t,e,n,s,i){return i.relativeTime(e||1,!!n,t,s)}function S(t,e,n){var s=W(Math.abs(t)/1e3),i=W(s/60),r=W(i/60),a=W(r/24),o=W(a/365),u=45>s&&["s",s]||1===i&&["m"]||45>i&&["mm",i]||1===r&&["h"]||22>r&&["hh",r]||1===a&&["d"]||25>=a&&["dd",a]||45>=a&&["M"]||345>a&&["MM",W(a/30)]||1===o&&["y"]||["yy",o];return u[2]=e,u[3]=t>0,u[4]=n,b.apply({},u)}function F(t,e,n){var s,i=n-e,r=n-t.day();return r>i&&(r-=7),i-7>r&&(r+=7),s=H(t).add("d",r),{week:Math.ceil(s.dayOfYear()/7),year:s.year()}}function O(t){var e=t._i,n=t._f;return null===e||""===e?null:("string"==typeof e&&(t._i=e=_().preparse(e)),H.isMoment(e)?(t=a({},e),t._d=new Date(+e._d)):n?d(n)?k(t):w(t):T(t),new i(t))}function z(t,e){H.fn[t]=H.fn[t+"s"]=function(t){var n=this._isUTC?"UTC":"";return null!=t?(this._d["set"+n+e](t),H.updateOffset(this),this):this._d["get"+n+e]()}}function C(t){H.duration.fn[t]=function(){return this._data[t]}}function L(t,e){H.duration.fn["as"+t]=function(){return+this/e}}for(var H,P,U="2.1.0",W=Math.round,x={},A="undefined"!=typeof module&&module.exports,G=/^\/?Date\((\-?\d+)/i,Z=/(\-)?(\d*)?\.?(\d+)\:(\d+)\:(\d+)\.?(\d{3})?/,E=/(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|SS?S?|X|zz?|ZZ?|.)/g,N=/(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g,J=/\d\d?/,I=/\d{1,3}/,V=/\d{3}/,X=/\d{1,4}/,$=/[+\-]?\d{1,6}/,R=/[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i,j=/Z|[\+\-]\d\d:?\d\d/i,q=/T/i,B=/[\+\-]?\d+(\.\d{1,3})?/,K=/^\s*\d{4}-\d\d-\d\d((T| )(\d\d(:\d\d(:\d\d(\.\d\d?\d?)?)?)?)?([\+\-]\d\d:?\d\d)?)?/,Q="YYYY-MM-DDTHH:mm:ssZ",te=[["HH:mm:ss.S",/(T| )\d\d:\d\d:\d\d\.\d{1,3}/],["HH:mm:ss",/(T| )\d\d:\d\d:\d\d/],["HH:mm",/(T| )\d\d:\d\d/],["HH",/(T| )\d\d/]],ee=/([\+\-]|\d\d)/gi,ne="Date|Hours|Minutes|Seconds|Milliseconds".split("|"),se={Milliseconds:1,Seconds:1e3,Minutes:6e4,Hours:36e5,Days:864e5,Months:2592e6,Years:31536e6},ie={ms:"millisecond",s:"second",m:"minute",h:"hour",d:"day",w:"week",M:"month",y:"year"},re={},ae="DDD w W M D d".split(" "),oe="M D H h m s w W".split(" "),ue={M:function(){return this.month()+1},MMM:function(t){return this.lang().monthsShort(this,t)},MMMM:function(t){return this.lang().months(this,t)},D:function(){return this.date()},DDD:function(){return this.dayOfYear()},d:function(){return this.day()},dd:function(t){return this.lang().weekdaysMin(this,t)},ddd:function(t){return this.lang().weekdaysShort(this,t)},dddd:function(t){return this.lang().weekdays(this,t)},w:function(){return this.week()},W:function(){return this.isoWeek()},YY:function(){return u(this.year()%100,2)},YYYY:function(){return u(this.year(),4)},YYYYY:function(){return u(this.year(),5)},gg:function(){return u(this.weekYear()%100,2)},gggg:function(){return this.weekYear()},ggggg:function(){return u(this.weekYear(),5)},GG:function(){return u(this.isoWeekYear()%100,2)},GGGG:function(){return this.isoWeekYear()},GGGGG:function(){return u(this.isoWeekYear(),5)},e:function(){return this.weekday()},E:function(){return this.isoWeekday()},a:function(){return this.lang().meridiem(this.hours(),this.minutes(),!0)},A:function(){return this.lang().meridiem(this.hours(),this.minutes(),!1)},H:function(){return this.hours()},h:function(){return this.hours()%12||12},m:function(){return this.minutes()},s:function(){return this.seconds()},S:function(){return~~(this.milliseconds()/100)},SS:function(){return u(~~(this.milliseconds()/10),2)},SSS:function(){return u(this.milliseconds(),3)},Z:function(){var t=-this.zone(),e="+";return 0>t&&(t=-t,e="-"),e+u(~~(t/60),2)+":"+u(~~t%60,2)},ZZ:function(){var t=-this.zone(),e="+";return 0>t&&(t=-t,e="-"),e+u(~~(10*t/6),4)},z:function(){return this.zoneAbbr()},zz:function(){return this.zoneName()},X:function(){return this.unix()}};ae.length;)P=ae.pop(),ue[P+"o"]=n(ue[P],P);for(;oe.length;)P=oe.pop(),ue[P+P]=e(ue[P],2);for(ue.DDDD=e(ue.DDD,3),s.prototype={set:function(t){var e,n;for(n in t)e=t[n],"function"==typeof e?this[n]=e:this["_"+n]=e},_months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_"),months:function(t){return this._months[t.month()]},_monthsShort:"Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_"),monthsShort:function(t){return this._monthsShort[t.month()]},monthsParse:function(t){var e,n,s;for(this._monthsParse||(this._monthsParse=[]),e=0;12>e;e++)if(this._monthsParse[e]||(n=H([2e3,e]),s="^"+this.months(n,"")+"|^"+this.monthsShort(n,""),this._monthsParse[e]=new RegExp(s.replace(".",""),"i")),this._monthsParse[e].test(t))return e},_weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),weekdays:function(t){return this._weekdays[t.day()]},_weekdaysShort:"Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_"),weekdaysShort:function(t){return this._weekdaysShort[t.day()]},_weekdaysMin:"Su_Mo_Tu_We_Th_Fr_Sa".split("_"),weekdaysMin:function(t){return this._weekdaysMin[t.day()]},weekdaysParse:function(t){var e,n,s;for(this._weekdaysParse||(this._weekdaysParse=[]),e=0;7>e;e++)if(this._weekdaysParse[e]||(n=H([2e3,1]).day(e),s="^"+this.weekdays(n,"")+"|^"+this.weekdaysShort(n,"")+"|^"+this.weekdaysMin(n,""),this._weekdaysParse[e]=new RegExp(s.replace(".",""),"i")),this._weekdaysParse[e].test(t))return e},_longDateFormat:{LT:"h:mm A",L:"MM/DD/YYYY",LL:"MMMM D YYYY",LLL:"MMMM D YYYY LT",LLLL:"dddd, MMMM D YYYY LT"},longDateFormat:function(t){var e=this._longDateFormat[t];return!e&&this._longDateFormat[t.toUpperCase()]&&(e=this._longDateFormat[t.toUpperCase()].replace(/MMMM|MM|DD|dddd/g,function(t){return t.slice(1)}),this._longDateFormat[t]=e),e},isPM:function(t){return"p"===(t+"").toLowerCase()[0]},_meridiemParse:/[ap]\.?m?\.?/i,meridiem:function(t,e,n){return t>11?n?"pm":"PM":n?"am":"AM"},_calendar:{sameDay:"[Today at] LT",nextDay:"[Tomorrow at] LT",nextWeek:"dddd [at] LT",lastDay:"[Yesterday at] LT",lastWeek:"[Last] dddd [at] LT",sameElse:"L"},calendar:function(t,e){var n=this._calendar[t];return"function"==typeof n?n.apply(e):n},_relativeTime:{future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"},relativeTime:function(t,e,n,s){var i=this._relativeTime[n];return"function"==typeof i?i(t,e,n,s):i.replace(/%d/i,t)},pastFuture:function(t,e){var n=this._relativeTime[t>0?"future":"past"];return"function"==typeof n?n(e):n.replace(/%s/i,e)},ordinal:function(t){return this._ordinal.replace("%d",t)},_ordinal:"%d",preparse:function(t){return t},postformat:function(t){return t},week:function(t){return F(t,this._week.dow,this._week.doy).week},_week:{dow:0,doy:6}},H=function(t,e,n){return O({_i:t,_f:e,_l:n,_isUTC:!1})},H.utc=function(t,e,n){return O({_useUTC:!0,_isUTC:!0,_l:n,_i:t,_f:e})},H.unix=function(t){return H(1e3*t)},H.duration=function(t,e){var n,s,i=H.isDuration(t),a="number"==typeof t,o=i?t._input:a?{}:t,u=Z.exec(t);return a?e?o[e]=t:o.milliseconds=t:u&&(n="-"===u[1]?-1:1,o={y:0,d:~~u[2]*n,h:~~u[3]*n,m:~~u[4]*n,s:~~u[5]*n,ms:~~u[6]*n}),s=new r(o),i&&t.hasOwnProperty("_lang")&&(s._lang=t._lang),s},H.version=U,H.defaultFormat=Q,H.updateOffset=function(){},H.lang=function(t,e){return t?(e?l(t,e):x[t]||_(t),H.duration.fn._lang=H.fn._lang=_(t),void 0):H.fn._lang._abbr},H.langData=function(t){return t&&t._lang&&t._lang._abbr&&(t=t._lang._abbr),_(t)},H.isMoment=function(t){return t instanceof i},H.isDuration=function(t){return t instanceof r},H.fn=i.prototype={clone:function(){return H(this)},valueOf:function(){return+this._d+6e4*(this._offset||0)},unix:function(){return Math.floor(+this/1e3)},toString:function(){return this.format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ")},toDate:function(){return this._offset?new Date(+this):this._d},toISOString:function(){return M(H(this).utc(),"YYYY-MM-DD[T]HH:mm:ss.SSS[Z]")},toArray:function(){var t=this;return[t.year(),t.month(),t.date(),t.hours(),t.minutes(),t.seconds(),t.milliseconds()]},isValid:function(){return null==this._isValid&&(this._isValid=this._a?!c(this._a,(this._isUTC?H.utc(this._a):H(this._a)).toArray()):!isNaN(this._d.getTime())),!!this._isValid},utc:function(){return this.zone(0)},local:function(){return this.zone(0),this._isUTC=!1,this},format:function(t){var e=M(this,t||H.defaultFormat);return this.lang().postformat(e)},add:function(t,e){var n;return n="string"==typeof t?H.duration(+e,t):H.duration(t,e),h(this,n,1),this},subtract:function(t,e){var n;return n="string"==typeof t?H.duration(+e,t):H.duration(t,e),h(this,n,-1),this},diff:function(t,e,n){var s,i,r=this._isUTC?H(t).zone(this._offset||0):H(t).local(),a=6e4*(this.zone()-r.zone());return e=f(e),"year"===e||"month"===e?(s=432e5*(this.daysInMonth()+r.daysInMonth()),i=12*(this.year()-r.year())+(this.month()-r.month()),i+=(this-H(this).startOf("month")-(r-H(r).startOf("month")))/s,i-=6e4*(this.zone()-H(this).startOf("month").zone()-(r.zone()-H(r).startOf("month").zone()))/s,"year"===e&&(i/=12)):(s=this-r,i="second"===e?s/1e3:"minute"===e?s/6e4:"hour"===e?s/36e5:"day"===e?(s-a)/864e5:"week"===e?(s-a)/6048e5:s),n?i:o(i)},from:function(t,e){return H.duration(this.diff(t)).lang(this.lang()._abbr).humanize(!e)},fromNow:function(t){return this.from(H(),t)},calendar:function(){var t=this.diff(H().startOf("day"),"days",!0),e=-6>t?"sameElse":-1>t?"lastWeek":0>t?"lastDay":1>t?"sameDay":2>t?"nextDay":7>t?"nextWeek":"sameElse";return this.format(this.lang().calendar(e,this))},isLeapYear:function(){var t=this.year();return 0===t%4&&0!==t%100||0===t%400},isDST:function(){return this.zone()<this.clone().month(0).zone()||this.zone()<this.clone().month(5).zone()},day:function(t){var e=this._isUTC?this._d.getUTCDay():this._d.getDay();return null!=t?"string"==typeof t&&(t=this.lang().weekdaysParse(t),"number"!=typeof t)?this:this.add({d:t-e}):e},month:function(t){var e,n=this._isUTC?"UTC":"";return null!=t?"string"==typeof t&&(t=this.lang().monthsParse(t),"number"!=typeof t)?this:(e=this.date(),this.date(1),this._d["set"+n+"Month"](t),this.date(Math.min(e,this.daysInMonth())),H.updateOffset(this),this):this._d["get"+n+"Month"]()},startOf:function(t){switch(t=f(t)){case"year":this.month(0);case"month":this.date(1);case"week":case"day":this.hours(0);case"hour":this.minutes(0);case"minute":this.seconds(0);case"second":this.milliseconds(0)}return"week"===t&&this.weekday(0),this},endOf:function(t){return this.startOf(t).add(t,1).subtract("ms",1)},isAfter:function(t,e){return e="undefined"!=typeof e?e:"millisecond",+this.clone().startOf(e)>+H(t).startOf(e)},isBefore:function(t,e){return e="undefined"!=typeof e?e:"millisecond",+this.clone().startOf(e)<+H(t).startOf(e)},isSame:function(t,e){return e="undefined"!=typeof e?e:"millisecond",+this.clone().startOf(e)===+H(t).startOf(e)},min:function(t){return t=H.apply(null,arguments),this>t?this:t},max:function(t){return t=H.apply(null,arguments),t>this?this:t},zone:function(t){var e=this._offset||0;return null==t?this._isUTC?e:this._d.getTimezoneOffset():("string"==typeof t&&(t=p(t)),Math.abs(t)<16&&(t=60*t),this._offset=t,this._isUTC=!0,e!==t&&h(this,H.duration(e-t,"m"),1,!0),this)},zoneAbbr:function(){return this._isUTC?"UTC":""},zoneName:function(){return this._isUTC?"Coordinated Universal Time":""},daysInMonth:function(){return H.utc([this.year(),this.month()+1,0]).date()},dayOfYear:function(t){var e=W((H(this).startOf("day")-H(this).startOf("year"))/864e5)+1;return null==t?e:this.add("d",t-e)},weekYear:function(t){var e=F(this,this.lang()._week.dow,this.lang()._week.doy).year;return null==t?e:this.add("y",t-e)},isoWeekYear:function(t){var e=F(this,1,4).year;return null==t?e:this.add("y",t-e)},week:function(t){var e=this.lang().week(this);return null==t?e:this.add("d",7*(t-e))},isoWeek:function(t){var e=F(this,1,4).week;return null==t?e:this.add("d",7*(t-e))},weekday:function(t){var e=(this._d.getDay()+7-this.lang()._week.dow)%7;return null==t?e:this.add("d",t-e)},isoWeekday:function(t){return null==t?this.day()||7:this.day(this.day()%7?t:t-7)},lang:function(e){return e===t?this._lang:(this._lang=_(e),this)}},P=0;P<ne.length;P++)z(ne[P].toLowerCase().replace(/s$/,""),ne[P]);z("year","FullYear"),H.fn.days=H.fn.day,H.fn.months=H.fn.month,H.fn.weeks=H.fn.week,H.fn.isoWeeks=H.fn.isoWeek,H.fn.toJSON=H.fn.toISOString,H.duration.fn=r.prototype={_bubble:function(){var t,e,n,s,i=this._milliseconds,r=this._days,a=this._months,u=this._data;u.milliseconds=i%1e3,t=o(i/1e3),u.seconds=t%60,e=o(t/60),u.minutes=e%60,n=o(e/60),u.hours=n%24,r+=o(n/24),u.days=r%30,a+=o(r/30),u.months=a%12,s=o(a/12),u.years=s},weeks:function(){return o(this.days()/7)},valueOf:function(){return this._milliseconds+864e5*this._days+2592e6*(this._months%12)+31536e6*~~(this._months/12)},humanize:function(t){var e=+this,n=S(e,!t,this.lang());return t&&(n=this.lang().pastFuture(e,n)),this.lang().postformat(n)},add:function(t,e){var n=H.duration(t,e);return this._milliseconds+=n._milliseconds,this._days+=n._days,this._months+=n._months,this._bubble(),this},subtract:function(t,e){var n=H.duration(t,e);return this._milliseconds-=n._milliseconds,this._days-=n._days,this._months-=n._months,this._bubble(),this},get:function(t){return t=f(t),this[t.toLowerCase()+"s"]()},as:function(t){return t=f(t),this["as"+t.charAt(0).toUpperCase()+t.slice(1)+"s"]()},lang:H.fn.lang};for(P in se)se.hasOwnProperty(P)&&(L(P,se[P]),C(P.toLowerCase()));L("Weeks",6048e5),H.duration.fn.asMonths=function(){return(+this-31536e6*this.years())/2592e6+12*this.years()},H.lang("en",{ordinal:function(t){var e=t%10,n=1===~~(t%100/10)?"th":1===e?"st":2===e?"nd":3===e?"rd":"th";return t+n}}),A&&(module.exports=H),"undefined"==typeof ender&&(this.moment=H),"function"==typeof define&&define.amd&&define("moment",[],function(){return H})}.call(this);
+}),
+"moment-ru": (function (require, exports, module) { /* wrapped by builder */
+function plural(e,a){var t=e.split("_");return 1===a%10&&11!==a%100?t[0]:a%10>=2&&4>=a%10&&(10>a%100||a%100>=20)?t[1]:t[2]}function relativeTimeWithPlural(e,a,t){var _={mm:"минута_минуты_минут",hh:"час_часа_часов",dd:"день_дня_дней",MM:"месяц_месяца_месяцев",yy:"год_года_лет"};return"m"===t?a?"минута":"минуту":e+" "+plural(_[t],+e)}function monthsCaseReplace(e,a){var t={nominative:"январь_февраль_март_апрель_май_июнь_июль_август_сентябрь_октябрь_ноябрь_декабрь".split("_"),accusative:"января_февраля_марта_апреля_мая_июня_июля_августа_сентября_октября_ноября_декабря".split("_")},_=/D[oD]? *MMMM?/.test(a)?"accusative":"nominative";return t[_][e.month()]}function weekdaysCaseReplace(e,a){var t={nominative:"воскресенье_понедельник_вторник_среда_четверг_пятница_суббота".split("_"),accusative:"воскресенье_понедельник_вторник_среду_четверг_пятницу_субботу".split("_")},_=/\[ ?[Вв] ?(?:прошлую|следующую)? ?\] ?dddd/.test(a)?"accusative":"nominative";return t[_][e.day()]}require("moment").lang("ru",{months:monthsCaseReplace,monthsShort:"янв_фев_мар_апр_май_июн_июл_авг_сен_окт_ноя_дек".split("_"),weekdays:weekdaysCaseReplace,weekdaysShort:"вск_пнд_втр_срд_чтв_птн_сбт".split("_"),weekdaysMin:"вс_пн_вт_ср_чт_пт_сб".split("_"),longDateFormat:{LT:"HH:mm",L:"DD.MM.YYYY",LL:"D MMMM YYYY г.",LLL:"D MMMM YYYY г., LT",LLLL:"dddd, D MMMM YYYY г., LT"},calendar:{sameDay:"[Сегодня в] LT",nextDay:"[Завтра в] LT",lastDay:"[Вчера в] LT",nextWeek:function(){return 2===this.day()?"[Во] dddd [в] LT":"[В] dddd [в] LT"},lastWeek:function(){switch(this.day()){case 0:return"[В прошлое] dddd [в] LT";case 1:case 2:case 4:return"[В прошлый] dddd [в] LT";case 3:case 5:case 6:return"[В прошлую] dddd [в] LT"}},sameElse:"L"},relativeTime:{future:"через %s",past:"%s назад",s:"несколько секунд",m:relativeTimeWithPlural,mm:relativeTimeWithPlural,h:"час",hh:relativeTimeWithPlural,d:"день",dd:relativeTimeWithPlural,M:"месяц",MM:relativeTimeWithPlural,y:"год",yy:relativeTimeWithPlural},ordinal:function(e,a){switch(a){case"M":case"d":case"DDD":return e+"-й";case"D":return e+"-го";case"w":case"W":return e+"-я";default:return e}},week:{dow:1,doy:7}});
+}),
+"app": (function (require, exports, module) { /* wrapped by builder */
+var Backbone, Gsender, Sidebar;
+
+Backbone =  require('backbone');
+Gsender =   require('gsender');
+Sidebar =   require('sidebar');
+
+module.exports = Backbone.Router.extend({
+
+  initialize: function() {
+    var _this = this;
+
+    this.sidebar = new Sidebar();
+    
+    $('[data-view=\"dict\"]').each(function(i, el) {
+      var sid, conf;
+
+      sid = $(el).data("dict-sid") || '';
+      conf = window[sid + '_data'] || {};
+
+      window[sid] = new Gsender({
+        el:   conf.el,
+        conf: conf
+      });
+
+    });     
+  }
+
+});
+}),
+"data": (function (require, exports, module) { /* wrapped by builder */
+var Backbone, Line;
+
+Backbone = require('backbone');
+Line =     require('line');
+
+module.exports = Backbone.Collection.extend({
+
+  model: Line
+
+});
+
+}),
+"dict": (function (require, exports, module) { /* wrapped by builder */
+var _, Backbone, Dict;
+
+_        = require('underscore');
+Backbone = require('backbone');
+
+Dict = Backbone.Model.extend({
+
+  idAttribute: "d$uuid",
+
+  initialize: function() {
+    return {
+      sid:                     '',
+      type:                    'parent',
+      caption:                 '',
+      showcaption:             '',
+      timeout:                 10000,
+      limit:                   50,
+      step:                    20,
+      query:                   '',
+      selectRowUUID:           '',
+      returnfieldname:         'd$uuid',
+      captionfieldname:        'd$uuid',
+      keyfieldname:            'd$uuid',
+      addfields:               {},
+      editfields:              {},
+      keys:                    {},
+      vals:                    {},
+      columns:                 {},
+      childs:                  {},
+      childsInfo:              {},
+      renderItemSearch:        null,
+      renderOptionSearch:      null,
+      cfselect: {
+        selectfieldexpression: '',
+        allwayspartial:        true
+      },
+      privileges: {
+        I: false,
+        S: false,
+        U: [],
+        D: false,
+        F: false
+      }
+    };
+  }    
+
+});
+
+Dict.prototype.setValsToLowerCase = function(ms) {
+  var tmp = {};
+  _.each(ms || {}, function(value, key) {
+    tmp[key] = value.toLowerCase();
+  });
+  return tmp;
+};
+
+Dict.prototype.setKeysToLowerCase = function(ms) {
+  var tmp = {};
+  _.each(ms || {}, function(value, key) {
+    tmp[key.toLowerCase()] = value;
+  });
+  return tmp;
+};
+
+Dict.prototype.cleanVals = function(new_vals) {
+  var keys, vals, 
+    tmp = {};
+
+  keys = this.get('keys') || {};
+  vals = this.get('vals') || {};
+
+  if ((new_vals != null) && (typeof new_vals === 'object')) {
+    vals = _.extend({}, vals, new_vals);
+  }
+
+  keys =  this.setValsToLowerCase(keys);
+  vals =  this.setKeysToLowerCase(vals);
+
+  _.each(keys, function(value, key) {
+    if (vals[value] != null) {
+      if (typeof vals[value] === 'string') {
+        tmp[value] = vals[value].trim();
+      } else {
+        tmp[value] = vals[value];
+      }
+    }
+  });
+
+  this.set('vals', tmp);
+
+  return tmp;
+};
+
+module.exports = Dict;
+
+}),
+"line": (function (require, exports, module) { /* wrapped by builder */
+var Backbone;
+
+Backbone = require('backbone');
+
+module.exports = Backbone.Model.extend({
+
+  idAttribute: "d$uuid",
+
+  initialize: function() {
+
+  }    
+
+});
+
+}),
+"common": (function (require, exports, module) { /* wrapped by builder */
+var Backbone, Common;
+
+Backbone = require('backbone');
+
+Common = Backbone.View.extend({
+
+  initialize: function() {}
+
+});
+
+
+module.exports = Common;
+
+}),
+"gsender": (function (require, exports, module) { /* wrapped by builder */
+var _, Backbone, Data, Dict, AddDeviceValue, Gsender, Common, Search, Insert;
+
+_ =          require('underscore');
+Backbone =   require('backbone');
+Common =     require('common');
+Data =       require('data');
+Dict =       require('dict');
+Search =     require('search');
+Insert =     require('insert');
+
+// AddDeviceValue = require('addDeviceValue.pl');
+
+Gsender = Common.extend({
+
+  el: "[data-view=\"dict\"]",
+
+  initialize: function() {
+    var model,
+      _this = this;
+
+    this.dict = new Dict(this.options.conf || {});
+
+    this.$thead = this.$el.find('thead');
+    this.$worksheet = this.$el.find('tbody');
+    this.$search = this.$el.find("[data-view=\"search\"]");
+    this.$insert = this.$el.find("[data-view=\"insert\"]");
+
+    this.dict.set('type', this.$el.data("dict-type") || 'parent');   
+    this.dict.cleanVals();
+
+    this.toolbar = this.dict.get('toolbar');
+
+    this.data = new Data();
+    this.data.url = '/api/dict/' + this.dict.get('sid');
+
+    if (this.toolbar.search === true) {
+      this.search = new Search({
+        el:    this.$search,
+        conf:  this.dict.toJSON()
+      });
+
+      this.data.on('add', function(data) {
+        _this.search.select.addOption(data.toJSON());
+      });
+
+      this.search.on('search', function(query) {
+        _this.dict.set({
+          limit: 50,
+          query: query
+        });
+        _this.$el.trigger('start.search');
+        _this.sendRequest('search');
+      });
+    }
+
+    if (this.toolbar.insert === true) {
+      this.insert = new Insert({
+        el:    this.$insert,
+        conf:  this.options.conf
+      });
+
+      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        e.preventDefault();
+        if (_this.insert.autoinsert === true) {
+          _this.insert.request();
+        } else {
+          _this.$insert.modal('show');
+        }
+      });
+    }
+
+    this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
+
+    this.$el.on('scroll', function() {
+      if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
+        _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
+        _this.$el.trigger('start.scroll');
+        _this.sendRequest('scroll');
+      }
+    });
+
+    this.$el.on('mouseover', function() {
+      $(this).css({
+        'cursor': 'pointer'
+      });
+    });
+
+    this.$el.on('click', 'td', function() {
+      var $tr = $(this).parent();
+      _this.dict.set('selectRowUUID', $tr.data('uuid'));
+      _this.colorActiveLine();
+      _this.updateChilds();
+    });
+
+    this.$el.on('click', "[data-action=\"delete\"]", function() {      
+      var $tr = $(this).parent().parent();
+      _this.dict.set('selectRowUUID', $tr.data('uuid'));
+      _this.sendRequest('remove', _this.getSelectLine());
+    });
+
+    this.data.on('add', function(line) {
+      var key = _this.dict.get('keyfieldname');
+      _this.$worksheet.append(jade.templates.line_data({
+        keyfieldname: key,
+        columns:      _this.dict.get('columns'),
+        line:         line.toJSON()
+      }));
+      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
+        container: 'body',
+        placement: 'top'
+      });
+      _this.$el.trigger('add.line', line.toJSON());
+    });
+
+    this.data.on('remove', function(line) {
+      var key = _this.dict.get('keyfieldname');
+      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
+      _this.$el.trigger('add.line', line.toJSON());
+    });
+
+    if (_this.dict.get('type') === 'parent') {
+      _this.sendRequest('onload');
+    }
+
+  }
+});
+
+Gsender.prototype.update = function(vals) {
+  if (this.dict.get('type') === 'child') {
+    this.dict.set('limit', 50);
+    this.dict.cleanVals(vals);
+    if (this.search != null) {      
+      this.search.select.conf.vals = this.dict.get('vals');
+    }
+    this.$el.trigger('start.update');
+    this.sendRequest('update');
+  }
+};
+
+Gsender.prototype.updateChilds = function() {
+  var line,
+    _this = this;
+  line = this.getSelectLine();
+  if (this.data !== null) {
+    _.each(this.dict.get('childs'), function(child) {
+      if (window[child.sid] !== null) {
+        if ((line != null) && (window[child.sid])) {
+          window[child.sid].update(line.toJSON() || {});
+        } else {
+          window[child.sid].showInformationNotFound();
+        }
+      }
+    });
+  }
+};
+
+Gsender.prototype.getUUIDbyFirstRecord = function() {
+  return this.$worksheet.find('tr:first').data('uuid') || '';
+};
+
+Gsender.prototype.getSelectLine = function() {
+  var _this = this;
+  return this.data.find(function(s) {
+    return s.get(_this.dict.get('keyfieldname')) === _this.dict.get('selectRowUUID');
+  });
+};
+
+Gsender.prototype.colorActiveLine = function(classname) {
+
+  if (classname == null) {
+    classname = 'active';
+  }
+
+  this.$worksheet.find('tr').removeClass(classname);
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
+  if (this.$activeLine != null) {
+    this.$activeLine.addClass(classname);
+  }
+};
+
+Gsender.prototype.showInformationNotFound = function() {
+  this.$worksheet.html(jade.templates.line_nothing({
+    columns: this.dict.get('columns') || {}
+  }));
+};
+
+Gsender.prototype.hideInformationNotFound = function() {
+  this.$worksheet.find("[data-type=\"nothing\"]").remove();
+};
+
+Gsender.prototype.showErrorOnServer = function() {
+  this.$worksheet.html(jade.templates.line_error({
+    columns: this.dict.get('columns') || {}
+  }));
+};
+
+Gsender.prototype.hideErrorOnServer = function() {
+  this.$worksheet.find("[data-type=\"error\"]").remove();
+};
+
+Gsender.prototype.showLoading = function(type) {
+
+  if (type == null) {
+    type = 'before';
+  }
+
+  if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
+    switch (type) {
+      case 'replace':
+        this.$worksheet.html(jade.templates.line_loading({
+          columns: this.dict.get('columns') || {}
+        }));
+      break;
+      case 'after':
+        this.$worksheet.append(jade.templates.line_loading({
+          columns: this.dict.get('columns') || {}
+        }));
+      break;
+      case 'before':
+        this.$worksheet.prepend(jade.templates.line_loading({
+          columns: this.dict.get('columns') || {}
+        }));
+      break;
+    }
+  }
+};
+
+Gsender.prototype.hideLoading = function() {
+  this.$worksheet.find("[data-type=\"loading\"]").remove();
+};
+
+Gsender.prototype.sendRequest = function(type, model) {
+  var method,
+    url,
+    success,
+    error,
+    _this = this;
+
+  if (type == null) {
+    type = 'scroll';
+  }
+
+  switch (type) {
+    case 'onload':
+      method = "fetch";
+      this.$worksheet.empty();
+      this.data.reset();
+      this.showLoading();
+    break;
+    case 'update':
+      method = "fetch";
+      this.$worksheet.empty();
+      this.data.reset();
+      this.showLoading();
+    break;
+    case 'search':
+      method = "fetch";
+      this.$worksheet.empty();
+      this.data.reset();
+      this.showLoading();
+    break;
+    case 'scroll':
+      method = "fetch";
+      this.showLoading('after');
+    break;
+    case 'remove':
+      method = "remove";
+    break;
+  }
+
+  // this.$el.trigger('request:' + type);
+
+  success = function() {
+    _this.hideLoading();
+    _this.hideErrorOnServer();
+    _this.hideInformationNotFound();
+    _this.checkResponse(type);
+  };
+
+  error = function() {
+    _this.hideLoading();
+    _this.showErrorOnServer();
+  };
+
+  if (method === 'fetch') {
+    this.data.fetch({
+      timeout: this.dict.get('timeout'),
+      data: {
+        limit: this.dict.get('limit')         || null,
+        query: this.dict.get('query')         || '',
+        keys:  this.dict.get('keys')          || {},
+        vals:  this.dict.get('vals')          || {}
+      },
+      success: success,
+      error:   error
+    });
+  }
+
+  if (method === 'remove') {
+    $.ajax({
+      url: '/api/dict/' + this.dict.get('sid'),
+      type: 'GET',
+      data: {
+        _method: 'DELETE',
+        line:    model.toJSON(),
+        keys:    this.dict.get('keys')        || {},
+        vals:    this.dict.get('vals')        || {}
+      },
+      timeout: this.dict.get('timeout'),
+      success: success,
+      error:   error
+    });
+    // model.destroy({
+    //   timeout: timeout,
+    //   // data:    data,
+    //   success: success,
+    //   error:   error
+    // });
+  }
+  
+};
+
+Gsender.prototype.checkResponse = function(type) {
+
+  if (type == null) {
+    type = "scroll";
+  }
+
+  switch (type) {
+    case 'update':
+      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
+      this.colorActiveLine();
+    break;
+    case 'onload':
+      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
+      this.colorActiveLine();
+      this.updateChilds();
+    break;      
+    case 'search':
+      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
+      this.colorActiveLine();
+      this.updateChilds();
+    break;      
+  }
+
+  if (this.data.length < 1) {
+    this.showInformationNotFound();
+  }
+
+  this.$el.trigger('response:' + type);
+};
+
+module.exports = Gsender;
+
+}),
+"insert": (function (require, exports, module) { /* wrapped by builder */
+
+var _, Common, Data, Dict, Search, Select;
+
+Common =   require('common');
+Data =     require('data');
+Dict =     require('dict');
+Select =   require('select');
+_ =        require('underscore');
+
+Insert = Common.extend({
+
+  el: "[data-view=\"insert\"]",
+
+  initialize: function() {
+    var _this;
+
+    // this.dict = new Dict(this.options.conf || {});
+
+
+    this.$body =        this.$el.find("[data-type=\"modal-body\"]");
+    this.$form =        this.$el.find("[data-view=\"form\"]");
+    this.$button =      this.$el.find("[data-type=\"button\"]");
+
+    this.conf =         this.options.conf   || {};
+    this.sid =          this.conf.sid       || {};
+    this.addfields =    this.conf.addfields || {};
+    this.columns =      this.conf.columns   || {};
+    this.controls =     {};
+    this.vals =         {};
+    this.autoinsert =   true;
+    
+    this.checkFields();
+
+    _this = this;
+
+    this.$button.on('click', function() {
+      if (_this.checkCompleteFields()) {
+        _this.request();
+      }
+    });
+  }
+});
+
+Insert.prototype.checkFields = function() {
+  var _this = this;
+
+  _.each(this.addfields, function(value, key) {
+    var id, sid, conf, select, caption, field;
+    _this.controls[key] = 'none';
+    value = value.toString().trim();
+    if (value.match(/^WDICTS\./i)) {
+      _this.autoinsert = false;
+      sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
+      id = _this.sid + "_" + sid;
+      conf = window[sid + '_data'];
+      // console.log(_this.sid, sid, conf);
+      _this.$form.append(jade.templates.insert_select({
+        id:   id,
+        conf: conf,
+      }));
+      select = new Select({
+        el:   "[data-control=\"" + id + "\"]",
+        type: 'select',
+        conf: conf
+      });
+      select.on('select', function(value) {
+        if (_this.checkCompleteFields()) {
+          _this.$button.removeAttr('disabled');
+        }
+      });
+      _this.controls[key] = {
+        type:   'select',
+        select: select,
+        value:  ''
+      };
+    }
+    if (value === 'default') {
+      _this.autoinsert = false;
+      id = _this.sid + "_" + key;
+      field = _.findWhere(_this.columns, {
+        field: key
+      });
+      caption = field.caption || '';
+      _this.$form.append(jade.templates.insert_default({
+        id:       id,
+        caption:  caption
+      }));
+      _this.controls[key] = {
+        type:   'default',
+        value:  ''
+      };
+    }
+    if (value.match(/^select/i)) {
+      _this.controls[key] = {
+        type: 'sql',
+        value: value
+      };
+    }
+  });
+};
+
+Insert.prototype.request = function() {
+  $.ajax({
+    url: '/api/dict/' + this.sid,
+    type: 'GET',
+    data: {
+      _method: 'PUT',
+      controls: this.vals
+    },
+    timeout: this.options.timeout || 1000,
+    success: function() {
+      alert('success');
+    },
+    error: function() {
+      alert('error');
+    }
+  });
+};
+
+Insert.prototype.checkCompleteFields = function() {
+  var _this = this;
+  var result = true;
+
+  _.each(this.controls, function(value, key) {
+    switch (_this.controls[key].type) {
+      case 'select':
+        _this.vals[key] = _this.controls[key].select.getValue();
+        break;
+      default:
+        _this.vals[key] = _this.controls[key].value;        
+    }
+    if (_this.vals[key] === '') {
+      result = false;
+    }
+  });
+  return result;
+};
+
+module.exports = Insert;
+
+
+}),
+"search": (function (require, exports, module) { /* wrapped by builder */
+
+var Common, Search, Select;
+
+Common =   require('common');
+Select =   require('select');
+
+Search = Common.extend({
+
+  el: "[data-view=\"search\"]",
+
+  initialize: function() {
+    var def, _this;
+
+    this.$query = this.$el.find('input');
+
+    this.select = new Select({
+      el:   this.$query,
+      type: 'search',
+      conf: this.options.conf || {}
+    });
+
+    _this = this;
+
+    this.select.on('search', function(query) {
+      _this.search(query);
+    });
+
+    this.$el.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
+    
+  }
+});
+
+Search.prototype.getQuery = function() {
+  return this.$query.val();
+};
+
+Search.prototype.clean = function() {
+  this.$query.val('');
+};
+
+Search.prototype.focus = function() {
+  this.$query.focus();
+};
+
+Search.prototype.search = function(query) {
+  var value, selectize;
+  value = query || this.$query.val();
+  this.select.clearOptions();
+  this.trigger('search', value);
+};
+
+module.exports = Search;
+
+}),
+"select": (function (require, exports, module) { /* wrapped by builder */
+
+var Common, Data, Select;
+
+Common =   require('common');
+Data =     require('data');
+
+Select = Common.extend({
+
+  el: "[data-view=\"select\"]",
+
+  initialize: function() {
+    var _this;
+    var searchfields = [];
+    var plugins = [];
+    var valuefield;
+    var create;
+    var selectOnTab = false;
+
+    // this.dict = new Dict(this.options.conf || {});
+    this.conf = this.options.conf || {};
+
+    this.data = new Data();
+    this.data.url = '/api/dict/' + this.conf.sid;
+
+    this.columns = this.conf.columns || {};
+    this.fields =  _.pluck(this.columns, 'field') || {};
+
+    this.cfselect = this.conf.cfselect || {};
+    this.selectfield = this.cfselect.selectfieldexpression || '';
+    if (this.selectfield !== '') {
+      this.selectfield = this.selectfield.toString().toLowerCase();
+    }
+
+    _this = this;
+
+    _.each(this.fields, function(value, key) {
+      var re1 = new RegExp("^" + value, 'ig');
+      var re2 = new RegExp("\\W" + value, 'ig');
+      if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
+        searchfields.push(value);
+      }
+    });
+    console.log(this.conf.sid, this.selectfield, searchfields);
+
+    switch (this.options.type) {
+      case 'search':
+        plugins =        ['restore_on_backspace'];
+        valuefield =     'value';
+        create =         this.create();
+        selectOnTab =    true;
+        break;
+      default:
+        plugins =        [];
+        valuefield =     this.conf.returnfieldname;
+        create =         false;
+        selectOnTab =    false;
+    }
+
+    this.$select = this.$el.selectize({
+      load:              this.load(this, searchfields),
+      valueField:        valuefield,
+      searchField:       searchfields,
+      create:            create,
+      plugins:           this.options.plugins           || plugins,
+      preload:           this.options.preload           || true,
+      maxItems:          this.options.maxItems          || 1,
+      maxOptions:        this.options.maxOptions        || 20,
+      delimeter:         this.options.delimeter         || ',',
+      persist:           this.options.persist           || true,
+      addPrecedence:     this.options.addPrecedence     || true,
+      selectOnTab:       this.options.selectOnTab       || selectOnTab,
+      allowEmptyOption:  this.options.allowEmptyOption  || true,      
+      render: {
+        item:            this.renderItem(searchfields),
+        option:          this.renderOption(searchfields)
+      }
+    });
+
+    if (this.$select[0]) {
+      this.selectize = this.$select[0].selectize;
+    }
+
+    _this = this;
+
+    if (this.selectize) {
+      if (this.options.type === 'select') {
+        // this.updateOptions();
+
+        this.selectize.on('change', function(value) {
+          _this.trigger('select', value);
+        });
+      }
+
+      if (this.options.type === 'search') {
+        this.selectize.on('item_add', function(value) {
+          _this.trigger('search', value);
+        });
+
+        this.selectize.on('item_remove', function() {
+          _this.trigger('search', '');
+        });
+      }
+    }
+  }
+});
+
+Select.prototype.setLineVals = function(str, line, escape) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    if (typeof value === 'string') {
+      if (typeof escape === 'function') {
+        value = escape(value.toString().trim());
+      } else {
+        value = "'" + value.trim() + "'";
+      }
+    }
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  ':' + key;
+    re =       new RegExp(pattern, 'ig');
+    str =      str.replace(re, value);
+  });
+
+  return str;
+};
+
+Select.prototype.setSearchVals = function(str, line, escape) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    if (typeof value === 'string') {
+      if (typeof escape === 'function') {
+        value = escape(value.toString().trim());
+      } else {
+        value = "" + value.toString().trim() + "";
+      }
+    }
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  key;
+    re =       new RegExp(pattern, 'ig');
+    str =      str.replace(re, value);
+  });
+
+  str = str.replace(/\|\|/gi, "");
+  str = str.replace(/\'\ \'/gi, " ");
+
+  return str;
+};
+
+Select.prototype.setSearchFields = function(fields, line, escape) {
+  var str = '';
+
+  if (fields == null) {
+    fields = [];
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(fields, function(value, key) {
+    if (line[value]) {
+      str = str + line[value] + ' ';
+    }
+  });
+
+  return str;
+};
+
+
+Select.prototype.addOption = function(data) {
+  if ((data) && (this.selectize)) {
+    this.selectize.addOption(data);
+  }
+};
+
+Select.prototype.updateOptions = function() {
+  var load, _this;
+  _this = this;
+  load = this.load(this);
+  load('***', function(data) {
+    if ((data) && (_this.selectize)) {
+      _this.selectize.addOption(data);
+    }
+  });
+};
+
+Select.prototype.getValue = function() {
+  if (this.selectize) {
+    return this.selectize.getValue();
+  }
+};
+
+Select.prototype.create = function() {
+  return function(input) {
+    return {
+      value:         input,
+      text:          input,
+      selectcaption: input
+    };
+  };
+};
+
+Select.prototype.renderItem = function(searchfields) {
+  var _this = this;
+  return function (item, escape) {
+    if (item[_this.conf.keyfieldname]) {
+      if ((_this.conf.renderItemSearch) && (_this.conf.renderItemSearch !== _this.selectfield)) {
+        return _this.setLineVals(_this.conf.renderItemSearch, item, escape);
+      } else {
+        if (item[_this.selectfield]) {
+          return '<div>' + item[_this.selectfield] + '</div>';
+        } else {
+          return '<div>' + _this.setSearchFields(searchfields, item, escape) + '</div>';
+        }
+      }
+    } else {
+      return '<div>' + escape(item.value) + '</div>';
+    }
+  };
+};
+
+Select.prototype.renderOption = function(searchfields) {
+  var _this = this;
+  return function (item, escape) {
+    if (item[_this.conf.keyfieldname]) {
+      if ((_this.conf.renderOptionSearch) && (_this.conf.renderOptionSearch !== _this.selectfield)) {
+        return _this.setLineVals(_this.conf.renderOptionSearch, item, escape);
+      } else {
+        if (item[_this.selectfield]) {
+          return '<div>' + item[_this.selectfield] + '</div>';
+        } else {
+          return '<div>' + _this.setSearchFields(searchfields, item, escape) + '</div>';
+        }
+      }
+    } else {
+      return '<div>' + escape(item.value) + '</div>';
+    }
+  };
+};
+
+Select.prototype.load = function(_this, searchfields) {
+  return function (query, fn) {
+    if (!fn) {
+      fn = function() {};
+    }
+
+    // if (!query) {
+    //   return fn();
+    // }
+
+    if (query === '***') {
+      query = '';
+    }
+
+    console.log(_this.conf.sid, query);
+
+    _this.data.fetch({
+      timeout: _this.options.timeout       || 1000,
+      data: {
+        query: query                       || '',
+        limit: _this.options.limit         || 20,
+        keys:  _this.conf.keys             || {},
+        vals:  _this.conf.vals             || {}
+      },
+      success: function() {
+        var data = _.map(_this.data.toJSON(), function(item) {
+          var str = _this.setSearchFields(searchfields, item);
+          item.value = str;
+          item.text = str;
+          return item;
+        });
+        fn(data);
+      },
+      error: function() {
+        fn();
+      }
+    });
+  };
+};
+
+Select.prototype.clearOptions = function() {
+  if (this.selectize) {
+    // this.selectize.clearOptions();
+  }
+};
+
+module.exports = Select;
+
+}),
+"sidebar": (function (require, exports, module) { /* wrapped by builder */
+var Backbone;
+
+Backbone = require('backbone');
+
+module.exports = Backbone.View.extend({
+
+  el: "#main-menu-toggle",
+
+  initialize: function() {
+    var _this = this,
+      $content = $('#content'),
+      $sidebar = $('#sidebar-left'),
+      $brand = $('.navbar-brand');
+
+    // $sidebar.on('transform', function() {
+    //   $sidebar.css({
+    //     height: $bottom.offset().top + $bottom.height() - $sidebar.offset().top
+    //   });
+    // });
+
+    // $(window).on('resize', function() {
+    //   $sidebar.trigger('transform');
+    // });
+
+    // $sidebar.trigger('transform');
+
+    this.$el.on('click', function() {
+
+      var span, spanNum, newSpa, newSpanNum;
+      
+      if ($(this).hasClass('open')) {
+
+        $(this).removeClass('open').addClass('close');
+
+        span =        $content.attr('class');
+        spanNum =     parseInt(span.replace( /^\D+/g, ''));
+        newSpanNum =  spanNum + 2;
+        newSpan =     'span' + newSpanNum;
+        
+        $brand.addClass('noBg');
+        $sidebar.hide();
+        $content.addClass('full').trigger('transform');
+
+      } else {
+
+        $(this).removeClass('close').addClass('open');
+      
+        span =        $content.attr('class');
+        spanNum =     parseInt(span.replace( /^\D+/g, ''));
+        newSpanNum =  spanNum - 2;
+        newSpan =     'span' + newSpanNum;
+        
+        $brand.removeClass('noBg');
+        $sidebar.show();
+        $content.removeClass('full').trigger('transform');
+
+      }
+
+    });
+
+  }
+
+});
+
+}),
+"addDeviceValue.pl": (function (require, exports, module) { /* wrapped by builder */
+
+var _, Backbone, Name, Template,
+  name = 'addDeviceValue';
+
+_ =            require('underscore');
+Backbone =     require('backbone');
+Template =     require(name + '.tpl');
+
+module.exports = Backbone.View.extend({
+
+  el: "[data-view=\"dict\"]",
+
+  initialize: function() {
+    var _this = this;
+
+    this.$worksheet =  this.$el.find('tbody');
+    
+    this.sid =         this.options.sid         || '';    
+    this.targetField = this.options.targetField || 'account_data';
+    this.uuid = '';
+
+    this.template = new Template();
+
+    this.checkLines();
+
+
+    this.$el.on('add.line', function(e, line) {
+      var $el, $line;      
+      if (line != null) {
+        if (line.d$uuid != null) {          
+          $line = _this.$worksheet.find("[data-uuid=\"" + line.d$uuid + "\"]");          
+          if ($line.length) {
+            $el = $line.find("[data-col-field=\"" + _this.targetField + "\"]");
+            if ($el.length) {
+              _this.checkLine($el);
+            }
+          }
+        }
+      }
+    });
+
+    this.$el.on('click', "[data-" + name + "=\"link\"]", function(e) {
+      e.preventDefault();
+      _this.uuid = $(this).parent().parent().data('uuid');
+      _this.$worksheet.find( "[data-" + name + "=\"input\"]").addClass('hide');
+      _this.$worksheet.find( "[data-" + name + "=\"link\"]").removeClass('hide');
+      $(this).addClass('hide');
+      $(this).parent().find( "[data-" + name + "=\"input\"]").removeClass('hide').focus();
+    });
+
+    this.$el.on('click', "td", function(e) {
+      if ($(this).parent().data('uuid') != _this.uuid) {
+        _this.$worksheet.find( "[data-" + name + "=\"input\"]").addClass('hide');
+        _this.$worksheet.find( "[data-" + name + "=\"link\"]").removeClass('hide');
+      }
+    });
+
+    this.$el.on('keyup', "[data-" + name + "=\"input\"]", function(e) {
+      var __this = this;
+      if (e.keyCode === 13) {
+        // $(this).parent().addClass('success');
+        this.blur();
+        $.ajax({
+          url:       '/api/' + name,
+          type:      'POST',
+          dataType:  'text',
+          data: {
+            uuid:   _this.uuid.trim(),
+            value:  $(this).val()
+          },
+          success: function(s) {
+            var sid = _this.sid;
+            $(__this).parent().html(_this.template.line({
+              value: $(__this).val()
+            }));
+            if (window[sid] != null) {
+              window[sid].trigger('update.childs');
+            }
+          }
+        });
+      }
+    });
+
+  },
+
+
+  checkLines: function() {
+    var _this = this;
+
+    this.$worksheet.find("[data-col-field=\"" + this.targetField + "\"]").each(function() {
+      _this.checkLine($(this));
+    });
+  },
+
+  checkLine: function($el) {
+    if ($el.data(name) != 'cell') {
+      $el.html(this.template.line({
+        value: $el.text()
+      }));
+      $el.data(name, 'cell');
+    }
+  }
+
+});
+
+}),
+"addDeviceValue.en.po": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = {
+  'messages': {
+    'Add': [
+      null,
+      'Add'
+    ],
+    'New value': [
+      null,
+      'New value'
+    ]
+  }  
+};
+
+}),
+"addDeviceValue.ru.po": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = {
+  'messages': {
+    'Add': [
+      null,
+      'Добавить'
+    ],
+    'New value': [
+      null,
+      'Введите значение'
+    ]
+  }  
+};
+
+}),
+"addDeviceValue.tpl": (function (require, exports, module) { /* wrapped by builder */
+
+var Template;
+
+Template = function(options) {
+
+  if (typeof options !== 'object') {
+    options = {};
+  }
+
+  this.name = options.name || 'addDeviceValue';
+  this.i18n();
+};
+
+Template.prototype.i18n = function() {
+  this.lang = $('html').attr('lang') || window.lang || 'en';
+  this.locale_data = require(this.name + '.' + this.lang + '.po');
+};
+
+Template.prototype.line = function(locals) {  
+  var buf = [];
+
+  if (typeof locals !== 'object') {
+    locals = {};
+  }
+
+  buf.push("<a data-" + this.name + "=\"link\" href=\"#\">");
+  if ((locals.value != null) && (locals.value.toString().trim() !== '')) {
+    buf.push(locals.value);
+  } else {
+    buf.push(window.gettext('Add', this.locale_data));
+  }
+  buf.push("</a>");
+  buf.push("<input ");
+  buf.push("class=\"input-sm form-control hide\" ");
+  buf.push("data-" + this.name + "=\"input\" ");
+  buf.push("type=\"text\" ");
+  if ((locals.value != null) && (locals.value.toString().trim() !== '')) {
+    buf.push("value=\"" + locals.value + "\" ");
+  }
+  buf.push("placeholder=\"" + window.gettext('New value', this.locale_data) + "\"");
+  buf.push(">");
+
+  return buf.join("");
+};
+
+
+module.exports = Template;
+}),
+"line_data.jade": (function (require, exports, module) { /* wrapped by builder */
+jade.templates = jade.templates || {};
+jade.templates['line_data'] = (function(){
+  return function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<tr');
+buf.push(attrs({ 'data-uuid':("" + (line[keyfieldname]) + "") }, {"data-uuid":true}));
+buf.push('><td><label><input type="checkbox"/></label></td>');
+// iterate columns
+;(function(){
+  if ('number' == typeof columns.length) {
+
+    for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
+      var column = columns[$index];
+
+ if (column.visible === true)
+{
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
+buf.push('>     ');
+ if ((line[column.field] != null) && (line[column.field] !== ''))        
+{
+ if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+{
+buf.push('<span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
+}
+ else
+{
+ if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+{
+ var groups = window.parseGroupLine(line[column.field]);
+// iterate groups
+;(function(){
+  if ('number' == typeof groups.length) {
+
+    for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
+      var group = groups[$index];
+
+buf.push('<span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push('>&nbsp;</span>&nbsp;');
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in groups) {
+      $$l++;      var group = groups[$index];
+
+buf.push('<span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push('>&nbsp;</span>&nbsp;');
+    }
+
+  }
+}).call(this);
+
+}
+ else
+{
+buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
+}
+}
+}
+buf.push('</td>');
+}
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in columns) {
+      $$l++;      var column = columns[$index];
+
+ if (column.visible === true)
+{
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
+buf.push('>     ');
+ if ((line[column.field] != null) && (line[column.field] !== ''))        
+{
+ if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+{
+buf.push('<span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
+}
+ else
+{
+ if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+{
+ var groups = window.parseGroupLine(line[column.field]);
+// iterate groups
+;(function(){
+  if ('number' == typeof groups.length) {
+
+    for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
+      var group = groups[$index];
+
+buf.push('<span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push('>&nbsp;</span>&nbsp;');
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in groups) {
+      $$l++;      var group = groups[$index];
+
+buf.push('<span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push('>&nbsp;</span>&nbsp;');
+    }
+
+  }
+}).call(this);
+
+}
+ else
+{
+buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
+}
+}
+}
+buf.push('</td>');
+}
+    }
+
+  }
+}).call(this);
+
+buf.push('<td><button');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data edit')) + ""), 'type':("button"), 'data-action':("edit"), "class": ('btn') + ' ' + ('btn-warning') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
+buf.push('><i class="fa fa-lg fa-edit"></i></button>&nbsp;<button');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data remove')) + ""), 'type':("button"), 'data-action':("delete"), "class": ('btn') + ' ' + ('btn-danger') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
+buf.push('><i class="fa fa-lg fa-trash-o"></i></button></td></tr>');
+}
+return buf.join("");
+};
+})();
+}),
+"line_error.jade": (function (require, exports, module) { /* wrapped by builder */
+jade.templates = jade.templates || {};
+jade.templates['line_error'] = (function(){
+  return function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<tr data-type="error"><td');
+buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push('> <h4>' + escape((interp = gettext('Error on server')) == null ? '' : interp) + '</h4></td></tr>');
+}
+return buf.join("");
+};
+})();
+}),
+"line_loading.jade": (function (require, exports, module) { /* wrapped by builder */
+jade.templates = jade.templates || {};
+jade.templates['line_loading'] = (function(){
+  return function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<tr data-type="loading"><td');
+buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push('> <div class="progress progress-striped active"><div style="width:100%;" class="progress-bar"></div></div></td></tr>');
+}
+return buf.join("");
+};
+})();
+}),
+"line_nothing.jade": (function (require, exports, module) { /* wrapped by builder */
+jade.templates = jade.templates || {};
+jade.templates['line_nothing'] = (function(){
+  return function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<tr data-type="nothing"><td');
+buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push('> <h4>' + escape((interp = gettext('Information not found')) == null ? '' : interp) + '</h4></td></tr>');
+}
+return buf.join("");
+};
+})();
+}),
+"insert_default.jade": (function (require, exports, module) { /* wrapped by builder */
+jade.templates = jade.templates || {};
+jade.templates['insert_default'] = (function(){
+  return function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="form-group"><label class="col-sm-2 control-label">' + escape((interp = caption) == null ? '' : interp) + '</label><div class="col-sm-10"><input');
+buf.push(attrs({ 'placeholder':("" + (caption) + ""), 'type':("text"), 'data-control':("" + (id) + ""), "class": ('form-control') }, {"placeholder":true,"type":true,"data-control":true}));
+buf.push('/></div></div>');
+}
+return buf.join("");
+};
+})();
+}),
+"insert_select.jade": (function (require, exports, module) { /* wrapped by builder */
+jade.templates = jade.templates || {};
+jade.templates['insert_select'] = (function(){
+  return function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="form-group"><label class="col-sm-2 control-label">' + escape((interp = conf.showcaption) == null ? '' : interp) + '</label><div class="col-sm-10"><select');
+buf.push(attrs({ 'placeholder':("" + (conf.showcaption) + ""), 'data-control':("" + (id) + ""), "class": ('form-control') }, {"placeholder":true,"data-control":true}));
+buf.push('></select></div></div>');
+}
+return buf.join("");
+};
+})();
 }),
 "selectize": (function (require) { /* wrapped by builder */
 /* added by builder */
@@ -3924,1379 +5463,5 @@ var jQuery = require("$");
 
 	return Selectize;
 }));
-}),
-"bootstrap": (function (require) { /* wrapped by builder */
-/* added by builder */
-var jQuery = require("$");
-
-/**
-* bootstrap.js v3.0.0 by @fat and @mdo
-* Copyright 2013 Twitter Inc.
-* http://www.apache.org/licenses/LICENSE-2.0
-*/
-if(!jQuery)throw new Error("Bootstrap requires jQuery");+function(a){"use strict";function b(){var a=document.createElement("bootstrap"),b={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"};for(var c in b)if(void 0!==a.style[c])return{end:b[c]}}a.fn.emulateTransitionEnd=function(b){var c=!1,d=this;a(this).one(a.support.transition.end,function(){c=!0});var e=function(){c||a(d).trigger(a.support.transition.end)};return setTimeout(e,b),this},a(function(){a.support.transition=b()})}(window.jQuery),+function(a){"use strict";var b='[data-dismiss="alert"]',c=function(c){a(c).on("click",b,this.close)};c.prototype.close=function(b){function c(){f.trigger("closed.bs.alert").remove()}var d=a(this),e=d.attr("data-target");e||(e=d.attr("href"),e=e&&e.replace(/.*(?=#[^\s]*$)/,""));var f=a(e);b&&b.preventDefault(),f.length||(f=d.hasClass("alert")?d:d.parent()),f.trigger(b=a.Event("close.bs.alert")),b.isDefaultPrevented()||(f.removeClass("in"),a.support.transition&&f.hasClass("fade")?f.one(a.support.transition.end,c).emulateTransitionEnd(150):c())};var d=a.fn.alert;a.fn.alert=function(b){return this.each(function(){var d=a(this),e=d.data("bs.alert");e||d.data("bs.alert",e=new c(this)),"string"==typeof b&&e[b].call(d)})},a.fn.alert.Constructor=c,a.fn.alert.noConflict=function(){return a.fn.alert=d,this},a(document).on("click.bs.alert.data-api",b,c.prototype.close)}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.$element=a(c),this.options=a.extend({},b.DEFAULTS,d)};b.DEFAULTS={loadingText:"loading..."},b.prototype.setState=function(a){var b="disabled",c=this.$element,d=c.is("input")?"val":"html",e=c.data();a+="Text",e.resetText||c.data("resetText",c[d]()),c[d](e[a]||this.options[a]),setTimeout(function(){"loadingText"==a?c.addClass(b).attr(b,b):c.removeClass(b).removeAttr(b)},0)},b.prototype.toggle=function(){var a=this.$element.closest('[data-toggle="buttons"]');if(a.length){var b=this.$element.find("input").prop("checked",!this.$element.hasClass("active")).trigger("change");"radio"===b.prop("type")&&a.find(".active").removeClass("active")}this.$element.toggleClass("active")};var c=a.fn.button;a.fn.button=function(c){return this.each(function(){var d=a(this),e=d.data("bs.button"),f="object"==typeof c&&c;e||d.data("bs.button",e=new b(this,f)),"toggle"==c?e.toggle():c&&e.setState(c)})},a.fn.button.Constructor=b,a.fn.button.noConflict=function(){return a.fn.button=c,this},a(document).on("click.bs.button.data-api","[data-toggle^=button]",function(b){var c=a(b.target);c.hasClass("btn")||(c=c.closest(".btn")),c.button("toggle"),b.preventDefault()})}(window.jQuery),+function(a){"use strict";var b=function(b,c){this.$element=a(b),this.$indicators=this.$element.find(".carousel-indicators"),this.options=c,this.paused=this.sliding=this.interval=this.$active=this.$items=null,"hover"==this.options.pause&&this.$element.on("mouseenter",a.proxy(this.pause,this)).on("mouseleave",a.proxy(this.cycle,this))};b.DEFAULTS={interval:5e3,pause:"hover",wrap:!0},b.prototype.cycle=function(b){return b||(this.paused=!1),this.interval&&clearInterval(this.interval),this.options.interval&&!this.paused&&(this.interval=setInterval(a.proxy(this.next,this),this.options.interval)),this},b.prototype.getActiveIndex=function(){return this.$active=this.$element.find(".item.active"),this.$items=this.$active.parent().children(),this.$items.index(this.$active)},b.prototype.to=function(b){var c=this,d=this.getActiveIndex();return b>this.$items.length-1||0>b?void 0:this.sliding?this.$element.one("slid",function(){c.to(b)}):d==b?this.pause().cycle():this.slide(b>d?"next":"prev",a(this.$items[b]))},b.prototype.pause=function(b){return b||(this.paused=!0),this.$element.find(".next, .prev").length&&a.support.transition.end&&(this.$element.trigger(a.support.transition.end),this.cycle(!0)),this.interval=clearInterval(this.interval),this},b.prototype.next=function(){return this.sliding?void 0:this.slide("next")},b.prototype.prev=function(){return this.sliding?void 0:this.slide("prev")},b.prototype.slide=function(b,c){var d=this.$element.find(".item.active"),e=c||d[b](),f=this.interval,g="next"==b?"left":"right",h="next"==b?"first":"last",i=this;if(!e.length){if(!this.options.wrap)return;e=this.$element.find(".item")[h]()}this.sliding=!0,f&&this.pause();var j=a.Event("slide.bs.carousel",{relatedTarget:e[0],direction:g});if(!e.hasClass("active")){if(this.$indicators.length&&(this.$indicators.find(".active").removeClass("active"),this.$element.one("slid",function(){var b=a(i.$indicators.children()[i.getActiveIndex()]);b&&b.addClass("active")})),a.support.transition&&this.$element.hasClass("slide")){if(this.$element.trigger(j),j.isDefaultPrevented())return;e.addClass(b),e[0].offsetWidth,d.addClass(g),e.addClass(g),d.one(a.support.transition.end,function(){e.removeClass([b,g].join(" ")).addClass("active"),d.removeClass(["active",g].join(" ")),i.sliding=!1,setTimeout(function(){i.$element.trigger("slid")},0)}).emulateTransitionEnd(600)}else{if(this.$element.trigger(j),j.isDefaultPrevented())return;d.removeClass("active"),e.addClass("active"),this.sliding=!1,this.$element.trigger("slid")}return f&&this.cycle(),this}};var c=a.fn.carousel;a.fn.carousel=function(c){return this.each(function(){var d=a(this),e=d.data("bs.carousel"),f=a.extend({},b.DEFAULTS,d.data(),"object"==typeof c&&c),g="string"==typeof c?c:f.slide;e||d.data("bs.carousel",e=new b(this,f)),"number"==typeof c?e.to(c):g?e[g]():f.interval&&e.pause().cycle()})},a.fn.carousel.Constructor=b,a.fn.carousel.noConflict=function(){return a.fn.carousel=c,this},a(document).on("click.bs.carousel.data-api","[data-slide], [data-slide-to]",function(b){var c,d=a(this),e=a(d.attr("data-target")||(c=d.attr("href"))&&c.replace(/.*(?=#[^\s]+$)/,"")),f=a.extend({},e.data(),d.data()),g=d.attr("data-slide-to");g&&(f.interval=!1),e.carousel(f),(g=d.attr("data-slide-to"))&&e.data("bs.carousel").to(g),b.preventDefault()}),a(window).on("load",function(){a('[data-ride="carousel"]').each(function(){var b=a(this);b.carousel(b.data())})})}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.$element=a(c),this.options=a.extend({},b.DEFAULTS,d),this.transitioning=null,this.options.parent&&(this.$parent=a(this.options.parent)),this.options.toggle&&this.toggle()};b.DEFAULTS={toggle:!0},b.prototype.dimension=function(){var a=this.$element.hasClass("width");return a?"width":"height"},b.prototype.show=function(){if(!this.transitioning&&!this.$element.hasClass("in")){var b=a.Event("show.bs.collapse");if(this.$element.trigger(b),!b.isDefaultPrevented()){var c=this.$parent&&this.$parent.find("> .panel > .in");if(c&&c.length){var d=c.data("bs.collapse");if(d&&d.transitioning)return;c.collapse("hide"),d||c.data("bs.collapse",null)}var e=this.dimension();this.$element.removeClass("collapse").addClass("collapsing")[e](0),this.transitioning=1;var f=function(){this.$element.removeClass("collapsing").addClass("in")[e]("auto"),this.transitioning=0,this.$element.trigger("shown.bs.collapse")};if(!a.support.transition)return f.call(this);var g=a.camelCase(["scroll",e].join("-"));this.$element.one(a.support.transition.end,a.proxy(f,this)).emulateTransitionEnd(350)[e](this.$element[0][g])}}},b.prototype.hide=function(){if(!this.transitioning&&this.$element.hasClass("in")){var b=a.Event("hide.bs.collapse");if(this.$element.trigger(b),!b.isDefaultPrevented()){var c=this.dimension();this.$element[c](this.$element[c]())[0].offsetHeight,this.$element.addClass("collapsing").removeClass("collapse").removeClass("in"),this.transitioning=1;var d=function(){this.transitioning=0,this.$element.trigger("hidden.bs.collapse").removeClass("collapsing").addClass("collapse")};return a.support.transition?(this.$element[c](0).one(a.support.transition.end,a.proxy(d,this)).emulateTransitionEnd(350),void 0):d.call(this)}}},b.prototype.toggle=function(){this[this.$element.hasClass("in")?"hide":"show"]()};var c=a.fn.collapse;a.fn.collapse=function(c){return this.each(function(){var d=a(this),e=d.data("bs.collapse"),f=a.extend({},b.DEFAULTS,d.data(),"object"==typeof c&&c);e||d.data("bs.collapse",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.collapse.Constructor=b,a.fn.collapse.noConflict=function(){return a.fn.collapse=c,this},a(document).on("click.bs.collapse.data-api","[data-toggle=collapse]",function(b){var c,d=a(this),e=d.attr("data-target")||b.preventDefault()||(c=d.attr("href"))&&c.replace(/.*(?=#[^\s]+$)/,""),f=a(e),g=f.data("bs.collapse"),h=g?"toggle":d.data(),i=d.attr("data-parent"),j=i&&a(i);g&&g.transitioning||(j&&j.find('[data-toggle=collapse][data-parent="'+i+'"]').not(d).addClass("collapsed"),d[f.hasClass("in")?"addClass":"removeClass"]("collapsed")),f.collapse(h)})}(window.jQuery),+function(a){"use strict";function b(){a(d).remove(),a(e).each(function(b){var d=c(a(this));d.hasClass("open")&&(d.trigger(b=a.Event("hide.bs.dropdown")),b.isDefaultPrevented()||d.removeClass("open").trigger("hidden.bs.dropdown"))})}function c(b){var c=b.attr("data-target");c||(c=b.attr("href"),c=c&&/#/.test(c)&&c.replace(/.*(?=#[^\s]*$)/,""));var d=c&&a(c);return d&&d.length?d:b.parent()}var d=".dropdown-backdrop",e="[data-toggle=dropdown]",f=function(b){a(b).on("click.bs.dropdown",this.toggle)};f.prototype.toggle=function(d){var e=a(this);if(!e.is(".disabled, :disabled")){var f=c(e),g=f.hasClass("open");if(b(),!g){if("ontouchstart"in document.documentElement&&!f.closest(".navbar-nav").length&&a('<div class="dropdown-backdrop"/>').insertAfter(a(this)).on("click",b),f.trigger(d=a.Event("show.bs.dropdown")),d.isDefaultPrevented())return;f.toggleClass("open").trigger("shown.bs.dropdown"),e.focus()}return!1}},f.prototype.keydown=function(b){if(/(38|40|27)/.test(b.keyCode)){var d=a(this);if(b.preventDefault(),b.stopPropagation(),!d.is(".disabled, :disabled")){var f=c(d),g=f.hasClass("open");if(!g||g&&27==b.keyCode)return 27==b.which&&f.find(e).focus(),d.click();var h=a("[role=menu] li:not(.divider):visible a",f);if(h.length){var i=h.index(h.filter(":focus"));38==b.keyCode&&i>0&&i--,40==b.keyCode&&i<h.length-1&&i++,~i||(i=0),h.eq(i).focus()}}}};var g=a.fn.dropdown;a.fn.dropdown=function(b){return this.each(function(){var c=a(this),d=c.data("dropdown");d||c.data("dropdown",d=new f(this)),"string"==typeof b&&d[b].call(c)})},a.fn.dropdown.Constructor=f,a.fn.dropdown.noConflict=function(){return a.fn.dropdown=g,this},a(document).on("click.bs.dropdown.data-api",b).on("click.bs.dropdown.data-api",".dropdown form",function(a){a.stopPropagation()}).on("click.bs.dropdown.data-api",e,f.prototype.toggle).on("keydown.bs.dropdown.data-api",e+", [role=menu]",f.prototype.keydown)}(window.jQuery),+function(a){"use strict";var b=function(b,c){this.options=c,this.$element=a(b),this.$backdrop=this.isShown=null,this.options.remote&&this.$element.load(this.options.remote)};b.DEFAULTS={backdrop:!0,keyboard:!0,show:!0},b.prototype.toggle=function(a){return this[this.isShown?"hide":"show"](a)},b.prototype.show=function(b){var c=this,d=a.Event("show.bs.modal",{relatedTarget:b});this.$element.trigger(d),this.isShown||d.isDefaultPrevented()||(this.isShown=!0,this.escape(),this.$element.on("click.dismiss.modal",'[data-dismiss="modal"]',a.proxy(this.hide,this)),this.backdrop(function(){var d=a.support.transition&&c.$element.hasClass("fade");c.$element.parent().length||c.$element.appendTo(document.body),c.$element.show(),d&&c.$element[0].offsetWidth,c.$element.addClass("in").attr("aria-hidden",!1),c.enforceFocus();var e=a.Event("shown.bs.modal",{relatedTarget:b});d?c.$element.find(".modal-dialog").one(a.support.transition.end,function(){c.$element.focus().trigger(e)}).emulateTransitionEnd(300):c.$element.focus().trigger(e)}))},b.prototype.hide=function(b){b&&b.preventDefault(),b=a.Event("hide.bs.modal"),this.$element.trigger(b),this.isShown&&!b.isDefaultPrevented()&&(this.isShown=!1,this.escape(),a(document).off("focusin.bs.modal"),this.$element.removeClass("in").attr("aria-hidden",!0).off("click.dismiss.modal"),a.support.transition&&this.$element.hasClass("fade")?this.$element.one(a.support.transition.end,a.proxy(this.hideModal,this)).emulateTransitionEnd(300):this.hideModal())},b.prototype.enforceFocus=function(){a(document).off("focusin.bs.modal").on("focusin.bs.modal",a.proxy(function(a){this.$element[0]===a.target||this.$element.has(a.target).length||this.$element.focus()},this))},b.prototype.escape=function(){this.isShown&&this.options.keyboard?this.$element.on("keyup.dismiss.bs.modal",a.proxy(function(a){27==a.which&&this.hide()},this)):this.isShown||this.$element.off("keyup.dismiss.bs.modal")},b.prototype.hideModal=function(){var a=this;this.$element.hide(),this.backdrop(function(){a.removeBackdrop(),a.$element.trigger("hidden.bs.modal")})},b.prototype.removeBackdrop=function(){this.$backdrop&&this.$backdrop.remove(),this.$backdrop=null},b.prototype.backdrop=function(b){var c=this.$element.hasClass("fade")?"fade":"";if(this.isShown&&this.options.backdrop){var d=a.support.transition&&c;if(this.$backdrop=a('<div class="modal-backdrop '+c+'" />').appendTo(document.body),this.$element.on("click.dismiss.modal",a.proxy(function(a){a.target===a.currentTarget&&("static"==this.options.backdrop?this.$element[0].focus.call(this.$element[0]):this.hide.call(this))},this)),d&&this.$backdrop[0].offsetWidth,this.$backdrop.addClass("in"),!b)return;d?this.$backdrop.one(a.support.transition.end,b).emulateTransitionEnd(150):b()}else!this.isShown&&this.$backdrop?(this.$backdrop.removeClass("in"),a.support.transition&&this.$element.hasClass("fade")?this.$backdrop.one(a.support.transition.end,b).emulateTransitionEnd(150):b()):b&&b()};var c=a.fn.modal;a.fn.modal=function(c,d){return this.each(function(){var e=a(this),f=e.data("bs.modal"),g=a.extend({},b.DEFAULTS,e.data(),"object"==typeof c&&c);f||e.data("bs.modal",f=new b(this,g)),"string"==typeof c?f[c](d):g.show&&f.show(d)})},a.fn.modal.Constructor=b,a.fn.modal.noConflict=function(){return a.fn.modal=c,this},a(document).on("click.bs.modal.data-api",'[data-toggle="modal"]',function(b){var c=a(this),d=c.attr("href"),e=a(c.attr("data-target")||d&&d.replace(/.*(?=#[^\s]+$)/,"")),f=e.data("modal")?"toggle":a.extend({remote:!/#/.test(d)&&d},e.data(),c.data());b.preventDefault(),e.modal(f,this).one("hide",function(){c.is(":visible")&&c.focus()})}),a(document).on("show.bs.modal",".modal",function(){a(document.body).addClass("modal-open")}).on("hidden.bs.modal",".modal",function(){a(document.body).removeClass("modal-open")})}(window.jQuery),+function(a){"use strict";var b=function(a,b){this.type=this.options=this.enabled=this.timeout=this.hoverState=this.$element=null,this.init("tooltip",a,b)};b.DEFAULTS={animation:!0,placement:"top",selector:!1,template:'<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,container:!1},b.prototype.init=function(b,c,d){this.enabled=!0,this.type=b,this.$element=a(c),this.options=this.getOptions(d);for(var e=this.options.trigger.split(" "),f=e.length;f--;){var g=e[f];if("click"==g)this.$element.on("click."+this.type,this.options.selector,a.proxy(this.toggle,this));else if("manual"!=g){var h="hover"==g?"mouseenter":"focus",i="hover"==g?"mouseleave":"blur";this.$element.on(h+"."+this.type,this.options.selector,a.proxy(this.enter,this)),this.$element.on(i+"."+this.type,this.options.selector,a.proxy(this.leave,this))}}this.options.selector?this._options=a.extend({},this.options,{trigger:"manual",selector:""}):this.fixTitle()},b.prototype.getDefaults=function(){return b.DEFAULTS},b.prototype.getOptions=function(b){return b=a.extend({},this.getDefaults(),this.$element.data(),b),b.delay&&"number"==typeof b.delay&&(b.delay={show:b.delay,hide:b.delay}),b},b.prototype.getDelegateOptions=function(){var b={},c=this.getDefaults();return this._options&&a.each(this._options,function(a,d){c[a]!=d&&(b[a]=d)}),b},b.prototype.enter=function(b){var c=b instanceof this.constructor?b:a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type);return clearTimeout(c.timeout),c.hoverState="in",c.options.delay&&c.options.delay.show?(c.timeout=setTimeout(function(){"in"==c.hoverState&&c.show()},c.options.delay.show),void 0):c.show()},b.prototype.leave=function(b){var c=b instanceof this.constructor?b:a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type);return clearTimeout(c.timeout),c.hoverState="out",c.options.delay&&c.options.delay.hide?(c.timeout=setTimeout(function(){"out"==c.hoverState&&c.hide()},c.options.delay.hide),void 0):c.hide()},b.prototype.show=function(){var b=a.Event("show.bs."+this.type);if(this.hasContent()&&this.enabled){if(this.$element.trigger(b),b.isDefaultPrevented())return;var c=this.tip();this.setContent(),this.options.animation&&c.addClass("fade");var d="function"==typeof this.options.placement?this.options.placement.call(this,c[0],this.$element[0]):this.options.placement,e=/\s?auto?\s?/i,f=e.test(d);f&&(d=d.replace(e,"")||"top"),c.detach().css({top:0,left:0,display:"block"}).addClass(d),this.options.container?c.appendTo(this.options.container):c.insertAfter(this.$element);var g=this.getPosition(),h=c[0].offsetWidth,i=c[0].offsetHeight;if(f){var j=this.$element.parent(),k=d,l=document.documentElement.scrollTop||document.body.scrollTop,m="body"==this.options.container?window.innerWidth:j.outerWidth(),n="body"==this.options.container?window.innerHeight:j.outerHeight(),o="body"==this.options.container?0:j.offset().left;d="bottom"==d&&g.top+g.height+i-l>n?"top":"top"==d&&g.top-l-i<0?"bottom":"right"==d&&g.right+h>m?"left":"left"==d&&g.left-h<o?"right":d,c.removeClass(k).addClass(d)}var p=this.getCalculatedOffset(d,g,h,i);this.applyPlacement(p,d),this.$element.trigger("shown.bs."+this.type)}},b.prototype.applyPlacement=function(a,b){var c,d=this.tip(),e=d[0].offsetWidth,f=d[0].offsetHeight,g=parseInt(d.css("margin-top"),10),h=parseInt(d.css("margin-left"),10);isNaN(g)&&(g=0),isNaN(h)&&(h=0),a.top=a.top+g,a.left=a.left+h,d.offset(a).addClass("in");var i=d[0].offsetWidth,j=d[0].offsetHeight;if("top"==b&&j!=f&&(c=!0,a.top=a.top+f-j),/bottom|top/.test(b)){var k=0;a.left<0&&(k=-2*a.left,a.left=0,d.offset(a),i=d[0].offsetWidth,j=d[0].offsetHeight),this.replaceArrow(k-e+i,i,"left")}else this.replaceArrow(j-f,j,"top");c&&d.offset(a)},b.prototype.replaceArrow=function(a,b,c){this.arrow().css(c,a?50*(1-a/b)+"%":"")},b.prototype.setContent=function(){var a=this.tip(),b=this.getTitle();a.find(".tooltip-inner")[this.options.html?"html":"text"](b),a.removeClass("fade in top bottom left right")},b.prototype.hide=function(){function b(){"in"!=c.hoverState&&d.detach()}var c=this,d=this.tip(),e=a.Event("hide.bs."+this.type);return this.$element.trigger(e),e.isDefaultPrevented()?void 0:(d.removeClass("in"),a.support.transition&&this.$tip.hasClass("fade")?d.one(a.support.transition.end,b).emulateTransitionEnd(150):b(),this.$element.trigger("hidden.bs."+this.type),this)},b.prototype.fixTitle=function(){var a=this.$element;(a.attr("title")||"string"!=typeof a.attr("data-original-title"))&&a.attr("data-original-title",a.attr("title")||"").attr("title","")},b.prototype.hasContent=function(){return this.getTitle()},b.prototype.getPosition=function(){var b=this.$element[0];return a.extend({},"function"==typeof b.getBoundingClientRect?b.getBoundingClientRect():{width:b.offsetWidth,height:b.offsetHeight},this.$element.offset())},b.prototype.getCalculatedOffset=function(a,b,c,d){return"bottom"==a?{top:b.top+b.height,left:b.left+b.width/2-c/2}:"top"==a?{top:b.top-d,left:b.left+b.width/2-c/2}:"left"==a?{top:b.top+b.height/2-d/2,left:b.left-c}:{top:b.top+b.height/2-d/2,left:b.left+b.width}},b.prototype.getTitle=function(){var a,b=this.$element,c=this.options;return a=b.attr("data-original-title")||("function"==typeof c.title?c.title.call(b[0]):c.title)},b.prototype.tip=function(){return this.$tip=this.$tip||a(this.options.template)},b.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".tooltip-arrow")},b.prototype.validate=function(){this.$element[0].parentNode||(this.hide(),this.$element=null,this.options=null)},b.prototype.enable=function(){this.enabled=!0},b.prototype.disable=function(){this.enabled=!1},b.prototype.toggleEnabled=function(){this.enabled=!this.enabled},b.prototype.toggle=function(b){var c=b?a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type):this;c.tip().hasClass("in")?c.leave(c):c.enter(c)},b.prototype.destroy=function(){this.hide().$element.off("."+this.type).removeData("bs."+this.type)};var c=a.fn.tooltip;a.fn.tooltip=function(c){return this.each(function(){var d=a(this),e=d.data("bs.tooltip"),f="object"==typeof c&&c;e||d.data("bs.tooltip",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.tooltip.Constructor=b,a.fn.tooltip.noConflict=function(){return a.fn.tooltip=c,this}}(window.jQuery),+function(a){"use strict";var b=function(a,b){this.init("popover",a,b)};if(!a.fn.tooltip)throw new Error("Popover requires tooltip.js");b.DEFAULTS=a.extend({},a.fn.tooltip.Constructor.DEFAULTS,{placement:"right",trigger:"click",content:"",template:'<div class="popover"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),b.prototype=a.extend({},a.fn.tooltip.Constructor.prototype),b.prototype.constructor=b,b.prototype.getDefaults=function(){return b.DEFAULTS},b.prototype.setContent=function(){var a=this.tip(),b=this.getTitle(),c=this.getContent();a.find(".popover-title")[this.options.html?"html":"text"](b),a.find(".popover-content")[this.options.html?"html":"text"](c),a.removeClass("fade top bottom left right in"),a.find(".popover-title").html()||a.find(".popover-title").hide()},b.prototype.hasContent=function(){return this.getTitle()||this.getContent()},b.prototype.getContent=function(){var a=this.$element,b=this.options;return a.attr("data-content")||("function"==typeof b.content?b.content.call(a[0]):b.content)},b.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".arrow")},b.prototype.tip=function(){return this.$tip||(this.$tip=a(this.options.template)),this.$tip};var c=a.fn.popover;a.fn.popover=function(c){return this.each(function(){var d=a(this),e=d.data("bs.popover"),f="object"==typeof c&&c;e||d.data("bs.popover",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.popover.Constructor=b,a.fn.popover.noConflict=function(){return a.fn.popover=c,this}}(window.jQuery),+function(a){"use strict";function b(c,d){var e,f=a.proxy(this.process,this);this.$element=a(c).is("body")?a(window):a(c),this.$body=a("body"),this.$scrollElement=this.$element.on("scroll.bs.scroll-spy.data-api",f),this.options=a.extend({},b.DEFAULTS,d),this.selector=(this.options.target||(e=a(c).attr("href"))&&e.replace(/.*(?=#[^\s]+$)/,"")||"")+" .nav li > a",this.offsets=a([]),this.targets=a([]),this.activeTarget=null,this.refresh(),this.process()}b.DEFAULTS={offset:10},b.prototype.refresh=function(){var b=this.$element[0]==window?"offset":"position";this.offsets=a([]),this.targets=a([]);var c=this;this.$body.find(this.selector).map(function(){var d=a(this),e=d.data("target")||d.attr("href"),f=/^#\w/.test(e)&&a(e);return f&&f.length&&[[f[b]().top+(!a.isWindow(c.$scrollElement.get(0))&&c.$scrollElement.scrollTop()),e]]||null}).sort(function(a,b){return a[0]-b[0]}).each(function(){c.offsets.push(this[0]),c.targets.push(this[1])})},b.prototype.process=function(){var a,b=this.$scrollElement.scrollTop()+this.options.offset,c=this.$scrollElement[0].scrollHeight||this.$body[0].scrollHeight,d=c-this.$scrollElement.height(),e=this.offsets,f=this.targets,g=this.activeTarget;if(b>=d)return g!=(a=f.last()[0])&&this.activate(a);for(a=e.length;a--;)g!=f[a]&&b>=e[a]&&(!e[a+1]||b<=e[a+1])&&this.activate(f[a])},b.prototype.activate=function(b){this.activeTarget=b,a(this.selector).parents(".active").removeClass("active");var c=this.selector+'[data-target="'+b+'"],'+this.selector+'[href="'+b+'"]',d=a(c).parents("li").addClass("active");d.parent(".dropdown-menu").length&&(d=d.closest("li.dropdown").addClass("active")),d.trigger("activate")};var c=a.fn.scrollspy;a.fn.scrollspy=function(c){return this.each(function(){var d=a(this),e=d.data("bs.scrollspy"),f="object"==typeof c&&c;e||d.data("bs.scrollspy",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.scrollspy.Constructor=b,a.fn.scrollspy.noConflict=function(){return a.fn.scrollspy=c,this},a(window).on("load",function(){a('[data-spy="scroll"]').each(function(){var b=a(this);b.scrollspy(b.data())})})}(window.jQuery),+function(a){"use strict";var b=function(b){this.element=a(b)};b.prototype.show=function(){var b=this.element,c=b.closest("ul:not(.dropdown-menu)"),d=b.attr("data-target");if(d||(d=b.attr("href"),d=d&&d.replace(/.*(?=#[^\s]*$)/,"")),!b.parent("li").hasClass("active")){var e=c.find(".active:last a")[0],f=a.Event("show.bs.tab",{relatedTarget:e});if(b.trigger(f),!f.isDefaultPrevented()){var g=a(d);this.activate(b.parent("li"),c),this.activate(g,g.parent(),function(){b.trigger({type:"shown.bs.tab",relatedTarget:e})})}}},b.prototype.activate=function(b,c,d){function e(){f.removeClass("active").find("> .dropdown-menu > .active").removeClass("active"),b.addClass("active"),g?(b[0].offsetWidth,b.addClass("in")):b.removeClass("fade"),b.parent(".dropdown-menu")&&b.closest("li.dropdown").addClass("active"),d&&d()}var f=c.find("> .active"),g=d&&a.support.transition&&f.hasClass("fade");g?f.one(a.support.transition.end,e).emulateTransitionEnd(150):e(),f.removeClass("in")};var c=a.fn.tab;a.fn.tab=function(c){return this.each(function(){var d=a(this),e=d.data("bs.tab");e||d.data("bs.tab",e=new b(this)),"string"==typeof c&&e[c]()})},a.fn.tab.Constructor=b,a.fn.tab.noConflict=function(){return a.fn.tab=c,this},a(document).on("click.bs.tab.data-api",'[data-toggle="tab"], [data-toggle="pill"]',function(b){b.preventDefault(),a(this).tab("show")})}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.options=a.extend({},b.DEFAULTS,d),this.$window=a(window).on("scroll.bs.affix.data-api",a.proxy(this.checkPosition,this)).on("click.bs.affix.data-api",a.proxy(this.checkPositionWithEventLoop,this)),this.$element=a(c),this.affixed=this.unpin=null,this.checkPosition()};b.RESET="affix affix-top affix-bottom",b.DEFAULTS={offset:0},b.prototype.checkPositionWithEventLoop=function(){setTimeout(a.proxy(this.checkPosition,this),1)},b.prototype.checkPosition=function(){if(this.$element.is(":visible")){var c=a(document).height(),d=this.$window.scrollTop(),e=this.$element.offset(),f=this.options.offset,g=f.top,h=f.bottom;"object"!=typeof f&&(h=g=f),"function"==typeof g&&(g=f.top()),"function"==typeof h&&(h=f.bottom());var i=null!=this.unpin&&d+this.unpin<=e.top?!1:null!=h&&e.top+this.$element.height()>=c-h?"bottom":null!=g&&g>=d?"top":!1;this.affixed!==i&&(this.unpin&&this.$element.css("top",""),this.affixed=i,this.unpin="bottom"==i?e.top-d:null,this.$element.removeClass(b.RESET).addClass("affix"+(i?"-"+i:"")),"bottom"==i&&this.$element.offset({top:document.body.offsetHeight-h-this.$element.height()}))}};var c=a.fn.affix;a.fn.affix=function(c){return this.each(function(){var d=a(this),e=d.data("bs.affix"),f="object"==typeof c&&c;e||d.data("bs.affix",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.affix.Constructor=b,a.fn.affix.noConflict=function(){return a.fn.affix=c,this},a(window).on("load",function(){a('[data-spy="affix"]').each(function(){var b=a(this),c=b.data();c.offset=c.offset||{},c.offsetBottom&&(c.offset.bottom=c.offsetBottom),c.offsetTop&&(c.offset.top=c.offsetTop),b.affix(c)})})}(window.jQuery);
-}),
-"moment": (function (require, exports, module) { /* wrapped by builder */
-// moment.js
-// version : 2.1.0
-// author : Tim Wood
-// license : MIT
-// momentjs.com
-!function(t){function e(t,e){return function(n){return u(t.call(this,n),e)}}function n(t,e){return function(n){return this.lang().ordinal(t.call(this,n),e)}}function s(){}function i(t){a(this,t)}function r(t){var e=t.years||t.year||t.y||0,n=t.months||t.month||t.M||0,s=t.weeks||t.week||t.w||0,i=t.days||t.day||t.d||0,r=t.hours||t.hour||t.h||0,a=t.minutes||t.minute||t.m||0,o=t.seconds||t.second||t.s||0,u=t.milliseconds||t.millisecond||t.ms||0;this._input=t,this._milliseconds=u+1e3*o+6e4*a+36e5*r,this._days=i+7*s,this._months=n+12*e,this._data={},this._bubble()}function a(t,e){for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t}function o(t){return 0>t?Math.ceil(t):Math.floor(t)}function u(t,e){for(var n=t+"";n.length<e;)n="0"+n;return n}function h(t,e,n,s){var i,r,a=e._milliseconds,o=e._days,u=e._months;a&&t._d.setTime(+t._d+a*n),(o||u)&&(i=t.minute(),r=t.hour()),o&&t.date(t.date()+o*n),u&&t.month(t.month()+u*n),a&&!s&&H.updateOffset(t),(o||u)&&(t.minute(i),t.hour(r))}function d(t){return"[object Array]"===Object.prototype.toString.call(t)}function c(t,e){var n,s=Math.min(t.length,e.length),i=Math.abs(t.length-e.length),r=0;for(n=0;s>n;n++)~~t[n]!==~~e[n]&&r++;return r+i}function f(t){return t?ie[t]||t.toLowerCase().replace(/(.)s$/,"$1"):t}function l(t,e){return e.abbr=t,x[t]||(x[t]=new s),x[t].set(e),x[t]}function _(t){if(!t)return H.fn._lang;if(!x[t]&&A)try{require("./lang/"+t)}catch(e){return H.fn._lang}return x[t]}function m(t){return t.match(/\[.*\]/)?t.replace(/^\[|\]$/g,""):t.replace(/\\/g,"")}function y(t){var e,n,s=t.match(E);for(e=0,n=s.length;n>e;e++)s[e]=ue[s[e]]?ue[s[e]]:m(s[e]);return function(i){var r="";for(e=0;n>e;e++)r+=s[e]instanceof Function?s[e].call(i,t):s[e];return r}}function M(t,e){function n(e){return t.lang().longDateFormat(e)||e}for(var s=5;s--&&N.test(e);)e=e.replace(N,n);return re[e]||(re[e]=y(e)),re[e](t)}function g(t,e){switch(t){case"DDDD":return V;case"YYYY":return X;case"YYYYY":return $;case"S":case"SS":case"SSS":case"DDD":return I;case"MMM":case"MMMM":case"dd":case"ddd":case"dddd":return R;case"a":case"A":return _(e._l)._meridiemParse;case"X":return B;case"Z":case"ZZ":return j;case"T":return q;case"MM":case"DD":case"YY":case"HH":case"hh":case"mm":case"ss":case"M":case"D":case"d":case"H":case"h":case"m":case"s":return J;default:return new RegExp(t.replace("\\",""))}}function p(t){var e=(j.exec(t)||[])[0],n=(e+"").match(ee)||["-",0,0],s=+(60*n[1])+~~n[2];return"+"===n[0]?-s:s}function D(t,e,n){var s,i=n._a;switch(t){case"M":case"MM":i[1]=null==e?0:~~e-1;break;case"MMM":case"MMMM":s=_(n._l).monthsParse(e),null!=s?i[1]=s:n._isValid=!1;break;case"D":case"DD":case"DDD":case"DDDD":null!=e&&(i[2]=~~e);break;case"YY":i[0]=~~e+(~~e>68?1900:2e3);break;case"YYYY":case"YYYYY":i[0]=~~e;break;case"a":case"A":n._isPm=_(n._l).isPM(e);break;case"H":case"HH":case"h":case"hh":i[3]=~~e;break;case"m":case"mm":i[4]=~~e;break;case"s":case"ss":i[5]=~~e;break;case"S":case"SS":case"SSS":i[6]=~~(1e3*("0."+e));break;case"X":n._d=new Date(1e3*parseFloat(e));break;case"Z":case"ZZ":n._useUTC=!0,n._tzm=p(e)}null==e&&(n._isValid=!1)}function Y(t){var e,n,s=[];if(!t._d){for(e=0;7>e;e++)t._a[e]=s[e]=null==t._a[e]?2===e?1:0:t._a[e];s[3]+=~~((t._tzm||0)/60),s[4]+=~~((t._tzm||0)%60),n=new Date(0),t._useUTC?(n.setUTCFullYear(s[0],s[1],s[2]),n.setUTCHours(s[3],s[4],s[5],s[6])):(n.setFullYear(s[0],s[1],s[2]),n.setHours(s[3],s[4],s[5],s[6])),t._d=n}}function w(t){var e,n,s=t._f.match(E),i=t._i;for(t._a=[],e=0;e<s.length;e++)n=(g(s[e],t).exec(i)||[])[0],n&&(i=i.slice(i.indexOf(n)+n.length)),ue[s[e]]&&D(s[e],n,t);i&&(t._il=i),t._isPm&&t._a[3]<12&&(t._a[3]+=12),t._isPm===!1&&12===t._a[3]&&(t._a[3]=0),Y(t)}function k(t){var e,n,s,r,o,u=99;for(r=0;r<t._f.length;r++)e=a({},t),e._f=t._f[r],w(e),n=new i(e),o=c(e._a,n.toArray()),n._il&&(o+=n._il.length),u>o&&(u=o,s=n);a(t,s)}function v(t){var e,n=t._i,s=K.exec(n);if(s){for(t._f="YYYY-MM-DD"+(s[2]||" "),e=0;4>e;e++)if(te[e][1].exec(n)){t._f+=te[e][0];break}j.exec(n)&&(t._f+=" Z"),w(t)}else t._d=new Date(n)}function T(e){var n=e._i,s=G.exec(n);n===t?e._d=new Date:s?e._d=new Date(+s[1]):"string"==typeof n?v(e):d(n)?(e._a=n.slice(0),Y(e)):e._d=n instanceof Date?new Date(+n):new Date(n)}function b(t,e,n,s,i){return i.relativeTime(e||1,!!n,t,s)}function S(t,e,n){var s=W(Math.abs(t)/1e3),i=W(s/60),r=W(i/60),a=W(r/24),o=W(a/365),u=45>s&&["s",s]||1===i&&["m"]||45>i&&["mm",i]||1===r&&["h"]||22>r&&["hh",r]||1===a&&["d"]||25>=a&&["dd",a]||45>=a&&["M"]||345>a&&["MM",W(a/30)]||1===o&&["y"]||["yy",o];return u[2]=e,u[3]=t>0,u[4]=n,b.apply({},u)}function F(t,e,n){var s,i=n-e,r=n-t.day();return r>i&&(r-=7),i-7>r&&(r+=7),s=H(t).add("d",r),{week:Math.ceil(s.dayOfYear()/7),year:s.year()}}function O(t){var e=t._i,n=t._f;return null===e||""===e?null:("string"==typeof e&&(t._i=e=_().preparse(e)),H.isMoment(e)?(t=a({},e),t._d=new Date(+e._d)):n?d(n)?k(t):w(t):T(t),new i(t))}function z(t,e){H.fn[t]=H.fn[t+"s"]=function(t){var n=this._isUTC?"UTC":"";return null!=t?(this._d["set"+n+e](t),H.updateOffset(this),this):this._d["get"+n+e]()}}function C(t){H.duration.fn[t]=function(){return this._data[t]}}function L(t,e){H.duration.fn["as"+t]=function(){return+this/e}}for(var H,P,U="2.1.0",W=Math.round,x={},A="undefined"!=typeof module&&module.exports,G=/^\/?Date\((\-?\d+)/i,Z=/(\-)?(\d*)?\.?(\d+)\:(\d+)\:(\d+)\.?(\d{3})?/,E=/(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|SS?S?|X|zz?|ZZ?|.)/g,N=/(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g,J=/\d\d?/,I=/\d{1,3}/,V=/\d{3}/,X=/\d{1,4}/,$=/[+\-]?\d{1,6}/,R=/[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i,j=/Z|[\+\-]\d\d:?\d\d/i,q=/T/i,B=/[\+\-]?\d+(\.\d{1,3})?/,K=/^\s*\d{4}-\d\d-\d\d((T| )(\d\d(:\d\d(:\d\d(\.\d\d?\d?)?)?)?)?([\+\-]\d\d:?\d\d)?)?/,Q="YYYY-MM-DDTHH:mm:ssZ",te=[["HH:mm:ss.S",/(T| )\d\d:\d\d:\d\d\.\d{1,3}/],["HH:mm:ss",/(T| )\d\d:\d\d:\d\d/],["HH:mm",/(T| )\d\d:\d\d/],["HH",/(T| )\d\d/]],ee=/([\+\-]|\d\d)/gi,ne="Date|Hours|Minutes|Seconds|Milliseconds".split("|"),se={Milliseconds:1,Seconds:1e3,Minutes:6e4,Hours:36e5,Days:864e5,Months:2592e6,Years:31536e6},ie={ms:"millisecond",s:"second",m:"minute",h:"hour",d:"day",w:"week",M:"month",y:"year"},re={},ae="DDD w W M D d".split(" "),oe="M D H h m s w W".split(" "),ue={M:function(){return this.month()+1},MMM:function(t){return this.lang().monthsShort(this,t)},MMMM:function(t){return this.lang().months(this,t)},D:function(){return this.date()},DDD:function(){return this.dayOfYear()},d:function(){return this.day()},dd:function(t){return this.lang().weekdaysMin(this,t)},ddd:function(t){return this.lang().weekdaysShort(this,t)},dddd:function(t){return this.lang().weekdays(this,t)},w:function(){return this.week()},W:function(){return this.isoWeek()},YY:function(){return u(this.year()%100,2)},YYYY:function(){return u(this.year(),4)},YYYYY:function(){return u(this.year(),5)},gg:function(){return u(this.weekYear()%100,2)},gggg:function(){return this.weekYear()},ggggg:function(){return u(this.weekYear(),5)},GG:function(){return u(this.isoWeekYear()%100,2)},GGGG:function(){return this.isoWeekYear()},GGGGG:function(){return u(this.isoWeekYear(),5)},e:function(){return this.weekday()},E:function(){return this.isoWeekday()},a:function(){return this.lang().meridiem(this.hours(),this.minutes(),!0)},A:function(){return this.lang().meridiem(this.hours(),this.minutes(),!1)},H:function(){return this.hours()},h:function(){return this.hours()%12||12},m:function(){return this.minutes()},s:function(){return this.seconds()},S:function(){return~~(this.milliseconds()/100)},SS:function(){return u(~~(this.milliseconds()/10),2)},SSS:function(){return u(this.milliseconds(),3)},Z:function(){var t=-this.zone(),e="+";return 0>t&&(t=-t,e="-"),e+u(~~(t/60),2)+":"+u(~~t%60,2)},ZZ:function(){var t=-this.zone(),e="+";return 0>t&&(t=-t,e="-"),e+u(~~(10*t/6),4)},z:function(){return this.zoneAbbr()},zz:function(){return this.zoneName()},X:function(){return this.unix()}};ae.length;)P=ae.pop(),ue[P+"o"]=n(ue[P],P);for(;oe.length;)P=oe.pop(),ue[P+P]=e(ue[P],2);for(ue.DDDD=e(ue.DDD,3),s.prototype={set:function(t){var e,n;for(n in t)e=t[n],"function"==typeof e?this[n]=e:this["_"+n]=e},_months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_"),months:function(t){return this._months[t.month()]},_monthsShort:"Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_"),monthsShort:function(t){return this._monthsShort[t.month()]},monthsParse:function(t){var e,n,s;for(this._monthsParse||(this._monthsParse=[]),e=0;12>e;e++)if(this._monthsParse[e]||(n=H([2e3,e]),s="^"+this.months(n,"")+"|^"+this.monthsShort(n,""),this._monthsParse[e]=new RegExp(s.replace(".",""),"i")),this._monthsParse[e].test(t))return e},_weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),weekdays:function(t){return this._weekdays[t.day()]},_weekdaysShort:"Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_"),weekdaysShort:function(t){return this._weekdaysShort[t.day()]},_weekdaysMin:"Su_Mo_Tu_We_Th_Fr_Sa".split("_"),weekdaysMin:function(t){return this._weekdaysMin[t.day()]},weekdaysParse:function(t){var e,n,s;for(this._weekdaysParse||(this._weekdaysParse=[]),e=0;7>e;e++)if(this._weekdaysParse[e]||(n=H([2e3,1]).day(e),s="^"+this.weekdays(n,"")+"|^"+this.weekdaysShort(n,"")+"|^"+this.weekdaysMin(n,""),this._weekdaysParse[e]=new RegExp(s.replace(".",""),"i")),this._weekdaysParse[e].test(t))return e},_longDateFormat:{LT:"h:mm A",L:"MM/DD/YYYY",LL:"MMMM D YYYY",LLL:"MMMM D YYYY LT",LLLL:"dddd, MMMM D YYYY LT"},longDateFormat:function(t){var e=this._longDateFormat[t];return!e&&this._longDateFormat[t.toUpperCase()]&&(e=this._longDateFormat[t.toUpperCase()].replace(/MMMM|MM|DD|dddd/g,function(t){return t.slice(1)}),this._longDateFormat[t]=e),e},isPM:function(t){return"p"===(t+"").toLowerCase()[0]},_meridiemParse:/[ap]\.?m?\.?/i,meridiem:function(t,e,n){return t>11?n?"pm":"PM":n?"am":"AM"},_calendar:{sameDay:"[Today at] LT",nextDay:"[Tomorrow at] LT",nextWeek:"dddd [at] LT",lastDay:"[Yesterday at] LT",lastWeek:"[Last] dddd [at] LT",sameElse:"L"},calendar:function(t,e){var n=this._calendar[t];return"function"==typeof n?n.apply(e):n},_relativeTime:{future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"},relativeTime:function(t,e,n,s){var i=this._relativeTime[n];return"function"==typeof i?i(t,e,n,s):i.replace(/%d/i,t)},pastFuture:function(t,e){var n=this._relativeTime[t>0?"future":"past"];return"function"==typeof n?n(e):n.replace(/%s/i,e)},ordinal:function(t){return this._ordinal.replace("%d",t)},_ordinal:"%d",preparse:function(t){return t},postformat:function(t){return t},week:function(t){return F(t,this._week.dow,this._week.doy).week},_week:{dow:0,doy:6}},H=function(t,e,n){return O({_i:t,_f:e,_l:n,_isUTC:!1})},H.utc=function(t,e,n){return O({_useUTC:!0,_isUTC:!0,_l:n,_i:t,_f:e})},H.unix=function(t){return H(1e3*t)},H.duration=function(t,e){var n,s,i=H.isDuration(t),a="number"==typeof t,o=i?t._input:a?{}:t,u=Z.exec(t);return a?e?o[e]=t:o.milliseconds=t:u&&(n="-"===u[1]?-1:1,o={y:0,d:~~u[2]*n,h:~~u[3]*n,m:~~u[4]*n,s:~~u[5]*n,ms:~~u[6]*n}),s=new r(o),i&&t.hasOwnProperty("_lang")&&(s._lang=t._lang),s},H.version=U,H.defaultFormat=Q,H.updateOffset=function(){},H.lang=function(t,e){return t?(e?l(t,e):x[t]||_(t),H.duration.fn._lang=H.fn._lang=_(t),void 0):H.fn._lang._abbr},H.langData=function(t){return t&&t._lang&&t._lang._abbr&&(t=t._lang._abbr),_(t)},H.isMoment=function(t){return t instanceof i},H.isDuration=function(t){return t instanceof r},H.fn=i.prototype={clone:function(){return H(this)},valueOf:function(){return+this._d+6e4*(this._offset||0)},unix:function(){return Math.floor(+this/1e3)},toString:function(){return this.format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ")},toDate:function(){return this._offset?new Date(+this):this._d},toISOString:function(){return M(H(this).utc(),"YYYY-MM-DD[T]HH:mm:ss.SSS[Z]")},toArray:function(){var t=this;return[t.year(),t.month(),t.date(),t.hours(),t.minutes(),t.seconds(),t.milliseconds()]},isValid:function(){return null==this._isValid&&(this._isValid=this._a?!c(this._a,(this._isUTC?H.utc(this._a):H(this._a)).toArray()):!isNaN(this._d.getTime())),!!this._isValid},utc:function(){return this.zone(0)},local:function(){return this.zone(0),this._isUTC=!1,this},format:function(t){var e=M(this,t||H.defaultFormat);return this.lang().postformat(e)},add:function(t,e){var n;return n="string"==typeof t?H.duration(+e,t):H.duration(t,e),h(this,n,1),this},subtract:function(t,e){var n;return n="string"==typeof t?H.duration(+e,t):H.duration(t,e),h(this,n,-1),this},diff:function(t,e,n){var s,i,r=this._isUTC?H(t).zone(this._offset||0):H(t).local(),a=6e4*(this.zone()-r.zone());return e=f(e),"year"===e||"month"===e?(s=432e5*(this.daysInMonth()+r.daysInMonth()),i=12*(this.year()-r.year())+(this.month()-r.month()),i+=(this-H(this).startOf("month")-(r-H(r).startOf("month")))/s,i-=6e4*(this.zone()-H(this).startOf("month").zone()-(r.zone()-H(r).startOf("month").zone()))/s,"year"===e&&(i/=12)):(s=this-r,i="second"===e?s/1e3:"minute"===e?s/6e4:"hour"===e?s/36e5:"day"===e?(s-a)/864e5:"week"===e?(s-a)/6048e5:s),n?i:o(i)},from:function(t,e){return H.duration(this.diff(t)).lang(this.lang()._abbr).humanize(!e)},fromNow:function(t){return this.from(H(),t)},calendar:function(){var t=this.diff(H().startOf("day"),"days",!0),e=-6>t?"sameElse":-1>t?"lastWeek":0>t?"lastDay":1>t?"sameDay":2>t?"nextDay":7>t?"nextWeek":"sameElse";return this.format(this.lang().calendar(e,this))},isLeapYear:function(){var t=this.year();return 0===t%4&&0!==t%100||0===t%400},isDST:function(){return this.zone()<this.clone().month(0).zone()||this.zone()<this.clone().month(5).zone()},day:function(t){var e=this._isUTC?this._d.getUTCDay():this._d.getDay();return null!=t?"string"==typeof t&&(t=this.lang().weekdaysParse(t),"number"!=typeof t)?this:this.add({d:t-e}):e},month:function(t){var e,n=this._isUTC?"UTC":"";return null!=t?"string"==typeof t&&(t=this.lang().monthsParse(t),"number"!=typeof t)?this:(e=this.date(),this.date(1),this._d["set"+n+"Month"](t),this.date(Math.min(e,this.daysInMonth())),H.updateOffset(this),this):this._d["get"+n+"Month"]()},startOf:function(t){switch(t=f(t)){case"year":this.month(0);case"month":this.date(1);case"week":case"day":this.hours(0);case"hour":this.minutes(0);case"minute":this.seconds(0);case"second":this.milliseconds(0)}return"week"===t&&this.weekday(0),this},endOf:function(t){return this.startOf(t).add(t,1).subtract("ms",1)},isAfter:function(t,e){return e="undefined"!=typeof e?e:"millisecond",+this.clone().startOf(e)>+H(t).startOf(e)},isBefore:function(t,e){return e="undefined"!=typeof e?e:"millisecond",+this.clone().startOf(e)<+H(t).startOf(e)},isSame:function(t,e){return e="undefined"!=typeof e?e:"millisecond",+this.clone().startOf(e)===+H(t).startOf(e)},min:function(t){return t=H.apply(null,arguments),this>t?this:t},max:function(t){return t=H.apply(null,arguments),t>this?this:t},zone:function(t){var e=this._offset||0;return null==t?this._isUTC?e:this._d.getTimezoneOffset():("string"==typeof t&&(t=p(t)),Math.abs(t)<16&&(t=60*t),this._offset=t,this._isUTC=!0,e!==t&&h(this,H.duration(e-t,"m"),1,!0),this)},zoneAbbr:function(){return this._isUTC?"UTC":""},zoneName:function(){return this._isUTC?"Coordinated Universal Time":""},daysInMonth:function(){return H.utc([this.year(),this.month()+1,0]).date()},dayOfYear:function(t){var e=W((H(this).startOf("day")-H(this).startOf("year"))/864e5)+1;return null==t?e:this.add("d",t-e)},weekYear:function(t){var e=F(this,this.lang()._week.dow,this.lang()._week.doy).year;return null==t?e:this.add("y",t-e)},isoWeekYear:function(t){var e=F(this,1,4).year;return null==t?e:this.add("y",t-e)},week:function(t){var e=this.lang().week(this);return null==t?e:this.add("d",7*(t-e))},isoWeek:function(t){var e=F(this,1,4).week;return null==t?e:this.add("d",7*(t-e))},weekday:function(t){var e=(this._d.getDay()+7-this.lang()._week.dow)%7;return null==t?e:this.add("d",t-e)},isoWeekday:function(t){return null==t?this.day()||7:this.day(this.day()%7?t:t-7)},lang:function(e){return e===t?this._lang:(this._lang=_(e),this)}},P=0;P<ne.length;P++)z(ne[P].toLowerCase().replace(/s$/,""),ne[P]);z("year","FullYear"),H.fn.days=H.fn.day,H.fn.months=H.fn.month,H.fn.weeks=H.fn.week,H.fn.isoWeeks=H.fn.isoWeek,H.fn.toJSON=H.fn.toISOString,H.duration.fn=r.prototype={_bubble:function(){var t,e,n,s,i=this._milliseconds,r=this._days,a=this._months,u=this._data;u.milliseconds=i%1e3,t=o(i/1e3),u.seconds=t%60,e=o(t/60),u.minutes=e%60,n=o(e/60),u.hours=n%24,r+=o(n/24),u.days=r%30,a+=o(r/30),u.months=a%12,s=o(a/12),u.years=s},weeks:function(){return o(this.days()/7)},valueOf:function(){return this._milliseconds+864e5*this._days+2592e6*(this._months%12)+31536e6*~~(this._months/12)},humanize:function(t){var e=+this,n=S(e,!t,this.lang());return t&&(n=this.lang().pastFuture(e,n)),this.lang().postformat(n)},add:function(t,e){var n=H.duration(t,e);return this._milliseconds+=n._milliseconds,this._days+=n._days,this._months+=n._months,this._bubble(),this},subtract:function(t,e){var n=H.duration(t,e);return this._milliseconds-=n._milliseconds,this._days-=n._days,this._months-=n._months,this._bubble(),this},get:function(t){return t=f(t),this[t.toLowerCase()+"s"]()},as:function(t){return t=f(t),this["as"+t.charAt(0).toUpperCase()+t.slice(1)+"s"]()},lang:H.fn.lang};for(P in se)se.hasOwnProperty(P)&&(L(P,se[P]),C(P.toLowerCase()));L("Weeks",6048e5),H.duration.fn.asMonths=function(){return(+this-31536e6*this.years())/2592e6+12*this.years()},H.lang("en",{ordinal:function(t){var e=t%10,n=1===~~(t%100/10)?"th":1===e?"st":2===e?"nd":3===e?"rd":"th";return t+n}}),A&&(module.exports=H),"undefined"==typeof ender&&(this.moment=H),"function"==typeof define&&define.amd&&define("moment",[],function(){return H})}.call(this);
-}),
-"moment-ru": (function (require, exports, module) { /* wrapped by builder */
-function plural(e,a){var t=e.split("_");return 1===a%10&&11!==a%100?t[0]:a%10>=2&&4>=a%10&&(10>a%100||a%100>=20)?t[1]:t[2]}function relativeTimeWithPlural(e,a,t){var _={mm:"минута_минуты_минут",hh:"час_часа_часов",dd:"день_дня_дней",MM:"месяц_месяца_месяцев",yy:"год_года_лет"};return"m"===t?a?"минута":"минуту":e+" "+plural(_[t],+e)}function monthsCaseReplace(e,a){var t={nominative:"январь_февраль_март_апрель_май_июнь_июль_август_сентябрь_октябрь_ноябрь_декабрь".split("_"),accusative:"января_февраля_марта_апреля_мая_июня_июля_августа_сентября_октября_ноября_декабря".split("_")},_=/D[oD]? *MMMM?/.test(a)?"accusative":"nominative";return t[_][e.month()]}function weekdaysCaseReplace(e,a){var t={nominative:"воскресенье_понедельник_вторник_среда_четверг_пятница_суббота".split("_"),accusative:"воскресенье_понедельник_вторник_среду_четверг_пятницу_субботу".split("_")},_=/\[ ?[Вв] ?(?:прошлую|следующую)? ?\] ?dddd/.test(a)?"accusative":"nominative";return t[_][e.day()]}require("moment").lang("ru",{months:monthsCaseReplace,monthsShort:"янв_фев_мар_апр_май_июн_июл_авг_сен_окт_ноя_дек".split("_"),weekdays:weekdaysCaseReplace,weekdaysShort:"вск_пнд_втр_срд_чтв_птн_сбт".split("_"),weekdaysMin:"вс_пн_вт_ср_чт_пт_сб".split("_"),longDateFormat:{LT:"HH:mm",L:"DD.MM.YYYY",LL:"D MMMM YYYY г.",LLL:"D MMMM YYYY г., LT",LLLL:"dddd, D MMMM YYYY г., LT"},calendar:{sameDay:"[Сегодня в] LT",nextDay:"[Завтра в] LT",lastDay:"[Вчера в] LT",nextWeek:function(){return 2===this.day()?"[Во] dddd [в] LT":"[В] dddd [в] LT"},lastWeek:function(){switch(this.day()){case 0:return"[В прошлое] dddd [в] LT";case 1:case 2:case 4:return"[В прошлый] dddd [в] LT";case 3:case 5:case 6:return"[В прошлую] dddd [в] LT"}},sameElse:"L"},relativeTime:{future:"через %s",past:"%s назад",s:"несколько секунд",m:relativeTimeWithPlural,mm:relativeTimeWithPlural,h:"час",hh:relativeTimeWithPlural,d:"день",dd:relativeTimeWithPlural,M:"месяц",MM:relativeTimeWithPlural,y:"год",yy:relativeTimeWithPlural},ordinal:function(e,a){switch(a){case"M":case"d":case"DDD":return e+"-й";case"D":return e+"-го";case"w":case"W":return e+"-я";default:return e}},week:{dow:1,doy:7}});
-}),
-"app": (function (require, exports, module) { /* wrapped by builder */
-var Backbone, Gsender, Sidebar;
-
-Backbone =  require('backbone');
-Gsender =   require('gsender');
-Sidebar =   require('sidebar');
-
-module.exports = Backbone.Router.extend({
-
-  initialize: function() {
-    var _this = this;
-
-    this.sidebar = new Sidebar();
-    
-    $('[data-view=\"dict\"]').each(function(i, el) {
-      var sid, conf, data;
-
-      sid = $(el).data("dict-sid");
-      conf = sid + '_data';
-      data = window[conf] || {};
-
-      window[sid] = new Gsender({
-        el:   data.el,
-        dict: data
-      });
-
-    });     
-  }
-
-});
-}),
-"data": (function (require, exports, module) { /* wrapped by builder */
-var Backbone, Line;
-
-Backbone = require('backbone');
-Line =     require('line');
-
-module.exports = Backbone.Collection.extend({
-
-  model: Line
-
-});
-
-}),
-"dict": (function (require, exports, module) { /* wrapped by builder */
-var _, Backbone, Dict;
-
-_        = require('underscore');
-Backbone = require('backbone');
-
-Dict = Backbone.Model.extend({
-
-  idAttribute: "d$uuid",
-
-  initialize: function() {
-    return {
-      sid:                     '',
-      type:                    'parent',
-      caption:                 '',
-      showcaption:             '',
-      timeout:                 10000,
-      limit:                   50,
-      step:                    20,
-      query:                   '',
-      selectRowUUID:           '',
-      returnfieldname:         'd$uuid',
-      captionfieldname:        'd$uuid',
-      keyfieldname:            'd$uuid',
-      addfields:               {},
-      editfields:              {},
-      keys:                    {},
-      vals:                    {},
-      columns:                 {},
-      childs:                  {},
-      childsInfo:              {},
-      renderItemSearch:        null,
-      renderOptionSearch:      null,
-      cfselect: {
-        selectfieldexpression: '',
-        allwayspartial:        true
-      },
-      privileges: {
-        I: false,
-        S: false,
-        U: [],
-        D: false,
-        F: false
-      }
-    };
-  }    
-
-});
-
-Dict.prototype.setLineVals = function(str, line, escape) {
-  var args;
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern, sub;
-    if (typeof value === 'string') {
-      if (typeof escape === 'function') {
-        value = escape(value.toString().trim());
-      } else {
-        value = "'" + value.trim() + "'";
-      }
-    }
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  ':' + key;
-    re =       new RegExp(pattern, 'ig');
-    str =      str.replace(re, value);
-  });
-
-  return str;
-};
-
-Dict.prototype.setValsToLowerCase = function(ms) {
-  var tmp = {};
-  _.each(ms || {}, function(value, key) {
-    tmp[key] = value.toLowerCase();
-  });
-  return tmp;
-};
-
-Dict.prototype.setKeysToLowerCase = function(ms) {
-  var tmp = {};
-  _.each(ms || {}, function(value, key) {
-    tmp[key.toLowerCase()] = value;
-  });
-  return tmp;
-};
-
-Dict.prototype.cleanVals = function(new_vals) {
-  var keys, vals, 
-    tmp = {};
-
-  keys = this.get('keys') || {};
-  vals = this.get('vals') || {};
-
-  if ((new_vals != null) && (typeof new_vals === 'object')) {
-    vals = _.extend({}, vals, new_vals);
-  }
-
-  keys =  this.setValsToLowerCase(keys);
-  vals =  this.setKeysToLowerCase(vals);
-
-  _.each(keys, function(value, key) {
-    if (vals[value] != null) {
-      if (typeof vals[value] === 'string') {
-        tmp[value] = vals[value].trim();
-      } else {
-        tmp[value] = vals[value];
-      }
-    }
-  });
-
-  this.set('vals', tmp);
-
-  return tmp;
-};
-
-module.exports = Dict;
-
-}),
-"line": (function (require, exports, module) { /* wrapped by builder */
-var Backbone;
-
-Backbone = require('backbone');
-
-module.exports = Backbone.Model.extend({
-
-  idAttribute: "d$uuid",
-
-  initialize: function() {
-
-  }    
-
-});
-
-}),
-"common": (function (require, exports, module) { /* wrapped by builder */
-var Backbone, Common;
-
-Backbone = require('backbone');
-
-Common = Backbone.View.extend({
-
-  initialize: function() {}
-
-});
-
-
-module.exports = Common;
-
-}),
-"gsender": (function (require, exports, module) { /* wrapped by builder */
-var _, Backbone, Data, Dict, AddDeviceValue, Gsender, Common, Search, Insert;
-
-_ =          require('underscore');
-Backbone =   require('backbone');
-Common =     require('common');
-Data =       require('data');
-Dict =       require('dict');
-Search =     require('search');
-Insert =     require('insert');
-
-// AddDeviceValue = require('addDeviceValue.pl');
-
-Gsender = Common.extend({
-
-  el: "[data-view=\"dict\"]",
-
-  initialize: function() {
-    var model,
-      _this = this;
-
-    this.dict = new Dict(this.options.dict || {});
-
-    this.$thead = this.$el.find('thead');
-    this.$worksheet = this.$el.find('tbody');
-    this.$search = this.$el.find("[data-view=\"search\"]");
-    this.$insert = this.$el.find("[data-view=\"insert\"]");
-
-    this.dict.set('type', this.$el.data("dict-type") || 'parent');   
-    this.dict.cleanVals();
-
-    this.toolbar = this.dict.get('toolbar');
-
-    this.data = new Data();
-    this.data.url = '/api/dict/' + this.dict.get('sid');
-
-    if (this.toolbar.search === true) {
-      this.search = new Search({
-        el:   this.$search,
-        dict:  this.dict.toJSON()
-      });
-
-      this.data.on('add', function(data) {
-        _this.search.select.addOption(data.toJSON());
-      });
-
-      this.search.on('search', function(query) {
-        _this.dict.set({
-          limit: 50,
-          query: query
-        });
-        _this.$el.trigger('start.search');
-        _this.sendRequest('search');
-      });
-    }
-
-    if (this.toolbar.insert === true) {
-      this.insert = new Insert({
-        el:    this.$insert,
-        dict:  this.dict.toJSON()
-      });
-
-      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-        e.preventDefault();
-        if (_this.insert.autoinsert === true) {
-          _this.insert.request();
-        } else {
-          _this.$insert.modal('show');
-        }
-      });
-    }
-
-    this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
-    });
-
-    this.$el.on('scroll', function() {
-      if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-        _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-        _this.$el.trigger('start.scroll');
-        _this.sendRequest('scroll');
-      }
-    });
-
-    this.$el.on('mouseover', function() {
-      $(this).css({
-        'cursor': 'pointer'
-      });
-    });
-
-    this.$el.on('click', 'td', function() {
-      var $tr = $(this).parent();
-      _this.dict.set('selectRowUUID', $tr.data('uuid'));
-      _this.colorActiveLine();
-      _this.updateChilds();
-    });
-
-    this.$el.on('click', "[data-action=\"delete\"]", function() {      
-      var $tr = $(this).parent().parent();
-      _this.dict.set('selectRowUUID', $tr.data('uuid'));
-      _this.sendRequest('remove', _this.getSelectLine());
-    });
-
-    this.data.on('add', function(line) {
-      var key = _this.dict.get('keyfieldname');
-      _this.$worksheet.append(jade.templates.line_data({
-        keyfieldname: key,
-        columns:      _this.dict.get('columns'),
-        line:         line.toJSON()
-      }));
-      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
-        container: 'body',
-        placement: 'top'
-      });
-      _this.$el.trigger('add.line', line.toJSON());
-    });
-
-    this.data.on('remove', function(line) {
-      var key = _this.dict.get('keyfieldname');
-      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
-      _this.$el.trigger('add.line', line.toJSON());
-    });
-
-    if (_this.dict.get('type') === 'parent') {
-      _this.sendRequest('onload');
-    }
-
-  }
-});
-
-Gsender.prototype.update = function(vals) {
-  if (this.dict.get('type') === 'child') {
-    this.dict.set('limit', 50);
-    this.dict.cleanVals(vals);
-    if (this.search != null) {      
-      this.search.select.dict.cleanVals(vals);
-    }
-    this.$el.trigger('start.update');
-    this.sendRequest('update');
-  }
-};
-
-Gsender.prototype.updateChilds = function() {
-  var line,
-    _this = this;
-  line = this.getSelectLine();
-  if (this.data !== null) {
-    _.each(this.dict.get('childs'), function(child) {
-      if (window[child.sid] !== null) {
-        if ((line != null) && (window[child.sid])) {
-          window[child.sid].update(line.toJSON() || {});
-        } else {
-          window[child.sid].showInformationNotFound();
-        }
-      }
-    });
-  }
-};
-
-Gsender.prototype.getUUIDbyFirstRecord = function() {
-  return this.$worksheet.find('tr:first').data('uuid') || '';
-};
-
-Gsender.prototype.getSelectLine = function() {
-  var _this = this;
-  return this.data.find(function(s) {
-    return s.get(_this.dict.get('keyfieldname')) === _this.dict.get('selectRowUUID');
-  });
-};
-
-Gsender.prototype.colorActiveLine = function(classname) {
-
-  if (classname == null) {
-    classname = 'active';
-  }
-
-  this.$worksheet.find('tr').removeClass(classname);
-  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
-  if (this.$activeLine != null) {
-    this.$activeLine.addClass(classname);
-  }
-};
-
-Gsender.prototype.showInformationNotFound = function() {
-  this.$worksheet.html(jade.templates.line_nothing({
-    columns: this.dict.get('columns') || {}
-  }));
-};
-
-Gsender.prototype.hideInformationNotFound = function() {
-  this.$worksheet.find("[data-type=\"nothing\"]").remove();
-};
-
-Gsender.prototype.showErrorOnServer = function() {
-  this.$worksheet.html(jade.templates.line_error({
-    columns: this.dict.get('columns') || {}
-  }));
-};
-
-Gsender.prototype.hideErrorOnServer = function() {
-  this.$worksheet.find("[data-type=\"error\"]").remove();
-};
-
-Gsender.prototype.showLoading = function(type) {
-
-  if (type == null) {
-    type = 'before';
-  }
-
-  if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
-    switch (type) {
-      case 'replace':
-        this.$worksheet.html(jade.templates.line_loading({
-          columns: this.dict.get('columns') || {}
-        }));
-      break;
-      case 'after':
-        this.$worksheet.append(jade.templates.line_loading({
-          columns: this.dict.get('columns') || {}
-        }));
-      break;
-      case 'before':
-        this.$worksheet.prepend(jade.templates.line_loading({
-          columns: this.dict.get('columns') || {}
-        }));
-      break;
-    }
-  }
-};
-
-Gsender.prototype.hideLoading = function() {
-  this.$worksheet.find("[data-type=\"loading\"]").remove();
-};
-
-Gsender.prototype.sendRequest = function(type, model) {
-  var method,
-    url,
-    success,
-    error,
-    _this = this;
-
-  if (type == null) {
-    type = 'scroll';
-  }
-
-  switch (type) {
-    case 'onload':
-      method = "fetch";
-      this.$worksheet.empty();
-      this.data.reset();
-      this.showLoading();
-    break;
-    case 'update':
-      method = "fetch";
-      this.$worksheet.empty();
-      this.data.reset();
-      this.showLoading();
-    break;
-    case 'search':
-      method = "fetch";
-      this.$worksheet.empty();
-      this.data.reset();
-      this.showLoading();
-    break;
-    case 'scroll':
-      method = "fetch";
-      this.showLoading('after');
-    break;
-    case 'remove':
-      method = "remove";
-    break;
-  }
-
-  // this.$el.trigger('request:' + type);
-
-  success = function() {
-    _this.hideLoading();
-    _this.hideErrorOnServer();
-    _this.hideInformationNotFound();
-    _this.checkResponse(type);
-  };
-
-  error = function() {
-    _this.hideLoading();
-    _this.showErrorOnServer();
-  };
-
-  if (method === 'fetch') {
-    this.data.fetch({
-      timeout: this.dict.get('timeout'),
-      data: {
-        limit: this.dict.get('limit')         || null,
-        query: this.dict.get('query')         || '',
-        keys:  this.dict.get('keys')          || {},
-        vals:  this.dict.get('vals')          || {}
-      },
-      success: success,
-      error:   error
-    });
-  }
-
-  if (method === 'remove') {
-    $.ajax({
-      url: '/api/dict/' + this.dict.get('sid'),
-      type: 'GET',
-      data: {
-        _method: 'DELETE',
-        line:    model.toJSON(),
-        keys:    this.dict.get('keys')        || {},
-        vals:    this.dict.get('vals')        || {}
-      },
-      timeout: this.dict.get('timeout'),
-      success: success,
-      error:   error
-    });
-    // model.destroy({
-    //   timeout: timeout,
-    //   // data:    data,
-    //   success: success,
-    //   error:   error
-    // });
-  }
-  
-};
-
-Gsender.prototype.checkResponse = function(type) {
-
-  if (type == null) {
-    type = "scroll";
-  }
-
-  switch (type) {
-    case 'update':
-      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
-      this.colorActiveLine();
-    break;
-    case 'onload':
-      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
-      this.colorActiveLine();
-      this.updateChilds();
-    break;      
-    case 'search':
-      this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
-      this.colorActiveLine();
-      this.updateChilds();
-    break;      
-  }
-
-  if (this.data.length < 1) {
-    this.showInformationNotFound();
-  }
-
-  this.$el.trigger('response:' + type);
-};
-
-module.exports = Gsender;
-
-}),
-"insert": (function (require, exports, module) { /* wrapped by builder */
-
-var _, Common, Data, Dict, Search, Select;
-
-Common =   require('common');
-Data =     require('data');
-Dict =     require('dict');
-Select =   require('select');
-_ =        require('underscore');
-
-Insert = Common.extend({
-
-  el: "[data-view=\"insert\"]",
-
-  initialize: function() {
-    var _this;
-
-    this.dict = new Dict(this.options.dict || {});
-
-    this.$body =   this.$el.find("[data-type=\"modal-body\"]");
-    this.$form =   this.$el.find("[data-view=\"form\"]");
-    this.$button = this.$el.find("[data-type=\"button\"]");
-
-    this.controls = {};
-    this.autoinsert = true;
-    this.checkFields();
-
-    _this = this;
-
-    this.$button.on('click', function() {
-      _this.request();
-    });
-  }
-});
-
-Insert.prototype.checkFields = function() {
-  var _this = this;
-  var fields = this.dict.get('addfields') || {};
-
-  _.each(fields, function(value, key) {
-    var id, sid, dict, conf, select;
-    _this.controls[key] = 'none';
-    if (value.toString().match(/^WDICTS\./i)) {
-      _this.autoinsert = false;
-      sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
-      id = _this.dict.get('sid') + "_" + sid;
-      conf = window[sid + '_data'];
-      if ((conf !== null) && (conf.privileges.S !== false)) {
-        dict = new Dict(conf);
-        _this.$form.append(jade.templates.insert_control({
-          id:   id,
-          dict: dict.toJSON()
-        }));
-        select = new Select({
-          el:   "[data-control=\"" + id + "\"]",
-          type: 'select',
-          dict: dict.toJSON()
-        });
-        select.on('select', function(value) {
-          _this.controls[key] = value;
-          if (_this.checkCompleteFields()) {
-            _this.$button.removeAttr('disabled');
-          }
-        });
-      }
-    } else {
-      if (value.toString().match(/^select/i)) {
-        _this.controls[key] = value;
-      }
-    }
-  });
-};
-
-Insert.prototype.request = function() {
-  $.ajax({
-    url: '/api/dict/' + this.dict.get('sid'),
-    type: 'GET',
-    data: {
-      _method: 'PUT',
-      controls: this.controls
-    },
-    timeout: this.dict.get('timeout'),
-    success: function() {
-      alert('success');
-    },
-    error: function() {
-      alert('error');
-    }
-  });
-};
-
-Insert.prototype.checkCompleteFields = function() {
-  var result = true;
-  _.each(this.controls, function(value, key) {
-    if (value === 'none') {
-      result = false;
-    }
-  });
-  return result;
-};
-
-module.exports = Insert;
-
-
-}),
-"search": (function (require, exports, module) { /* wrapped by builder */
-
-var Common, Search, Select, Dict;
-
-Dict =     require('dict');
-Common =   require('common');
-Select =   require('select');
-
-Search = Common.extend({
-
-  el: "[data-view=\"search\"]",
-
-  initialize: function() {
-    var def, _this;
-
-    this.$query = this.$el.find('input');
-
-    this.select = new Select({
-      el:   this.$query,
-      type: 'search',
-      dict: this.options.dict || {}
-    });
-
-    _this = this;
-
-    this.select.on('search', function(query) {
-      _this.search(query);
-    });
-
-    this.$el.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
-    });
-    
-  }
-});
-
-Search.prototype.getQuery = function() {
-  return this.$query.val();
-};
-
-Search.prototype.clean = function() {
-  this.$query.val('');
-};
-
-Search.prototype.focus = function() {
-  this.$query.focus();
-};
-
-Search.prototype.search = function(query) {
-  var value, selectize;
-  value = query || this.$query.val();
-  this.select.clearOptions();
-  this.trigger('search', value);
-};
-
-module.exports = Search;
-
-}),
-"select": (function (require, exports, module) { /* wrapped by builder */
-
-var Common, Data, Select, Dict;
-
-Common =   require('common');
-Data =     require('data');
-Dict =     require('dict');
-
-Select = Common.extend({
-
-  el: "[data-view=\"select\"]",
-
-  initialize: function() {
-    var selectfield, valuefield, selectize, cfselect, load, _this;
-
-    this.dict = new Dict(this.options.dict || {});
-
-    this.data = new Data();
-    this.data.url = '/api/dict/' + this.dict.get('sid');
-
-    _this = this;
-
-    cfselect = this.dict.get('cfselect') || {};
-    selectfield = cfselect.selectfieldexpression || '';
-    if (selectfield !== '') {
-      selectfield = selectfield.toString().toLowerCase();
-    }
-
-    valuefield = this.options.type === 'search' ? selectfield : this.dict.get('returnfieldname');
-
-    this.$select = this.$el.selectize({
-      maxItems:          1,
-      maxOptions:        100,
-      delimeter:         ',',
-      valueField:        valuefield,
-      searchField:       selectfield,
-      load:              this.load(this),
-      persist:           false,
-      addPrecedence:     true,
-      create: function(input) {
-        return {
-          value:         input,
-          text:          input,
-          selectcaption: input
-        };
-      },
-      render: {
-        item: function (item, escape) {
-          if (item[_this.dict.get('keyfieldname')]) {
-            if ((_this.dict.get('renderItemSearch')) && (_this.dict.get('renderItemSearch') !== selectfield)) {
-              return _this.dict.setLineVals(_this.dict.get('renderItemSearch'), item, escape);
-            } else {
-              if (item[selectfield]) {
-                return '<div>' + item[selectfield] + '</div>';
-              } else {
-                return '<div>' + selectfield + '</div>';
-              }
-            }
-          } else {
-            return '<div>' + escape(item.value) + '</div>';
-          }
-        },
-        option: function (item, escape) {
-          if (item[_this.dict.get('keyfieldname')]) {
-            if ((_this.dict.get('renderOptionSearch')) && (_this.dict.get('renderOptionSearch') !== selectfield)) {
-              return _this.dict.setLineVals(_this.dict.get('renderOptionSearch'), item, escape);
-            } else {
-              if (item[selectfield]) {
-                return '<div>' + item[selectfield] + '</div>';
-              } else {
-                return '<div>' + selectfield + '</div>';
-              }
-            }
-          } else {
-            return '<div>' + escape(item.value) + '</div>';
-          }
-        }        
-      }
-    });
-
-    if (this.$select[0]) {
-      this.selectize = this.$select[0].selectize;
-    }
-
-    _this = this;
-
-    if (this.selectize) {
-      if (this.options.type === 'select') {
-        this.updateOptions();
-
-        this.selectize.on('change', function(value) {
-          _this.trigger('select', value);
-        });
-      }
-
-      if (this.options.type === 'search') {
-        this.selectize.on('item_add', function(value) {
-          _this.trigger('search', value);
-        });
-
-        this.selectize.on('item_remove', function() {
-          _this.trigger('search', '');
-        });
-      }
-    }
-  }
-});
-
-Select.prototype.addOption = function(data) {
-  if ((data) && (this.selectize)) {
-    this.selectize.addOption(data);
-  }
-};
-
-Select.prototype.updateOptions = function() {
-  var load, _this;
-  _this = this;
-  load = this.load(this);
-  load('***', function(data) {
-    if ((data) && (_this.selectize)) {
-      _this.selectize.addOption(data);
-    }
-  });
-};
-
-Select.prototype.load = function(_this) {
-  return function (query, fn) {
-    if (!fn) {
-      fn = function() {};
-    }
-
-    if (!query) {
-      return fn();
-    }
-
-    if (query === '***') {
-      query = '';
-    }
-
-    _this.dict.set('query', query);
-
-    _this.data.fetch({
-      timeout: _this.dict.get('timeout'),
-      data: {
-        query: _this.dict.get('query')     || '',
-        limit: _this.dict.get('limit')     || null,
-        keys:  _this.dict.get('keys')      || {},
-        vals:  _this.dict.get('vals')      || {}
-      },
-      success: function() {
-        fn(_this.data.toJSON());
-      },
-      error: function() {
-        fn();
-      }
-    });
-  };
-};
-
-Select.prototype.clearOptions = function() {
-  if (this.selectize) {
-    // this.selectize.clearOptions();
-  }
-};
-
-module.exports = Select;
-
-}),
-"sidebar": (function (require, exports, module) { /* wrapped by builder */
-var Backbone;
-
-Backbone = require('backbone');
-
-module.exports = Backbone.View.extend({
-
-  el: "#main-menu-toggle",
-
-  initialize: function() {
-    var _this = this,
-      $content = $('#content'),
-      $sidebar = $('#sidebar-left'),
-      $brand = $('.navbar-brand');
-
-    // $sidebar.on('transform', function() {
-    //   $sidebar.css({
-    //     height: $bottom.offset().top + $bottom.height() - $sidebar.offset().top
-    //   });
-    // });
-
-    // $(window).on('resize', function() {
-    //   $sidebar.trigger('transform');
-    // });
-
-    // $sidebar.trigger('transform');
-
-    this.$el.on('click', function() {
-
-      var span, spanNum, newSpa, newSpanNum;
-      
-      if ($(this).hasClass('open')) {
-
-        $(this).removeClass('open').addClass('close');
-
-        span =        $content.attr('class');
-        spanNum =     parseInt(span.replace( /^\D+/g, ''));
-        newSpanNum =  spanNum + 2;
-        newSpan =     'span' + newSpanNum;
-        
-        $brand.addClass('noBg');
-        $sidebar.hide();
-        $content.addClass('full').trigger('transform');
-
-      } else {
-
-        $(this).removeClass('close').addClass('open');
-      
-        span =        $content.attr('class');
-        spanNum =     parseInt(span.replace( /^\D+/g, ''));
-        newSpanNum =  spanNum - 2;
-        newSpan =     'span' + newSpanNum;
-        
-        $brand.removeClass('noBg');
-        $sidebar.show();
-        $content.removeClass('full').trigger('transform');
-
-      }
-
-    });
-
-  }
-
-});
-
-}),
-"addDeviceValue.pl": (function (require, exports, module) { /* wrapped by builder */
-
-var _, Backbone, Name, Template,
-  name = 'addDeviceValue';
-
-_ =            require('underscore');
-Backbone =     require('backbone');
-Template =     require(name + '.tpl');
-
-module.exports = Backbone.View.extend({
-
-  el: "[data-view=\"dict\"]",
-
-  initialize: function() {
-    var _this = this;
-
-    this.$worksheet =  this.$el.find('tbody');
-    
-    this.sid =         this.options.sid         || '';    
-    this.targetField = this.options.targetField || 'account_data';
-    this.uuid = '';
-
-    this.template = new Template();
-
-    this.checkLines();
-
-
-    this.$el.on('add.line', function(e, line) {
-      var $el, $line;      
-      if (line != null) {
-        if (line.d$uuid != null) {          
-          $line = _this.$worksheet.find("[data-uuid=\"" + line.d$uuid + "\"]");          
-          if ($line.length) {
-            $el = $line.find("[data-col-field=\"" + _this.targetField + "\"]");
-            if ($el.length) {
-              _this.checkLine($el);
-            }
-          }
-        }
-      }
-    });
-
-    this.$el.on('click', "[data-" + name + "=\"link\"]", function(e) {
-      e.preventDefault();
-      _this.uuid = $(this).parent().parent().data('uuid');
-      _this.$worksheet.find( "[data-" + name + "=\"input\"]").addClass('hide');
-      _this.$worksheet.find( "[data-" + name + "=\"link\"]").removeClass('hide');
-      $(this).addClass('hide');
-      $(this).parent().find( "[data-" + name + "=\"input\"]").removeClass('hide').focus();
-    });
-
-    this.$el.on('click', "td", function(e) {
-      if ($(this).parent().data('uuid') != _this.uuid) {
-        _this.$worksheet.find( "[data-" + name + "=\"input\"]").addClass('hide');
-        _this.$worksheet.find( "[data-" + name + "=\"link\"]").removeClass('hide');
-      }
-    });
-
-    this.$el.on('keyup', "[data-" + name + "=\"input\"]", function(e) {
-      var __this = this;
-      if (e.keyCode === 13) {
-        // $(this).parent().addClass('success');
-        this.blur();
-        $.ajax({
-          url:       '/api/' + name,
-          type:      'POST',
-          dataType:  'text',
-          data: {
-            uuid:   _this.uuid.trim(),
-            value:  $(this).val()
-          },
-          success: function(s) {
-            var sid = _this.sid;
-            $(__this).parent().html(_this.template.line({
-              value: $(__this).val()
-            }));
-            if (window[sid] != null) {
-              window[sid].trigger('update.childs');
-            }
-          }
-        });
-      }
-    });
-
-  },
-
-
-  checkLines: function() {
-    var _this = this;
-
-    this.$worksheet.find("[data-col-field=\"" + this.targetField + "\"]").each(function() {
-      _this.checkLine($(this));
-    });
-  },
-
-  checkLine: function($el) {
-    if ($el.data(name) != 'cell') {
-      $el.html(this.template.line({
-        value: $el.text()
-      }));
-      $el.data(name, 'cell');
-    }
-  }
-
-});
-
-}),
-"addDeviceValue.en.po": (function (require, exports, module) { /* wrapped by builder */
-
-module.exports = {
-  'messages': {
-    'Add': [
-      null,
-      'Add'
-    ],
-    'New value': [
-      null,
-      'New value'
-    ]
-  }  
-};
-
-}),
-"addDeviceValue.ru.po": (function (require, exports, module) { /* wrapped by builder */
-
-module.exports = {
-  'messages': {
-    'Add': [
-      null,
-      'Добавить'
-    ],
-    'New value': [
-      null,
-      'Введите значение'
-    ]
-  }  
-};
-
-}),
-"addDeviceValue.tpl": (function (require, exports, module) { /* wrapped by builder */
-
-var Template;
-
-Template = function(options) {
-
-  if (typeof options !== 'object') {
-    options = {};
-  }
-
-  this.name = options.name || 'addDeviceValue';
-  this.i18n();
-};
-
-Template.prototype.i18n = function() {
-  this.lang = $('html').attr('lang') || window.lang || 'en';
-  this.locale_data = require(this.name + '.' + this.lang + '.po');
-};
-
-Template.prototype.line = function(locals) {  
-  var buf = [];
-
-  if (typeof locals !== 'object') {
-    locals = {};
-  }
-
-  buf.push("<a data-" + this.name + "=\"link\" href=\"#\">");
-  if ((locals.value != null) && (locals.value.toString().trim() !== '')) {
-    buf.push(locals.value);
-  } else {
-    buf.push(window.gettext('Add', this.locale_data));
-  }
-  buf.push("</a>");
-  buf.push("<input ");
-  buf.push("class=\"input-sm form-control hide\" ");
-  buf.push("data-" + this.name + "=\"input\" ");
-  buf.push("type=\"text\" ");
-  if ((locals.value != null) && (locals.value.toString().trim() !== '')) {
-    buf.push("value=\"" + locals.value + "\" ");
-  }
-  buf.push("placeholder=\"" + window.gettext('New value', this.locale_data) + "\"");
-  buf.push(">");
-
-  return buf.join("");
-};
-
-
-module.exports = Template;
-}),
-"line_data.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_data'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<tr');
-buf.push(attrs({ 'data-uuid':("" + (line[keyfieldname]) + "") }, {"data-uuid":true}));
-buf.push('><td><label><input type="checkbox"/></label></td>');
-// iterate columns
-;(function(){
-  if ('number' == typeof columns.length) {
-
-    for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
-      var column = columns[$index];
-
-buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>     ');
- if ((line[column.field] != null) && (line[column.field] !== ''))        
-{
- if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-{
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
-buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
-}
- else
-{
- if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
-{
- var groups = window.parseGroupLine(line[column.field]);
-// iterate groups
-;(function(){
-  if ('number' == typeof groups.length) {
-
-    for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
-      var group = groups[$index];
-
- console.log(group);
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in groups) {
-      $$l++;      var group = groups[$index];
-
- console.log(group);
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
-    }
-
-  }
-}).call(this);
-
-}
- else
-{
-buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
-}
-}
-}
-buf.push('</td>');
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in columns) {
-      $$l++;      var column = columns[$index];
-
-buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>     ');
- if ((line[column.field] != null) && (line[column.field] !== ''))        
-{
- if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-{
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
-buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
-}
- else
-{
- if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
-{
- var groups = window.parseGroupLine(line[column.field]);
-// iterate groups
-;(function(){
-  if ('number' == typeof groups.length) {
-
-    for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
-      var group = groups[$index];
-
- console.log(group);
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in groups) {
-      $$l++;      var group = groups[$index];
-
- console.log(group);
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
-    }
-
-  }
-}).call(this);
-
-}
- else
-{
-buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
-}
-}
-}
-buf.push('</td>');
-    }
-
-  }
-}).call(this);
-
-buf.push('<td><button');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data edit')) + ""), 'type':("button"), 'data-action':("edit"), "class": ('btn') + ' ' + ('btn-warning') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
-buf.push('><i class="fa fa-lg fa-edit"></i></button>&nbsp;<button');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data remove')) + ""), 'type':("button"), 'data-action':("delete"), "class": ('btn') + ' ' + ('btn-danger') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
-buf.push('><i class="fa fa-lg fa-trash-o"></i></button></td></tr>');
-}
-return buf.join("");
-};
-})();
-}),
-"line_error.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_error'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<tr data-type="error"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
-buf.push('> <h4>' + escape((interp = gettext('Error on server')) == null ? '' : interp) + '</h4></td></tr>');
-}
-return buf.join("");
-};
-})();
-}),
-"line_loading.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_loading'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<tr data-type="loading"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
-buf.push('> <div class="progress progress-striped active"><div style="width:100%;" class="progress-bar"></div></div></td></tr>');
-}
-return buf.join("");
-};
-})();
-}),
-"line_nothing.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_nothing'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<tr data-type="nothing"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
-buf.push('> <h4>' + escape((interp = gettext('Information not found')) == null ? '' : interp) + '</h4></td></tr>');
-}
-return buf.join("");
-};
-})();
-}),
-"insert_control.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['insert_control'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<div class="form-group"><label class="col-sm-2 control-label">' + escape((interp = dict.showcaption) == null ? '' : interp) + '</label><div class="col-sm-10"><select');
-buf.push(attrs({ 'placeholder':("" + (dict.showcaption) + ""), 'data-control':("" + (id) + ""), "class": ('form-control') }, {"placeholder":true,"data-control":true}));
-buf.push('></select></div></div>');
-}
-return buf.join("");
-};
-})();
 })
 },{},{});

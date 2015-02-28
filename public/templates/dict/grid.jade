@@ -41,8 +41,9 @@
                   tr
                     th
                     - each column in parentDict.columns
-                      th(class = "#{column.hidden_class}")
-                        span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
+                      - if (column.visible === true)
+                        th(class = "#{column.hidden_class}")
+                          span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
                     th
 
                 tbody
@@ -73,8 +74,9 @@
                     tr
                       th
                       -   each column in child.columns
-                        th(class = "#{column.hidden_class}")
-                          span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
+                        - if (column.visible === true)
+                          th(class = "#{column.hidden_class}")
+                            span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
                       th
 
                   tbody

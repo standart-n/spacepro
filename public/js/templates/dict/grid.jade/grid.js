@@ -66,11 +66,14 @@ buf.push('</form></div></div><div class="row"><div class="col-md-12"><table clas
     for (var $index = 0, $$l = parentDict.columns.length; $index < $$l; $index++) {
       var column = parentDict.columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<th');
 buf.push(attrs({ "class": ("" + (column.hidden_class) + "") }, {"class":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
 buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
+}
     }
 
   } else {
@@ -78,11 +81,14 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
     for (var $index in parentDict.columns) {
       $$l++;      var column = parentDict.columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<th');
 buf.push(attrs({ "class": ("" + (column.hidden_class) + "") }, {"class":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
 buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
+}
     }
 
   }
@@ -123,11 +129,14 @@ buf.push('</form></div></div><div class="row"><div class="col-md-12"><table clas
     for (var $index = 0, $$l = child.columns.length; $index < $$l; $index++) {
       var column = child.columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<th');
 buf.push(attrs({ "class": ("" + (column.hidden_class) + "") }, {"class":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
 buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
+}
     }
 
   } else {
@@ -135,11 +144,14 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
     for (var $index in child.columns) {
       $$l++;      var column = child.columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<th');
 buf.push(attrs({ "class": ("" + (column.hidden_class) + "") }, {"class":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
 buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
+}
     }
 
   }
@@ -180,11 +192,14 @@ buf.push('</form></div></div><div class="row"><div class="col-md-12"><table clas
     for (var $index = 0, $$l = child.columns.length; $index < $$l; $index++) {
       var column = child.columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<th');
 buf.push(attrs({ "class": ("" + (column.hidden_class) + "") }, {"class":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
 buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
+}
     }
 
   } else {
@@ -192,11 +207,14 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
     for (var $index in child.columns) {
       $$l++;      var column = child.columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<th');
 buf.push(attrs({ "class": ("" + (column.hidden_class) + "") }, {"class":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (column.field) + "") }, {"data-toggle":true,"title":true}));
 buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span></th>');
+}
     }
 
   }

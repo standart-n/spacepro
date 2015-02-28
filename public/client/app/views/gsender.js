@@ -18,7 +18,7 @@ Gsender = Common.extend({
     var model,
       _this = this;
 
-    this.dict = new Dict(this.options.dict || {});
+    this.dict = new Dict(this.options.conf || {});
 
     this.$thead = this.$el.find('thead');
     this.$worksheet = this.$el.find('tbody');
@@ -35,8 +35,8 @@ Gsender = Common.extend({
 
     if (this.toolbar.search === true) {
       this.search = new Search({
-        el:   this.$search,
-        dict:  this.dict.toJSON()
+        el:    this.$search,
+        conf:  this.dict.toJSON()
       });
 
       this.data.on('add', function(data) {
@@ -56,7 +56,7 @@ Gsender = Common.extend({
     if (this.toolbar.insert === true) {
       this.insert = new Insert({
         el:    this.$insert,
-        dict:  this.dict.toJSON()
+        conf:  this.options.conf
       });
 
       this.$el.on('click', "[data-action=\"insert\"]", function(e) {
@@ -133,7 +133,7 @@ Gsender.prototype.update = function(vals) {
     this.dict.set('limit', 50);
     this.dict.cleanVals(vals);
     if (this.search != null) {      
-      this.search.select.dict.cleanVals(vals);
+      this.search.select.conf.vals = this.dict.get('vals');
     }
     this.$el.trigger('start.update');
     this.sendRequest('update');

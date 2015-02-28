@@ -15,6 +15,8 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
     for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
       var column = columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<td');
 buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
 buf.push('>     ');
@@ -38,10 +40,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
- console.log(group);
 buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;');
     }
 
   } else {
@@ -49,10 +50,9 @@ buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
- console.log(group);
 buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;');
     }
 
   }
@@ -66,6 +66,7 @@ buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) 
 }
 }
 buf.push('</td>');
+}
     }
 
   } else {
@@ -73,6 +74,8 @@ buf.push('</td>');
     for (var $index in columns) {
       $$l++;      var column = columns[$index];
 
+ if (column.visible === true)
+{
 buf.push('<td');
 buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
 buf.push('>     ');
@@ -96,10 +99,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
- console.log(group);
 buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;');
     }
 
   } else {
@@ -107,10 +109,9 @@ buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
- console.log(group);
 buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>' + escape((interp = group.id) == null ? '' : interp) + '</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;');
     }
 
   }
@@ -124,6 +125,7 @@ buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) 
 }
 }
 buf.push('</td>');
+}
     }
 
   }

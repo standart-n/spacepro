@@ -46,35 +46,6 @@ Dict = Backbone.Model.extend({
 
 });
 
-Dict.prototype.setLineVals = function(str, line, escape) {
-  var args;
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern, sub;
-    if (typeof value === 'string') {
-      if (typeof escape === 'function') {
-        value = escape(value.toString().trim());
-      } else {
-        value = "'" + value.trim() + "'";
-      }
-    }
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  ':' + key;
-    re =       new RegExp(pattern, 'ig');
-    str =      str.replace(re, value);
-  });
-
-  return str;
-};
-
 Dict.prototype.setValsToLowerCase = function(ms) {
   var tmp = {};
   _.each(ms || {}, function(value, key) {

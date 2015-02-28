@@ -31,11 +31,18 @@ $(function() {
     alert(JSON.stringify(s));
   };
   
-  window.gettext = function(msgid) {
-    var msgstr, _ref;
-    if (((_ref = window.json_locale_data) != null ? _ref.messages[msgid] : void 0) != null) {
-      if (window.json_locale_data.messages[msgid].length > 1) {
-        msgstr = window.json_locale_data.messages[msgid][1];
+  window.gettext = function(msgid, json_locale_data) {
+    var msgstr, data;
+    data = json_locale_data || window.json_locale_data || {};
+    if (data.messages != null) {
+      if (data.messages[msgid] != null) {
+        if (typeof(data.messages[msgid]) == 'string') {
+          msgstr = data.messages[msgid];
+        } else {
+          if (data.messages[msgid].length > 1) {
+            msgstr = data.messages[msgid][1];
+          }
+        }
       }
     }
     if (msgstr == null) {

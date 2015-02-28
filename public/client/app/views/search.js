@@ -1,7 +1,6 @@
 
-var Common, Search, Select, Dict;
+var Common, Search, Select;
 
-Dict =     require('dict');
 Common =   require('common');
 Select =   require('select');
 
@@ -17,7 +16,7 @@ Search = Common.extend({
     this.select = new Select({
       el:   this.$query,
       type: 'search',
-      dict: this.options.dict || {}
+      conf: this.options.conf || {}
     });
 
     _this = this;

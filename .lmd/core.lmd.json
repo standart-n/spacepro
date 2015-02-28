@@ -29,12 +29,6 @@
       },
       "exports": "Backbone"
     },
-    "selectize": {
-      "path": "public/lib/selectize/selectize.js",
-      "require": {
-        "jQuery": "$"
-      }
-    },
     "bootstrap": {
       "path": "public/lib/bootstrap/bootstrap.min.js",
       "require": {

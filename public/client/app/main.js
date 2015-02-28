@@ -15,7 +15,8 @@ require('line_data.jade');
 require('line_nothing.jade');
 require('line_error.jade');
 require('line_loading.jade');
-require('insert_control.jade');
+require('insert_select.jade');
+require('insert_default.jade');
 
 Backbone =    require('backbone');
 App =         require('app');

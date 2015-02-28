@@ -10,7 +10,13 @@
     "<%= file.replace('.po','') %>.po": "public/client/plugins/**/*.po.js",
     "<%= file.replace('.tpl','') %>.tpl": "public/client/plugins/**/*.tpl.js",
     "line_<%= file.replace('line_','') %>.jade": "public/js/templates/dict/line_*.jade/*.js",
-    "insert_<%= file.replace('insert_','') %>.jade": "public/js/templates/dict/insert_*.jade/*.js"
+    "insert_<%= file.replace('insert_','') %>.jade": "public/js/templates/dict/insert_*.jade/*.js",
+    "selectize": {
+      "path": "public/lib/selectize/selectize.js",
+      "require": {
+        "jQuery": "$"
+      }
+    }
   },
   "main": "main"
 }

@@ -77,7 +77,7 @@ module.exports = function(grunt) {
         },
         files: {
           src: [
-            './lib/**/*.js',
+            './lib/**/*.js'
           ]
         }
       },
@@ -87,7 +87,9 @@ module.exports = function(grunt) {
         },
         files: {
           src: [
-            './public/client/**/*.js',
+            './public/client/app/**/*.js',
+            './public/client/signin/**/*.js',
+            './public/client/plugins/**/*.js'
           ]
         }
       },
@@ -97,7 +99,7 @@ module.exports = function(grunt) {
         },
         files: {
           src: [
-            './test/spec/**/*.js',
+            './test/spec/**/*.js'
           ]
         }
       }

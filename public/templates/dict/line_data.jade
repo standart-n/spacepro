@@ -4,22 +4,22 @@ tr(data-uuid = "#{line[keyfieldname]}")
     label
       input(type = "checkbox")
   - each column in columns
-    td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")      
-      - if ((line[column.field] != null) && (line[column.field] !== ''))        
-        - if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-          span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")
-            span #{moment(line[column.field]).format('DD.MM.YYYY')}
-            &nbsp;
-            small #{moment(line[column.field]).format('HH:mm')}
-        - else
-          - if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
-            - var groups = window.parseGroupLine(line[column.field]);
-            - each group in groups
-              - console.log(group);
-              span.badge(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") #{group.id}
+    - if (column.visible === true)
+      td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")      
+        - if ((line[column.field] != null) && (line[column.field] !== ''))        
+          - if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+            span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")
+              span #{moment(line[column.field]).format('DD.MM.YYYY')}
               &nbsp;
+              small #{moment(line[column.field]).format('HH:mm')}
           - else
-            span #{line[column.field]}
+            - if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+              - var groups = window.parseGroupLine(line[column.field]);
+              - each group in groups
+                span.badge(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") &nbsp;
+                &nbsp;
+            - else
+              span #{line[column.field]}
   td
     button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "#{gettext('Line data edit')}", type = "button", data-action = "edit")
       i.fa.fa-lg.fa-edit
