@@ -31,6 +31,7 @@ Gsender = Common.extend({
     this.toolbar = this.dict.get('toolbar');
 
     this.data = new Data();
+    this.data.setIdAttribute(this.dict.get('keyfieldname'));
     this.data.url = '/api/dict/' + this.dict.get('sid');
 
     if (this.toolbar.search === true) {
@@ -45,29 +46,29 @@ Gsender = Common.extend({
 
       this.search.on('search', function(query) {
         _this.dict.set({
-          limit: 50,
+          limit: 20,
           query: query
         });
-        _this.$el.trigger('start.search');
         _this.sendRequest('search');
       });
     }
 
-    if (this.toolbar.insert === true) {
-      this.insert = new Insert({
-        el:    this.$insert,
-        conf:  this.options.conf
-      });
+    // if (this.toolbar.insert === true) {
 
-      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-        e.preventDefault();
-        if (_this.insert.autoinsert === true) {
-          _this.insert.request();
-        } else {
-          _this.$insert.modal('show');
-        }
-      });
-    }
+    //   this.insert = new Insert({
+    //     el:    this.$insert,
+    //     conf:  this.options.conf
+    //   });
+
+    //   this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+    //     e.preventDefault();
+    //     if (_this.insert.autoinsert === true) {
+    //       _this.insert.request();
+    //     } else {
+    //       _this.$insert.modal('show');
+    //     }
+    //   });
+    // }
 
     this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
       container: 'body',
@@ -77,7 +78,6 @@ Gsender = Common.extend({
     this.$el.on('scroll', function() {
       if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
         _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-        _this.$el.trigger('start.scroll');
         _this.sendRequest('scroll');
       }
     });
@@ -93,6 +93,14 @@ Gsender = Common.extend({
       _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.colorActiveLine();
       _this.updateChilds();
+    });
+
+    this.$el.on('dblclick', 'td', function() {
+      var $tr = $(this).parent();
+      // _this.dict.set('selectRowUUID', $tr.data('uuid'));
+      // _this.colorActiveLine();
+      // _this.updateChilds();
+      // alert($(this).data('col-value'));
     });
 
     this.$el.on('click', "[data-action=\"delete\"]", function() {      
@@ -118,7 +126,7 @@ Gsender = Common.extend({
     this.data.on('remove', function(line) {
       var key = _this.dict.get('keyfieldname');
       _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
-      _this.$el.trigger('add.line', line.toJSON());
+      _this.$el.trigger('remove.line', line.toJSON());
     });
 
     if (_this.dict.get('type') === 'parent') {
@@ -133,9 +141,9 @@ Gsender.prototype.update = function(vals) {
     this.dict.set('limit', 50);
     this.dict.cleanVals(vals);
     if (this.search != null) {      
+      this.search.select.conf.keys = this.dict.get('keys');
       this.search.select.conf.vals = this.dict.get('vals');
     }
-    this.$el.trigger('start.update');
     this.sendRequest('update');
   }
 };
@@ -162,14 +170,10 @@ Gsender.prototype.getUUIDbyFirstRecord = function() {
 };
 
 Gsender.prototype.getSelectLine = function() {
-  var _this = this;
-  return this.data.find(function(s) {
-    return s.get(_this.dict.get('keyfieldname')) === _this.dict.get('selectRowUUID');
-  });
+  return this.data.get(this.dict.get('selectRowUUID')) || {};
 };
 
 Gsender.prototype.colorActiveLine = function(classname) {
-
   if (classname == null) {
     classname = 'active';
   }
@@ -271,7 +275,6 @@ Gsender.prototype.sendRequest = function(type, model) {
     break;
   }
 
-  // this.$el.trigger('request:' + type);
 
   success = function() {
     _this.hideLoading();

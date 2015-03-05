@@ -15,6 +15,7 @@ Select = Common.extend({
     var valuefield;
     var create;
     var selectOnTab = false;
+    var preload = true;
 
     // this.dict = new Dict(this.options.conf || {});
     this.conf = this.options.conf || {};
@@ -40,7 +41,10 @@ Select = Common.extend({
         searchfields.push(value);
       }
     });
-    console.log(this.conf.sid, this.selectfield, searchfields);
+
+    this.searchfields = searchfields;
+
+    // console.log(this.conf.sid, this.selectfield, searchfields);
 
     switch (this.options.type) {
       case 'search':
@@ -48,21 +52,23 @@ Select = Common.extend({
         valuefield =     'value';
         create =         this.create();
         selectOnTab =    true;
+        preload =        false;
         break;
       default:
         plugins =        [];
         valuefield =     this.conf.returnfieldname;
         create =         false;
         selectOnTab =    false;
+        preload =        true;
     }
 
     this.$select = this.$el.selectize({
-      load:              this.load(this, searchfields),
+      load:              this.load(this),
       valueField:        valuefield,
-      searchField:       searchfields,
+      searchField:       this.searchfields,
       create:            create,
       plugins:           this.options.plugins           || plugins,
-      preload:           this.options.preload           || true,
+      preload:           this.options.preload           || preload,
       maxItems:          this.options.maxItems          || 1,
       maxOptions:        this.options.maxOptions        || 20,
       delimeter:         this.options.delimeter         || ',',
@@ -71,8 +77,8 @@ Select = Common.extend({
       selectOnTab:       this.options.selectOnTab       || selectOnTab,
       allowEmptyOption:  this.options.allowEmptyOption  || true,      
       render: {
-        item:            this.renderItem(searchfields),
-        option:          this.renderOption(searchfields)
+        item:            this.renderItem(),
+        option:          this.renderOption()
       }
     });
 
@@ -186,7 +192,8 @@ Select.prototype.setSearchFields = function(fields, line, escape) {
 
 Select.prototype.addOption = function(data) {
   if ((data) && (this.selectize)) {
-    this.selectize.addOption(data);
+    // this.selectize.addOption(data);
+    this.selectize.addOption(this.checkDataItem(data));
   }
 };
 
@@ -217,7 +224,7 @@ Select.prototype.create = function() {
   };
 };
 
-Select.prototype.renderItem = function(searchfields) {
+Select.prototype.renderItem = function() {
   var _this = this;
   return function (item, escape) {
     if (item[_this.conf.keyfieldname]) {
@@ -227,7 +234,7 @@ Select.prototype.renderItem = function(searchfields) {
         if (item[_this.selectfield]) {
           return '<div>' + item[_this.selectfield] + '</div>';
         } else {
-          return '<div>' + _this.setSearchFields(searchfields, item, escape) + '</div>';
+          return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
         }
       }
     } else {
@@ -236,7 +243,7 @@ Select.prototype.renderItem = function(searchfields) {
   };
 };
 
-Select.prototype.renderOption = function(searchfields) {
+Select.prototype.renderOption = function() {
   var _this = this;
   return function (item, escape) {
     if (item[_this.conf.keyfieldname]) {
@@ -246,7 +253,7 @@ Select.prototype.renderOption = function(searchfields) {
         if (item[_this.selectfield]) {
           return '<div>' + item[_this.selectfield] + '</div>';
         } else {
-          return '<div>' + _this.setSearchFields(searchfields, item, escape) + '</div>';
+          return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
         }
       }
     } else {
@@ -255,7 +262,7 @@ Select.prototype.renderOption = function(searchfields) {
   };
 };
 
-Select.prototype.load = function(_this, searchfields) {
+Select.prototype.load = function(_this) {
   return function (query, fn) {
     if (!fn) {
       fn = function() {};
@@ -269,8 +276,6 @@ Select.prototype.load = function(_this, searchfields) {
       query = '';
     }
 
-    console.log(_this.conf.sid, query);
-
     _this.data.fetch({
       timeout: _this.options.timeout       || 1000,
       data: {
@@ -279,20 +284,34 @@ Select.prototype.load = function(_this, searchfields) {
         keys:  _this.conf.keys             || {},
         vals:  _this.conf.vals             || {}
       },
-      success: function() {
-        var data = _.map(_this.data.toJSON(), function(item) {
-          var str = _this.setSearchFields(searchfields, item);
-          item.value = str;
-          item.text = str;
-          return item;
-        });
-        fn(data);
+      success: function() {        
+        fn(_this.checkData(_this.data.toJSON()));
       },
       error: function() {
         fn();
       }
     });
   };
+};
+
+Select.prototype.checkData = function(data) {
+  var _this = this;
+  if (typeof(data) === 'object') {
+    _.map(data, function(item) {
+      return _this.checkDataItem(item);
+    });    
+  }
+  return data;
+};
+
+Select.prototype.checkDataItem = function(item) {
+  var str = '';
+  if (typeof(data) === 'object') {
+    str = this.setSearchFields(this.searchfields, item);
+    item.value = str;
+    item.text = str;
+  }
+  return item;
 };
 
 Select.prototype.clearOptions = function() {

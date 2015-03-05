@@ -1,13 +1,15 @@
-var Backbone;
 
-Backbone = require('backbone');
+var Backbone = require('backbone');
 
-module.exports = Backbone.Model.extend({
+var Line = Backbone.Model.extend({
 
-  idAttribute: "d$uuid",
+  // idAttribute: "d$uuid",
+  idAttribute: "id2",
 
   initialize: function() {
 
   }    
 
 });
+
+module.exports = Line;

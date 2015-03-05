@@ -18,8 +18,8 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
  if (column.visible === true)
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>     ');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-value':("" + (line[column.field]) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-value":true}));
+buf.push('>');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
  if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
@@ -40,9 +40,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
-buf.push('<span');
+buf.push('<small><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;</small>');
     }
 
   } else {
@@ -50,9 +50,9 @@ buf.push('>&nbsp;</span>&nbsp;');
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
-buf.push('<span');
+buf.push('<small><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;</small>');
     }
 
   }
@@ -77,8 +77,8 @@ buf.push('</td>');
  if (column.visible === true)
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>     ');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-value':("" + (line[column.field]) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-value":true}));
+buf.push('>');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
  if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
@@ -99,9 +99,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
-buf.push('<span');
+buf.push('<small><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;</small>');
     }
 
   } else {
@@ -109,9 +109,9 @@ buf.push('>&nbsp;</span>&nbsp;');
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
-buf.push('<span');
+buf.push('<small><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;');
+buf.push('>&nbsp;</span>&nbsp;</small>');
     }
 
   }
