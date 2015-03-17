@@ -4,7 +4,7 @@
     ul.nav.nav-tabs.nav-stacked.main-menu
 
       - each dict in webDicts.dicts
-        - if (dict.sid == webDicts.active.sid)
+        - if (dict.sid == webDicts.active)
           li.active
             a(href = "#")
               .visible-sm

@@ -1,5 +1,6 @@
 
 #content.col-sm-11.col-lg-10
+  - var parentDict = wdicts_data[webDicts.active]
 
   .row
     .col-md-12
@@ -8,7 +9,8 @@
           a(href = "#dddd", data-toggle = "tab") 
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
             span.hidden-xs.hidden-sm #{parentDict.showcaption}
-        - each child in parentDict.childs
+        - each childInfo in parentDict.childsInfo
+          - var child = wdicts_data[childInfo.wdict]
           li
             a(href = "##{child.sid}", data-toggle = "tab") 
               i(class = "fa fa-fw fa-lg #{child.faIcon}")
@@ -48,7 +50,8 @@
 
                 tbody
 
-        - each child in parentDict.childs
+        - each childInfo in parentDict.childsInfo
+          - var child = wdicts_data[childInfo.wdict]
           .tab-pane(id = "#{child.sid}", data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
             br
             .row
@@ -56,7 +59,7 @@
                 form.form-inline(data-view = "search")
                   - if (child.toolbar.search === true)
                     .form-group.col-xs-12.col-md-6.col-lg-4
-                      input.form-control(type = "search", placeholder = "search")
+                      input.form-control(width = "100%", type = "search", placeholder = "#{gettext('Toolbar search')}")
                   - if (child.toolbar.insert === true)
                     a.btn.btn-success(href = "#", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}")
                       i.fa.fa-plus

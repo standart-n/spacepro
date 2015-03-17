@@ -1,6 +1,5 @@
-jade.templates = jade.templates || {};
-jade.templates['sidebar'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -13,7 +12,7 @@ buf.push('<div id="sidebar-left" class="col-lg-2 col-sm-1"><div class="sidebar-n
     for (var $index = 0, $$l = webDicts.dicts.length; $index < $$l; $index++) {
       var dict = webDicts.dicts[$index];
 
- if (dict.sid == webDicts.active.sid)
+ if (dict.sid == webDicts.active)
 {
 buf.push('<li class="active"><a href="#"><div class="visible-sm">');
  if (dict.settings.main.fa_icon !== undefined) {
@@ -54,7 +53,7 @@ buf.push('</div><small class="hidden-sm">' + escape((interp = dict.caption) == n
     for (var $index in webDicts.dicts) {
       $$l++;      var dict = webDicts.dicts[$index];
 
- if (dict.sid == webDicts.active.sid)
+ if (dict.sid == webDicts.active)
 {
 buf.push('<li class="active"><a href="#"><div class="visible-sm">');
  if (dict.settings.main.fa_icon !== undefined) {
@@ -97,4 +96,3 @@ buf.push('</ul></div></div>');
 }
 return buf.join("");
 };
-})();

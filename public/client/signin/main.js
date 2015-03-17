@@ -2,7 +2,7 @@
 var App, Backbone, User;
 
 window.JSON = require('json2');
-window.jade = require('jade');
+window.jade = require('runtime');
 
 window.jade.templates = {};
 

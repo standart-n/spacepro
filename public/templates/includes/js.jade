@@ -12,6 +12,12 @@
 
 - })
 
+//- - wdicts_data.forEach(function(dict){
+each dict in wdicts_data
+
+  != "<script type=\"text/javascript\">var " + dict.sid + "_data = " + JSON.stringify(dict) + ";</script>"
+
+//- - })
 
 - scripts.forEach(function(script){
 

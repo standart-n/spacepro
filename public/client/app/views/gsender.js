@@ -1,16 +1,15 @@
-var _, Backbone, Data, Dict, AddDeviceValue, Gsender, Common, Search, Insert;
 
-_ =          require('underscore');
-Backbone =   require('backbone');
-Common =     require('common');
-Data =       require('data');
-Dict =       require('dict');
-Search =     require('search');
-Insert =     require('insert');
+var _ =          require('underscore');
+var Backbone =   require('backbone');
+var Common =     require('common');
+var Data =       require('data');
+var Dict =       require('dict');
+var Search =     require('search');
+var Insert =     require('insert');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
-Gsender = Common.extend({
+var Gsender = Common.extend({
 
   el: "[data-view=\"dict\"]",
 
@@ -25,7 +24,7 @@ Gsender = Common.extend({
     this.$search = this.$el.find("[data-view=\"search\"]");
     this.$insert = this.$el.find("[data-view=\"insert\"]");
 
-    this.dict.set('type', this.$el.data("dict-type") || 'parent');   
+    this.dict.set('type', this.$el.data("dict-type") || 'parent');
     this.dict.cleanVals();
 
     this.toolbar = this.dict.get('toolbar');
@@ -37,7 +36,8 @@ Gsender = Common.extend({
     if (this.toolbar.search === true) {
       this.search = new Search({
         el:    this.$search,
-        conf:  this.dict.toJSON()
+        conf:  this.options.conf || {}
+        // conf:  this.dict.toJSON()
       });
 
       this.data.on('add', function(data) {
@@ -53,34 +53,34 @@ Gsender = Common.extend({
       });
     }
 
-    // if (this.toolbar.insert === true) {
+    if (this.toolbar.insert === true) {
 
-    //   this.insert = new Insert({
-    //     el:    this.$insert,
-    //     conf:  this.options.conf
-    //   });
+      this.insert = new Insert({
+        el:    this.$insert,
+        conf:  this.options.conf
+      });
 
-    //   this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-    //     e.preventDefault();
-    //     if (_this.insert.autoinsert === true) {
-    //       _this.insert.request();
-    //     } else {
-    //       _this.$insert.modal('show');
-    //     }
-    //   });
-    // }
+      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        e.preventDefault();
+        if (_this.insert.autoinsert === true) {
+          _this.insert.request();
+        } else {
+          _this.$insert.modal('show');
+        }
+      });
+    }
 
     this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
+      container: 'body'
+      // placement: 'top'
     });
 
-    this.$el.on('scroll', function() {
-      if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-        _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-        _this.sendRequest('scroll');
-      }
-    });
+    // this.$el.on('scroll', function() {
+    //   if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
+    //     _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
+    //     _this.sendRequest('scroll');
+    //   }
+    // });
 
     this.$el.on('mouseover', function() {
       $(this).css({
@@ -90,6 +90,7 @@ Gsender = Common.extend({
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
+      _this.unColorActiveLine();
       _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.colorActiveLine();
       _this.updateChilds();
@@ -97,9 +98,6 @@ Gsender = Common.extend({
 
     this.$el.on('dblclick', 'td', function() {
       var $tr = $(this).parent();
-      // _this.dict.set('selectRowUUID', $tr.data('uuid'));
-      // _this.colorActiveLine();
-      // _this.updateChilds();
       // alert($(this).data('col-value'));
     });
 
@@ -120,13 +118,13 @@ Gsender = Common.extend({
         container: 'body',
         placement: 'top'
       });
-      _this.$el.trigger('add.line', line.toJSON());
+      // _this.$el.trigger('add.line', line.toJSON());
     });
 
     this.data.on('remove', function(line) {
       var key = _this.dict.get('keyfieldname');
       _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
-      _this.$el.trigger('remove.line', line.toJSON());
+      // _this.$el.trigger('remove.line', line.toJSON());
     });
 
     if (_this.dict.get('type') === 'parent') {
@@ -149,16 +147,20 @@ Gsender.prototype.update = function(vals) {
 };
 
 Gsender.prototype.updateChilds = function() {
-  var line,
-    _this = this;
-  line = this.getSelectLine();
+  var _this = this;
+  var line = this.getSelectLine();
   if (this.data !== null) {
-    _.each(this.dict.get('childs'), function(child) {
-      if (window[child.sid] !== null) {
-        if ((line != null) && (window[child.sid])) {
-          window[child.sid].update(line.toJSON() || {});
+    _.each(this.dict.get('childsInfo'), function(childInfo) {
+      if (window[childInfo.wdict] !== undefined) {
+        if (line != null) {
+          window[childInfo.wdict].update(line.toJSON() || {});
+          if (window[childInfo.wdict].search != null) {
+            if (window[childInfo.wdict].search.select != null) {
+              window[childInfo.wdict].search.select.clearOptions();
+            }
+          }
         } else {
-          window[child.sid].showInformationNotFound();
+          window[childInfo.wdict].showInformationNotFound();
         }
       }
     });
@@ -173,12 +175,20 @@ Gsender.prototype.getSelectLine = function() {
   return this.data.get(this.dict.get('selectRowUUID')) || {};
 };
 
+Gsender.prototype.unColorActiveLine = function(classname) {
+  if (classname == null) {
+    classname = 'active';
+  }
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
+  if (this.$activeLine != null) {
+    this.$activeLine.removeClass(classname);
+  }
+};
+
 Gsender.prototype.colorActiveLine = function(classname) {
   if (classname == null) {
     classname = 'active';
   }
-
-  this.$worksheet.find('tr').removeClass(classname);
   this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
   if (this.$activeLine != null) {
     this.$activeLine.addClass(classname);

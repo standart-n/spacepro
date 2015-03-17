@@ -5,7 +5,7 @@ tr(data-uuid = "#{line[keyfieldname]}")
       input(type = "checkbox")
   - each column in columns
     - if (column.visible === true)
-      td(class = "#{column.hidden_class}", data-col-field = "#{column.field}", data-col-value = "#{line[column.field]}")
+      td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")
         - if ((line[column.field] != null) && (line[column.field] !== ''))        
           - if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
             span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")
@@ -16,11 +16,14 @@ tr(data-uuid = "#{line[keyfieldname]}")
             - if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
               - var groups = window.parseGroupLine(line[column.field]);
               - each group in groups
-                small
-                  span.badge(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") &nbsp;
-                  &nbsp;
+                span.badge(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") &nbsp;
             - else
-              span #{line[column.field]}
+              - if (line[column.field].length > 103)
+                //- span(data-toggle = "tooltip", title = "#{line[column.field]}") #{line[column.field].slice(0, 100)}
+                span #{line[column.field].slice(0, 100)}
+                  b ...
+              - else              
+                | #{line[column.field]}
   td
     button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "#{gettext('Line data edit')}", type = "button", data-action = "edit")
       i.fa.fa-lg.fa-edit

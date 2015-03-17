@@ -48,7 +48,7 @@ Search.prototype.focus = function() {
 Search.prototype.search = function(query) {
   var value, selectize;
   value = query || this.$query.val();
-  this.select.clearOptions();
+  // this.select.clearOptions();
   this.trigger('search', value);
 };
 

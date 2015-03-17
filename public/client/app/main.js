@@ -1,9 +1,7 @@
-var Backbone, App, AddDeviceValues;
 
 window.JSON = require('json2');
-window.jade = require('jade');
+window.jade = require('runtime');
 
-window.jade.templates = {};
 
 require('jquery');
 // require('jquery-ui');
@@ -11,15 +9,16 @@ require('bootstrap');
 require('selectize');
 require('moment');
 
-require('line_data.jade');
-require('line_nothing.jade');
-require('line_error.jade');
-require('line_loading.jade');
-require('insert_select.jade');
-require('insert_default.jade');
+window.jade.templates = {};
+window.jade.templates.line_data =      require('line_data.jade');
+window.jade.templates.line_nothing =   require('line_nothing.jade');
+window.jade.templates.line_error =     require('line_error.jade');
+window.jade.templates.line_loading =   require('line_loading.jade');
+window.jade.templates.insert_select =  require('insert_select.jade');
+window.jade.templates.insert_default = require('insert_default.jade');
 
-Backbone =    require('backbone');
-App =         require('app');
+var Backbone =    require('backbone');
+var App =         require('app');
 
 $(function() {
 

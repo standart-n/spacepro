@@ -1,6 +1,5 @@
-jade.templates = jade.templates || {};
-jade.templates['line_data'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -18,7 +17,7 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
  if (column.visible === true)
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-value':("" + (line[column.field]) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-value":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
 buf.push('>');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
@@ -40,9 +39,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   } else {
@@ -50,9 +49,9 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   }
@@ -61,7 +60,14 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
 }
  else
 {
-buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
+ if (line[column.field].length > 103)
+{
+buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+}
+ else              
+{
+buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
+}
 }
 }
 }
@@ -77,7 +83,7 @@ buf.push('</td>');
  if (column.visible === true)
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-value':("" + (line[column.field]) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-value":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
 buf.push('>');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
@@ -99,9 +105,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   } else {
@@ -109,9 +115,9 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   }
@@ -120,7 +126,14 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
 }
  else
 {
-buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
+ if (line[column.field].length > 103)
+{
+buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+}
+ else              
+{
+buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
+}
 }
 }
 }
@@ -139,4 +152,3 @@ buf.push('><i class="fa fa-lg fa-trash-o"></i></button></td></tr>');
 }
 return buf.join("");
 };
-})();

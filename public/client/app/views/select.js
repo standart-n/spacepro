@@ -306,7 +306,7 @@ Select.prototype.checkData = function(data) {
 
 Select.prototype.checkDataItem = function(item) {
   var str = '';
-  if (typeof(data) === 'object') {
+  if (typeof(item) === 'object') {
     str = this.setSearchFields(this.searchfields, item);
     item.value = str;
     item.text = str;
@@ -316,7 +316,7 @@ Select.prototype.checkDataItem = function(item) {
 
 Select.prototype.clearOptions = function() {
   if (this.selectize) {
-    // this.selectize.clearOptions();
+    this.selectize.clearOptions();
   }
 };
 

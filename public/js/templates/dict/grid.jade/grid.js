@@ -1,20 +1,22 @@
-jade.templates = jade.templates || {};
-jade.templates['grid'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="content" class="col-sm-11 col-lg-10"><div class="row"><div class="col-md-12"><ul class="nav nav-pills"><li class="active"><a href="#dddd" data-toggle="tab"> <i');
+buf.push('<div id="content" class="col-sm-11 col-lg-10">');
+ var parentDict = wdicts_data[webDicts.active]
+buf.push('<div class="row"><div class="col-md-12"><ul class="nav nav-pills"><li class="active"><a href="#dddd" data-toggle="tab"> <i');
 buf.push(attrs({ "class": ("fa fa-fw fa-lg " + (parentDict.faIcon) + "") }, {"class":true}));
 buf.push('></i><span class="hidden-xs hidden-sm">' + escape((interp = parentDict.showcaption) == null ? '' : interp) + '</span></a></li>');
-// iterate parentDict.childs
+// iterate parentDict.childsInfo
 ;(function(){
-  if ('number' == typeof parentDict.childs.length) {
+  if ('number' == typeof parentDict.childsInfo.length) {
 
-    for (var $index = 0, $$l = parentDict.childs.length; $index < $$l; $index++) {
-      var child = parentDict.childs[$index];
+    for (var $index = 0, $$l = parentDict.childsInfo.length; $index < $$l; $index++) {
+      var childInfo = parentDict.childsInfo[$index];
 
+ var child = wdicts_data[childInfo.wdict]
 buf.push('<li><a');
 buf.push(attrs({ 'href':("#" + (child.sid) + ""), 'data-toggle':("tab") }, {"href":true,"data-toggle":true}));
 buf.push('> <i');
@@ -24,9 +26,10 @@ buf.push('></i><span class="hidden-xs hidden-sm">' + escape((interp = child.show
 
   } else {
     var $$l = 0;
-    for (var $index in parentDict.childs) {
-      $$l++;      var child = parentDict.childs[$index];
+    for (var $index in parentDict.childsInfo) {
+      $$l++;      var childInfo = parentDict.childsInfo[$index];
 
+ var child = wdicts_data[childInfo.wdict]
 buf.push('<li><a');
 buf.push(attrs({ 'href':("#" + (child.sid) + ""), 'data-toggle':("tab") }, {"href":true,"data-toggle":true}));
 buf.push('> <i');
@@ -95,19 +98,22 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
 }).call(this);
 
 buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
-// iterate parentDict.childs
+// iterate parentDict.childsInfo
 ;(function(){
-  if ('number' == typeof parentDict.childs.length) {
+  if ('number' == typeof parentDict.childsInfo.length) {
 
-    for (var $index = 0, $$l = parentDict.childs.length; $index < $$l; $index++) {
-      var child = parentDict.childs[$index];
+    for (var $index = 0, $$l = parentDict.childsInfo.length; $index < $$l; $index++) {
+      var childInfo = parentDict.childsInfo[$index];
 
+ var child = wdicts_data[childInfo.wdict]
 buf.push('<div');
 buf.push(attrs({ 'id':("" + (child.sid) + ""), 'data-view':("dict"), 'data-dict-type':("child"), 'data-dict-sid':("" + (child.sid) + ""), "class": ('tab-pane') }, {"id":true,"data-view":true,"data-dict-type":true,"data-dict-sid":true}));
 buf.push('><br/><div class="row"><div class="col-md-12"><form data-view="search" class="form-inline">');
  if (child.toolbar.search === true)
 {
-buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input type="search" placeholder="search" class="form-control"/></div>');
+buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input');
+buf.push(attrs({ 'width':("100%"), 'type':("search"), 'placeholder':("" + (gettext('Toolbar search')) + ""), "class": ('form-control') }, {"width":true,"type":true,"placeholder":true}));
+buf.push('/></div>');
 }
  if (child.toolbar.insert === true)
 {
@@ -162,15 +168,18 @@ buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
 
   } else {
     var $$l = 0;
-    for (var $index in parentDict.childs) {
-      $$l++;      var child = parentDict.childs[$index];
+    for (var $index in parentDict.childsInfo) {
+      $$l++;      var childInfo = parentDict.childsInfo[$index];
 
+ var child = wdicts_data[childInfo.wdict]
 buf.push('<div');
 buf.push(attrs({ 'id':("" + (child.sid) + ""), 'data-view':("dict"), 'data-dict-type':("child"), 'data-dict-sid':("" + (child.sid) + ""), "class": ('tab-pane') }, {"id":true,"data-view":true,"data-dict-type":true,"data-dict-sid":true}));
 buf.push('><br/><div class="row"><div class="col-md-12"><form data-view="search" class="form-inline">');
  if (child.toolbar.search === true)
 {
-buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input type="search" placeholder="search" class="form-control"/></div>');
+buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input');
+buf.push(attrs({ 'width':("100%"), 'type':("search"), 'placeholder':("" + (gettext('Toolbar search')) + ""), "class": ('form-control') }, {"width":true,"type":true,"placeholder":true}));
+buf.push('/></div>');
 }
  if (child.toolbar.insert === true)
 {
@@ -230,4 +239,3 @@ buf.push('</div></div></div></div>');
 }
 return buf.join("");
 };
-})();

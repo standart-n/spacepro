@@ -1,6 +1,5 @@
-jade.templates = jade.templates || {};
-jade.templates['navbar'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -9,4 +8,3 @@ buf.push('<header class="navbar"><div class="container"><button type="button" da
 }
 return buf.join("");
 };
-})();

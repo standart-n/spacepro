@@ -313,7 +313,7 @@ sb.on('stats:before-require-count', function (moduleName, module) {
 var App, Backbone, User;
 
 window.JSON = require('json2');
-window.jade = require('jade');
+window.jade = require('runtime');
 
 window.jade.templates = {};
 
@@ -406,7 +406,7 @@ return jQuery;
 /* added by builder */
 return JSON;
 }),
-"jade": (function (require) { /* wrapped by builder */
+"runtime": (function (require) { /* wrapped by builder */
 jade=function(r){function e(r){return null!=r}return Array.isArray||(Array.isArray=function(r){return"[object Array]"==Object.prototype.toString.call(r)}),Object.keys||(Object.keys=function(r){var e=[];for(var t in r)r.hasOwnProperty(t)&&e.push(t);return e}),r.merge=function(r,t){var a=r["class"],n=t["class"];(a||n)&&(a=a||[],n=n||[],Array.isArray(a)||(a=[a]),Array.isArray(n)||(n=[n]),a=a.filter(e),n=n.filter(e),r["class"]=a.concat(n).join(" "));for(var s in t)"class"!=s&&(r[s]=t[s]);return r},r.attrs=function(e,t){var a=[],n=e.terse;delete e.terse;var s=Object.keys(e),c=s.length;if(c){a.push("");for(var i=0;c>i;++i){var o=s[i],u=e[o];"boolean"==typeof u||null==u?u&&(n?a.push(o):a.push(o+'="'+o+'"')):0==o.indexOf("data")&&"string"!=typeof u?a.push(o+"='"+JSON.stringify(u)+"'"):"class"==o&&Array.isArray(u)?a.push(o+'="'+r.escape(u.join(" "))+'"'):t&&t[o]?a.push(o+'="'+r.escape(u)+'"'):a.push(o+'="'+u+'"')}}return a.join(" ")},r.escape=function(r){return String(r).replace(/&(?!(\w+|\#\d+);)/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")},r.rethrow=function(){},r}({});
 
 /* added by builder */
@@ -641,9 +641,8 @@ module.exports = Backbone.Router.extend({
 
 }),
 "resolve.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['resolve'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -652,6 +651,5 @@ buf.push('<div data-type="modal" role="dialog" tabindex="-1" class="modal fade s
 }
 return buf.join("");
 };
-})();
 })
 },{},{});

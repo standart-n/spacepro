@@ -17,7 +17,7 @@
       "path": "public/lib/json2/json2.min.js",
       "exports": "JSON"
     },
-    "jade": {
+    "runtime": {
       "path": "public/lib/jade/runtime.js",
       "exports": "jade"
     },      

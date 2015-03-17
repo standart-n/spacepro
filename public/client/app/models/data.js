@@ -1,17 +1,21 @@
-var Backbone, Line;
 
-var Backbone = require('backbone');
-var Line =     require('line');
+var Backbone =    require('backbone');
+var Line_id =     require('line_id');
+var Line_d$uuid = require('line_d$uuid');
 
 var Data = Backbone.Collection.extend({
-
-  model: Line
 
 });
 
 Data.prototype.setIdAttribute = function(attr) {
 
-	this.model.prototype.idAttribute = attr;
+  if (attr === 'id') {
+    this.model = Line_id;
+  }
+
+  if (attr === 'd$uuid') {
+    this.model = Line_d$uuid;
+  }
 
 };
 

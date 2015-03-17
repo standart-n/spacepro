@@ -309,12 +309,10 @@ sb.on('stats:before-require-count', function (moduleName, module) {
     main(lmd_trigger('lmd-register:decorate-require', 'main', lmd_require)[1], output.exports, output);
 })/*DO NOT ADD ; !*/
 (this,(function (require, exports, module) { /* wrapped by builder */
-var Backbone, App, AddDeviceValues;
 
 window.JSON = require('json2');
-window.jade = require('jade');
+window.jade = require('runtime');
 
-window.jade.templates = {};
 
 require('jquery');
 // require('jquery-ui');
@@ -322,15 +320,16 @@ require('bootstrap');
 require('selectize');
 require('moment');
 
-require('line_data.jade');
-require('line_nothing.jade');
-require('line_error.jade');
-require('line_loading.jade');
-require('insert_select.jade');
-require('insert_default.jade');
+window.jade.templates = {};
+window.jade.templates.line_data =      require('line_data.jade');
+window.jade.templates.line_nothing =   require('line_nothing.jade');
+window.jade.templates.line_error =     require('line_error.jade');
+window.jade.templates.line_loading =   require('line_loading.jade');
+window.jade.templates.insert_select =  require('insert_select.jade');
+window.jade.templates.insert_default = require('insert_default.jade');
 
-Backbone =    require('backbone');
-App =         require('app');
+var Backbone =    require('backbone');
+var App =         require('app');
 
 $(function() {
 
@@ -428,7 +427,7 @@ return jQuery;
 /* added by builder */
 return JSON;
 }),
-"jade": (function (require) { /* wrapped by builder */
+"runtime": (function (require) { /* wrapped by builder */
 jade=function(r){function e(r){return null!=r}return Array.isArray||(Array.isArray=function(r){return"[object Array]"==Object.prototype.toString.call(r)}),Object.keys||(Object.keys=function(r){var e=[];for(var t in r)r.hasOwnProperty(t)&&e.push(t);return e}),r.merge=function(r,t){var a=r["class"],n=t["class"];(a||n)&&(a=a||[],n=n||[],Array.isArray(a)||(a=[a]),Array.isArray(n)||(n=[n]),a=a.filter(e),n=n.filter(e),r["class"]=a.concat(n).join(" "));for(var s in t)"class"!=s&&(r[s]=t[s]);return r},r.attrs=function(e,t){var a=[],n=e.terse;delete e.terse;var s=Object.keys(e),c=s.length;if(c){a.push("");for(var i=0;c>i;++i){var o=s[i],u=e[o];"boolean"==typeof u||null==u?u&&(n?a.push(o):a.push(o+'="'+o+'"')):0==o.indexOf("data")&&"string"!=typeof u?a.push(o+"='"+JSON.stringify(u)+"'"):"class"==o&&Array.isArray(u)?a.push(o+'="'+r.escape(u.join(" "))+'"'):t&&t[o]?a.push(o+'="'+r.escape(u)+'"'):a.push(o+'="'+u+'"')}}return a.join(" ")},r.escape=function(r){return String(r).replace(/&(?!(\w+|\#\d+);)/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")},r.rethrow=function(){},r}({});
 
 /* added by builder */
@@ -497,20 +496,24 @@ module.exports = Backbone.Router.extend({
 });
 }),
 "data": (function (require, exports, module) { /* wrapped by builder */
-var Backbone, Line;
 
-var Backbone = require('backbone');
-var Line =     require('line');
+var Backbone =    require('backbone');
+var Line_id =     require('line_id');
+var Line_d$uuid = require('line_d$uuid');
 
 var Data = Backbone.Collection.extend({
-
-  model: Line
 
 });
 
 Data.prototype.setIdAttribute = function(attr) {
 
-	this.model.prototype.idAttribute = attr;
+  if (attr === 'id') {
+    this.model = Line_id;
+  }
+
+  if (attr === 'd$uuid') {
+    this.model = Line_d$uuid;
+  }
 
 };
 
@@ -619,9 +622,6 @@ var Backbone = require('backbone');
 
 var Line = Backbone.Model.extend({
 
-  // idAttribute: "d$uuid",
-  idAttribute: "id2",
-
   initialize: function() {
 
   }    
@@ -629,6 +629,32 @@ var Line = Backbone.Model.extend({
 });
 
 module.exports = Line;
+
+}),
+"line_d$uuid": (function (require, exports, module) { /* wrapped by builder */
+
+var Line = require('line');
+
+var Line_d$uuid = Line.extend({
+
+  idAttribute: "d$uuid",
+
+});
+
+module.exports = Line_d$uuid;
+
+}),
+"line_id": (function (require, exports, module) { /* wrapped by builder */
+
+var Line = require('line');
+
+var Line_id = Line.extend({
+
+  idAttribute: "id",
+
+});
+
+module.exports = Line_id;
 
 }),
 "common": (function (require, exports, module) { /* wrapped by builder */
@@ -647,19 +673,18 @@ module.exports = Common;
 
 }),
 "gsender": (function (require, exports, module) { /* wrapped by builder */
-var _, Backbone, Data, Dict, AddDeviceValue, Gsender, Common, Search, Insert;
 
-_ =          require('underscore');
-Backbone =   require('backbone');
-Common =     require('common');
-Data =       require('data');
-Dict =       require('dict');
-Search =     require('search');
-Insert =     require('insert');
+var _ =          require('underscore');
+var Backbone =   require('backbone');
+var Common =     require('common');
+var Data =       require('data');
+var Dict =       require('dict');
+var Search =     require('search');
+var Insert =     require('insert');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
-Gsender = Common.extend({
+var Gsender = Common.extend({
 
   el: "[data-view=\"dict\"]",
 
@@ -674,7 +699,7 @@ Gsender = Common.extend({
     this.$search = this.$el.find("[data-view=\"search\"]");
     this.$insert = this.$el.find("[data-view=\"insert\"]");
 
-    this.dict.set('type', this.$el.data("dict-type") || 'parent');   
+    this.dict.set('type', this.$el.data("dict-type") || 'parent');
     this.dict.cleanVals();
 
     this.toolbar = this.dict.get('toolbar');
@@ -686,7 +711,8 @@ Gsender = Common.extend({
     if (this.toolbar.search === true) {
       this.search = new Search({
         el:    this.$search,
-        conf:  this.dict.toJSON()
+        conf:  this.options.conf || {}
+        // conf:  this.dict.toJSON()
       });
 
       this.data.on('add', function(data) {
@@ -702,34 +728,34 @@ Gsender = Common.extend({
       });
     }
 
-    // if (this.toolbar.insert === true) {
+    if (this.toolbar.insert === true) {
 
-    //   this.insert = new Insert({
-    //     el:    this.$insert,
-    //     conf:  this.options.conf
-    //   });
+      this.insert = new Insert({
+        el:    this.$insert,
+        conf:  this.options.conf
+      });
 
-    //   this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-    //     e.preventDefault();
-    //     if (_this.insert.autoinsert === true) {
-    //       _this.insert.request();
-    //     } else {
-    //       _this.$insert.modal('show');
-    //     }
-    //   });
-    // }
+      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        e.preventDefault();
+        if (_this.insert.autoinsert === true) {
+          _this.insert.request();
+        } else {
+          _this.$insert.modal('show');
+        }
+      });
+    }
 
     this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
+      container: 'body'
+      // placement: 'top'
     });
 
-    this.$el.on('scroll', function() {
-      if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-        _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-        _this.sendRequest('scroll');
-      }
-    });
+    // this.$el.on('scroll', function() {
+    //   if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
+    //     _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
+    //     _this.sendRequest('scroll');
+    //   }
+    // });
 
     this.$el.on('mouseover', function() {
       $(this).css({
@@ -739,6 +765,7 @@ Gsender = Common.extend({
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
+      _this.unColorActiveLine();
       _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.colorActiveLine();
       _this.updateChilds();
@@ -746,9 +773,6 @@ Gsender = Common.extend({
 
     this.$el.on('dblclick', 'td', function() {
       var $tr = $(this).parent();
-      // _this.dict.set('selectRowUUID', $tr.data('uuid'));
-      // _this.colorActiveLine();
-      // _this.updateChilds();
       // alert($(this).data('col-value'));
     });
 
@@ -769,13 +793,13 @@ Gsender = Common.extend({
         container: 'body',
         placement: 'top'
       });
-      _this.$el.trigger('add.line', line.toJSON());
+      // _this.$el.trigger('add.line', line.toJSON());
     });
 
     this.data.on('remove', function(line) {
       var key = _this.dict.get('keyfieldname');
       _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
-      _this.$el.trigger('remove.line', line.toJSON());
+      // _this.$el.trigger('remove.line', line.toJSON());
     });
 
     if (_this.dict.get('type') === 'parent') {
@@ -798,16 +822,20 @@ Gsender.prototype.update = function(vals) {
 };
 
 Gsender.prototype.updateChilds = function() {
-  var line,
-    _this = this;
-  line = this.getSelectLine();
+  var _this = this;
+  var line = this.getSelectLine();
   if (this.data !== null) {
-    _.each(this.dict.get('childs'), function(child) {
-      if (window[child.sid] !== null) {
-        if ((line != null) && (window[child.sid])) {
-          window[child.sid].update(line.toJSON() || {});
+    _.each(this.dict.get('childsInfo'), function(childInfo) {
+      if (window[childInfo.wdict] !== undefined) {
+        if (line != null) {
+          window[childInfo.wdict].update(line.toJSON() || {});
+          if (window[childInfo.wdict].search != null) {
+            if (window[childInfo.wdict].search.select != null) {
+              window[childInfo.wdict].search.select.clearOptions();
+            }
+          }
         } else {
-          window[child.sid].showInformationNotFound();
+          window[childInfo.wdict].showInformationNotFound();
         }
       }
     });
@@ -822,12 +850,20 @@ Gsender.prototype.getSelectLine = function() {
   return this.data.get(this.dict.get('selectRowUUID')) || {};
 };
 
+Gsender.prototype.unColorActiveLine = function(classname) {
+  if (classname == null) {
+    classname = 'active';
+  }
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
+  if (this.$activeLine != null) {
+    this.$activeLine.removeClass(classname);
+  }
+};
+
 Gsender.prototype.colorActiveLine = function(classname) {
   if (classname == null) {
     classname = 'active';
   }
-
-  this.$worksheet.find('tr').removeClass(classname);
   this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
   if (this.$activeLine != null) {
     this.$activeLine.addClass(classname);
@@ -1202,7 +1238,7 @@ Search.prototype.focus = function() {
 Search.prototype.search = function(query) {
   var value, selectize;
   value = query || this.$query.val();
-  this.select.clearOptions();
+  // this.select.clearOptions();
   this.trigger('search', value);
 };
 
@@ -1518,7 +1554,7 @@ Select.prototype.checkData = function(data) {
 
 Select.prototype.checkDataItem = function(item) {
   var str = '';
-  if (typeof(data) === 'object') {
+  if (typeof(item) === 'object') {
     str = this.setSearchFields(this.searchfields, item);
     item.value = str;
     item.text = str;
@@ -1528,7 +1564,7 @@ Select.prototype.checkDataItem = function(item) {
 
 Select.prototype.clearOptions = function() {
   if (this.selectize) {
-    // this.selectize.clearOptions();
+    this.selectize.clearOptions();
   }
 };
 
@@ -1790,9 +1826,8 @@ Template.prototype.line = function(locals) {
 module.exports = Template;
 }),
 "line_data.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_data'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1810,7 +1845,7 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
  if (column.visible === true)
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-value':("" + (line[column.field]) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-value":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
 buf.push('>');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
@@ -1832,9 +1867,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   } else {
@@ -1842,9 +1877,9 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   }
@@ -1853,7 +1888,14 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
 }
  else
 {
-buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
+ if (line[column.field].length > 103)
+{
+buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+}
+ else              
+{
+buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
+}
 }
 }
 }
@@ -1869,7 +1911,7 @@ buf.push('</td>');
  if (column.visible === true)
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-value':("" + (line[column.field]) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-value":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
 buf.push('>');
  if ((line[column.field] != null) && (line[column.field] !== ''))        
 {
@@ -1891,9 +1933,9 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
     for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
       var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   } else {
@@ -1901,9 +1943,9 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
     for (var $index in groups) {
       $$l++;      var group = groups[$index];
 
-buf.push('<small><span');
+buf.push('<span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
-buf.push('>&nbsp;</span>&nbsp;</small>');
+buf.push('>&nbsp;</span>');
     }
 
   }
@@ -1912,7 +1954,14 @@ buf.push('>&nbsp;</span>&nbsp;</small>');
 }
  else
 {
-buf.push('<span>' + escape((interp = line[column.field]) == null ? '' : interp) + '</span>');
+ if (line[column.field].length > 103)
+{
+buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+}
+ else              
+{
+buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
+}
 }
 }
 }
@@ -1931,12 +1980,10 @@ buf.push('><i class="fa fa-lg fa-trash-o"></i></button></td></tr>');
 }
 return buf.join("");
 };
-})();
 }),
 "line_error.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_error'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1947,12 +1994,10 @@ buf.push('> <h4>' + escape((interp = gettext('Error on server')) == null ? '' : 
 }
 return buf.join("");
 };
-})();
 }),
 "line_loading.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_loading'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1963,12 +2008,10 @@ buf.push('> <div class="progress progress-striped active"><div style="width:100%
 }
 return buf.join("");
 };
-})();
 }),
 "line_nothing.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['line_nothing'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1979,12 +2022,10 @@ buf.push('> <h4>' + escape((interp = gettext('Information not found')) == null ?
 }
 return buf.join("");
 };
-})();
 }),
 "insert_default.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['insert_default'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1995,12 +2036,10 @@ buf.push('/></div></div>');
 }
 return buf.join("");
 };
-})();
 }),
 "insert_select.jade": (function (require, exports, module) { /* wrapped by builder */
-jade.templates = jade.templates || {};
-jade.templates['insert_select'] = (function(){
-  return function anonymous(locals, attrs, escape, rethrow, merge) {
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -2011,7 +2050,6 @@ buf.push('></select></div></div>');
 }
 return buf.join("");
 };
-})();
 }),
 "selectize": (function (require) { /* wrapped by builder */
 /* added by builder */
