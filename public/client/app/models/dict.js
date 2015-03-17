@@ -28,6 +28,9 @@ Dict = Backbone.Model.extend({
       columns:                 {},
       childs:                  {},
       childsInfo:              {},
+      foldergroup:             '',
+      initfolder_id:           null,
+      folders_visible:         0,
       renderItemSearch:        null,
       renderOptionSearch:      null,
       cfselect: {
