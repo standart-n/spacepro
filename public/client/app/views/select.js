@@ -1,10 +1,10 @@
 
-var Common, Data, Select;
 
-Common =   require('common');
-Data =     require('data');
+var _ =        require('_');
+var Common =   require('common');
+// var Data =     require('data');
 
-Select = Common.extend({
+var Select = Common.extend({
 
   el: "[data-view=\"select\"]",
 
@@ -20,8 +20,8 @@ Select = Common.extend({
     // this.dict = new Dict(this.options.conf || {});
     this.conf = this.options.conf || {};
 
-    this.data = new Data();
-    this.data.url = '/api/dict/' + this.conf.sid;
+    // this.data = new Data();
+    // this.data.url = '/api/dict/' + this.conf.sid;
 
     this.columns = this.conf.columns || {};
     this.fields =  _.pluck(this.columns, 'field') || {};
@@ -53,13 +53,21 @@ Select = Common.extend({
         create =         this.create();
         selectOnTab =    true;
         preload =        false;
-        break;
-      default:
+      break;
+      case 'select':
         plugins =        [];
         valuefield =     this.conf.returnfieldname;
         create =         false;
         selectOnTab =    false;
         preload =        true;
+      break;
+      case 'folders':
+        plugins =        [];
+        valuefield =     'id';
+        create =         false;
+        selectOnTab =    false;
+        preload =        false;
+      break;
     }
 
     this.$select = this.$el.selectize({
@@ -89,9 +97,8 @@ Select = Common.extend({
     _this = this;
 
     if (this.selectize) {
-      if (this.options.type === 'select') {
-        // this.updateOptions();
-
+      if ((this.options.type === 'select') || (this.options.type === 'folders')) {
+        console.log('this.options.type:', this.options.type);
         this.selectize.on('change', function(value) {
           _this.trigger('select', value);
         });
@@ -189,11 +196,27 @@ Select.prototype.setSearchFields = function(fields, line, escape) {
   return str;
 };
 
+Select.prototype.addItem = function(item, silent) {
+  if (silent == null) {
+    silent = true;
+  }
+  if ((item) && (this.selectize)) {
+    this.selectize.addItem(item, false);
+  }
+};
 
 Select.prototype.addOption = function(data) {
   if ((data) && (this.selectize)) {
-    // this.selectize.addOption(data);
     this.selectize.addOption(this.checkDataItem(data));
+  }
+};
+
+Select.prototype.addOptions = function(data) {
+  var _this = this;
+  if ((data) && (this.selectize)) {
+    _.each(data, function(item) {
+      _this.selectize.addOption(_this.checkDataItem(item));
+    });
   }
 };
 
@@ -227,18 +250,22 @@ Select.prototype.create = function() {
 Select.prototype.renderItem = function() {
   var _this = this;
   return function (item, escape) {
-    if (item[_this.conf.keyfieldname]) {
-      if ((_this.conf.renderItemSearch) && (_this.conf.renderItemSearch !== _this.selectfield)) {
-        return _this.setLineVals(_this.conf.renderItemSearch, item, escape);
-      } else {
-        if (item[_this.selectfield]) {
-          return '<div>' + item[_this.selectfield] + '</div>';
+    if (_this.options.type !== 'folders') {
+      if (item[_this.conf.keyfieldname]) {
+        if ((_this.conf.renderitemsearch !== '') && (_this.conf.renderitemsearch !== _this.selectfield)) {
+          return _this.setLineVals(_this.conf.renderitemsearch, item, escape);
         } else {
-          return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          if (item[_this.selectfield]) {
+            return '<div>' + item[_this.selectfield] + '</div>';
+          } else {
+            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          }
         }
+      } else {
+        return '<div>' + escape(item.value) + '</div>';
       }
     } else {
-      return '<div>' + escape(item.value) + '</div>';
+      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
   };
 };
@@ -246,20 +273,39 @@ Select.prototype.renderItem = function() {
 Select.prototype.renderOption = function() {
   var _this = this;
   return function (item, escape) {
-    if (item[_this.conf.keyfieldname]) {
-      if ((_this.conf.renderOptionSearch) && (_this.conf.renderOptionSearch !== _this.selectfield)) {
-        return _this.setLineVals(_this.conf.renderOptionSearch, item, escape);
-      } else {
-        if (item[_this.selectfield]) {
-          return '<div>' + item[_this.selectfield] + '</div>';
+    if (_this.options.type !== 'folders') {
+      if (item[_this.conf.keyfieldname]) {
+        if ((_this.conf.renderoptionsearch !== '') && (_this.conf.renderoptionsearch !== _this.selectfield)) {
+          return _this.setLineVals(_this.conf.renderoptionsearch, item, escape);
         } else {
-          return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          if (item[_this.selectfield]) {
+            return '<div>' + item[_this.selectfield] + '</div>';
+          } else {
+            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          }
         }
+      } else {
+        return '<div>' + escape(item.value) + '</div>';
       }
     } else {
-      return '<div>' + escape(item.value) + '</div>';
+      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
   };
+};
+
+Select.prototype.renderFolder = function(item, escape) {
+  var color;
+  var str = "";
+  if (item.color) {
+    color = window.colorToHex(item.color);
+  } else {
+    color = 'f5f5f5';
+  }
+  str += '<span class="label" style="color:#000;background-color:#' + color + ';">&nbsp;</span>&nbsp;&nbsp;';
+  // str += escape(item.depth) + ' ';
+  // str += escape(item.id) + ' ';
+  str += escape(item.caption);
+  return str;
 };
 
 Select.prototype.load = function(_this) {
@@ -276,7 +322,10 @@ Select.prototype.load = function(_this) {
       query = '';
     }
 
-    _this.data.fetch({
+    $.ajax({
+      type: "GET",
+      url: '/api/dict/' + _this.conf.sid,
+      dataType: 'json',
       timeout: _this.options.timeout       || 1000,
       data: {
         query: query                       || '',
@@ -284,13 +333,14 @@ Select.prototype.load = function(_this) {
         keys:  _this.conf.keys             || {},
         vals:  _this.conf.vals             || {}
       },
-      success: function() {        
-        fn(_this.checkData(_this.data.toJSON()));
+      success: function(data) {
+        fn(_this.checkData(data));
       },
       error: function() {
         fn();
       }
     });
+
   };
 };
 

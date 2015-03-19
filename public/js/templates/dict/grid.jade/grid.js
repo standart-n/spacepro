@@ -42,12 +42,18 @@ buf.push('></i><span class="hidden-xs hidden-sm">' + escape((interp = child.show
 
 buf.push('</ul><div class="tab-content"><div');
 buf.push(attrs({ 'id':("dddd"), 'data-view':("dict"), 'data-dict-type':("parent"), 'data-dict-sid':("" + (parentDict.sid) + ""), "class": ('tab-pane') + ' ' + ('active') }, {"id":true,"data-view":true,"data-dict-type":true,"data-dict-sid":true}));
-buf.push('><div data-view="insert" data-type="modal" role="dialog" tabindex="-1" class="modal fade dict-insert"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;     </button><h4 class="modal-title">' + escape((interp = gettext('Add new record')) == null ? '' : interp) + '</h4></div><div data-type="modal-body" class="modal-body"><form role="form" data-view="form" class="form-horizontal"></form></div><div class="modal-footer"><button data-type="button" type="button" disabled="disabled" class="btn btn-success">' + escape((interp = gettext('Save new record')) == null ? '' : interp) + '</button><button type="button" data-dismiss="modal" class="btn btn-default">' + escape((interp = gettext('Cancel new record')) == null ? '' : interp) + '</button></div></div></div></div><br/><div class="row"><div class="col-md-12"><form data-view="search" class="form-inline">');
+buf.push('><div data-view="insert" data-type="modal" role="dialog" tabindex="-1" class="modal fade dict-insert"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;     </button><h4 class="modal-title">' + escape((interp = gettext('Add new record')) == null ? '' : interp) + '</h4></div><div data-type="modal-body" class="modal-body"><form role="form" data-view="form" class="form-horizontal"></form></div><div class="modal-footer"><button data-type="button" type="button" disabled="disabled" class="btn btn-success">' + escape((interp = gettext('Save new record')) == null ? '' : interp) + '</button><button type="button" data-dismiss="modal" class="btn btn-default">' + escape((interp = gettext('Cancel new record')) == null ? '' : interp) + '</button></div></div></div></div><br/><div class="row"><div class="col-md-12"><form data-view="toolbar" class="form-inline">');
  if (parentDict.toolbar.search === true)
 {
-buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input');
+buf.push('<div data-view="search" class="form-group col-xs-12 col-md-6 col-lg-4"><input');
 buf.push(attrs({ 'width':("100%"), 'type':("search"), 'placeholder':("" + (gettext('Toolbar search')) + ""), "class": ('form-control') }, {"width":true,"type":true,"placeholder":true}));
 buf.push('/></div>');
+}
+ if (parentDict.toolbar.folders === true)
+{
+buf.push('<div data-view="folders" class="form-group col-xs-12 col-md-6 col-lg-4"><select');
+buf.push(attrs({ 'placeholder':("" + (gettext('Toolbar folders')) + ""), "class": ('form-control') }, {"placeholder":true}));
+buf.push('></select></div>');
 }
  if (parentDict.toolbar.insert === true)
 {
@@ -97,7 +103,7 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
   }
 }).call(this);
 
-buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
+buf.push('</tr></thead><tbody></tbody></table></div></div></div>');
 // iterate parentDict.childsInfo
 ;(function(){
   if ('number' == typeof parentDict.childsInfo.length) {
@@ -108,12 +114,18 @@ buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
  var child = wdicts_data[childInfo.wdict]
 buf.push('<div');
 buf.push(attrs({ 'id':("" + (child.sid) + ""), 'data-view':("dict"), 'data-dict-type':("child"), 'data-dict-sid':("" + (child.sid) + ""), "class": ('tab-pane') }, {"id":true,"data-view":true,"data-dict-type":true,"data-dict-sid":true}));
-buf.push('><br/><div class="row"><div class="col-md-12"><form data-view="search" class="form-inline">');
+buf.push('><br/><div class="row"><div class="col-md-12"><form data-view="toolbar" class="form-inline">');
  if (child.toolbar.search === true)
 {
-buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input');
+buf.push('<div data-view="search" class="form-group col-xs-12 col-md-6 col-lg-4"><input');
 buf.push(attrs({ 'width':("100%"), 'type':("search"), 'placeholder':("" + (gettext('Toolbar search')) + ""), "class": ('form-control') }, {"width":true,"type":true,"placeholder":true}));
 buf.push('/></div>');
+}
+ if (child.toolbar.folders === true)
+{
+buf.push('<div data-view="folders" class="form-group col-xs-12 col-md-3 col-lg-2"><select');
+buf.push(attrs({ 'placeholder':("" + (gettext('Toolbar folders')) + ""), "class": ('form-control') }, {"placeholder":true}));
+buf.push('></select></div>');
 }
  if (child.toolbar.insert === true)
 {
@@ -163,7 +175,7 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
   }
 }).call(this);
 
-buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
+buf.push('</tr></thead><tbody></tbody></table></div></div></div>');
     }
 
   } else {
@@ -174,12 +186,18 @@ buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
  var child = wdicts_data[childInfo.wdict]
 buf.push('<div');
 buf.push(attrs({ 'id':("" + (child.sid) + ""), 'data-view':("dict"), 'data-dict-type':("child"), 'data-dict-sid':("" + (child.sid) + ""), "class": ('tab-pane') }, {"id":true,"data-view":true,"data-dict-type":true,"data-dict-sid":true}));
-buf.push('><br/><div class="row"><div class="col-md-12"><form data-view="search" class="form-inline">');
+buf.push('><br/><div class="row"><div class="col-md-12"><form data-view="toolbar" class="form-inline">');
  if (child.toolbar.search === true)
 {
-buf.push('<div class="form-group col-xs-12 col-md-6 col-lg-4"><input');
+buf.push('<div data-view="search" class="form-group col-xs-12 col-md-6 col-lg-4"><input');
 buf.push(attrs({ 'width':("100%"), 'type':("search"), 'placeholder':("" + (gettext('Toolbar search')) + ""), "class": ('form-control') }, {"width":true,"type":true,"placeholder":true}));
 buf.push('/></div>');
+}
+ if (child.toolbar.folders === true)
+{
+buf.push('<div data-view="folders" class="form-group col-xs-12 col-md-3 col-lg-2"><select');
+buf.push(attrs({ 'placeholder':("" + (gettext('Toolbar folders')) + ""), "class": ('form-control') }, {"placeholder":true}));
+buf.push('></select></div>');
 }
  if (child.toolbar.insert === true)
 {
@@ -229,7 +247,7 @@ buf.push('>' + escape((interp = column.caption) == null ? '' : interp) + '</span
   }
 }).call(this);
 
-buf.push('<th></th></tr></thead><tbody></tbody></table></div></div></div>');
+buf.push('</tr></thead><tbody></tbody></table></div></div></div>');
     }
 
   }

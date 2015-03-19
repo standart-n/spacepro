@@ -144,11 +144,7 @@ buf.push('</td>');
   }
 }).call(this);
 
-buf.push('<td><button');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data edit')) + ""), 'type':("button"), 'data-action':("edit"), "class": ('btn') + ' ' + ('btn-warning') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
-buf.push('><i class="fa fa-lg fa-edit"></i></button>&nbsp;<button');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data remove')) + ""), 'type':("button"), 'data-action':("delete"), "class": ('btn') + ' ' + ('btn-danger') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
-buf.push('><i class="fa fa-lg fa-trash-o"></i></button></td></tr>');
+buf.push('</tr>');
 }
 return buf.join("");
 };

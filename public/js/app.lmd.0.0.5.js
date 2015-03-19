@@ -550,6 +550,9 @@ Dict = Backbone.Model.extend({
       columns:                 {},
       childs:                  {},
       childsInfo:              {},
+      foldergroup:             '',
+      initfolder_id:           null,
+      folders_visible:         0,
       renderItemSearch:        null,
       renderOptionSearch:      null,
       cfselect: {
@@ -672,6 +675,65 @@ Common = Backbone.View.extend({
 module.exports = Common;
 
 }),
+"folders": (function (require, exports, module) { /* wrapped by builder */
+
+
+var Common =   require('common');
+var Select =   require('select');
+
+var Folders = Common.extend({
+
+  el: "[data-view=\"folders\"]",
+
+  initialize: function() {
+
+    if (!this.options.conf) {
+      this.options.conf = {};
+    }
+
+    this.$select = this.$el.find('select');
+
+    this.select = new Select({
+      el:   this.$select,
+      type: 'folders',
+      conf: this.options.conf || {}
+    });
+
+    this.select.addOptions(this.options.conf.folders || []);
+
+    if (this.options.conf.initfolder_id) {
+      this.select.addItem(this.options.conf.initfolder_id, true);
+    }
+
+    var _this = this;
+
+    this.select.on('select', function(value) {
+      _this.search(value);
+    });    
+    
+  }
+});
+
+Folders.prototype.getQuery = function() {
+  return this.$select.val();
+};
+
+Folders.prototype.clean = function() {
+  this.$select.val('');
+};
+
+Folders.prototype.focus = function() {
+  this.$select.focus();
+};
+
+Folders.prototype.search = function(query) {
+  var value = query || this.$select.val();
+  this.trigger('select', value);
+};
+
+module.exports = Folders;
+
+}),
 "gsender": (function (require, exports, module) { /* wrapped by builder */
 
 var _ =          require('underscore');
@@ -681,6 +743,7 @@ var Data =       require('data');
 var Dict =       require('dict');
 var Search =     require('search');
 var Insert =     require('insert');
+var Folders =    require('folders');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
@@ -694,10 +757,12 @@ var Gsender = Common.extend({
 
     this.dict = new Dict(this.options.conf || {});
 
-    this.$thead = this.$el.find('thead');
-    this.$worksheet = this.$el.find('tbody');
-    this.$search = this.$el.find("[data-view=\"search\"]");
-    this.$insert = this.$el.find("[data-view=\"insert\"]");
+    this.$thead =       this.$el.find('thead');
+    this.$worksheet =   this.$el.find('tbody');
+    this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
+    this.$search =      this.$el.find("[data-view=\"search\"]");
+    this.$insert =      this.$el.find("[data-view=\"insert\"]");
+    this.$folders =     this.$el.find("[data-view=\"folders\"]");
 
     this.dict.set('type', this.$el.data("dict-type") || 'parent');
     this.dict.cleanVals();
@@ -712,7 +777,6 @@ var Gsender = Common.extend({
       this.search = new Search({
         el:    this.$search,
         conf:  this.options.conf || {}
-        // conf:  this.dict.toJSON()
       });
 
       this.data.on('add', function(data) {
@@ -721,8 +785,26 @@ var Gsender = Common.extend({
 
       this.search.on('search', function(query) {
         _this.dict.set({
-          limit: 20,
           query: query
+        });
+        _this.sendRequest('search');
+      });
+    }
+
+    if (this.toolbar.folders === true) {
+
+      this.folders = new Folders({
+        el:    this.$folders,
+        conf:  this.options.conf
+      });
+
+      if (this.options.conf.initfolder_id) {
+        this.dict.set('folder_id', this.options.conf.initfolder_id);
+      }
+
+      this.folders.on('select', function(folder_id) {
+        _this.dict.set({
+          folder_id: folder_id
         });
         _this.sendRequest('search');
       });
@@ -744,6 +826,11 @@ var Gsender = Common.extend({
         }
       });
     }
+
+    this.$toolbar.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
 
     this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
       container: 'body'
@@ -977,10 +1064,11 @@ Gsender.prototype.sendRequest = function(type, model) {
     this.data.fetch({
       timeout: this.dict.get('timeout'),
       data: {
-        limit: this.dict.get('limit')         || null,
-        query: this.dict.get('query')         || '',
-        keys:  this.dict.get('keys')          || {},
-        vals:  this.dict.get('vals')          || {}
+        limit:     this.dict.get('limit')         || null,
+        folder_id: this.dict.get('folder_id')     || null,
+        query:     this.dict.get('query')         || '',
+        keys:      this.dict.get('keys')          || {},
+        vals:      this.dict.get('vals')          || {}
       },
       success: success,
       error:   error
@@ -1060,9 +1148,6 @@ Insert = Common.extend({
 
   initialize: function() {
     var _this;
-
-    // this.dict = new Dict(this.options.conf || {});
-
 
     this.$body =        this.$el.find("[data-type=\"modal-body\"]");
     this.$form =        this.$el.find("[data-view=\"form\"]");
@@ -1201,10 +1286,10 @@ Search = Common.extend({
   initialize: function() {
     var def, _this;
 
-    this.$query = this.$el.find('input');
+    this.$select = this.$el.find('input');
 
     this.select = new Select({
-      el:   this.$query,
+      el:   this.$select,
       type: 'search',
       conf: this.options.conf || {}
     });
@@ -1213,32 +1298,24 @@ Search = Common.extend({
 
     this.select.on('search', function(query) {
       _this.search(query);
-    });
-
-    this.$el.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
-    });
-    
+    });    
   }
 });
 
 Search.prototype.getQuery = function() {
-  return this.$query.val();
+  return this.$select.val();
 };
 
 Search.prototype.clean = function() {
-  this.$query.val('');
+  this.$select.val('');
 };
 
 Search.prototype.focus = function() {
-  this.$query.focus();
+  this.$select.focus();
 };
 
 Search.prototype.search = function(query) {
-  var value, selectize;
-  value = query || this.$query.val();
-  // this.select.clearOptions();
+  var value = query || this.$select.val();
   this.trigger('search', value);
 };
 
@@ -1247,12 +1324,12 @@ module.exports = Search;
 }),
 "select": (function (require, exports, module) { /* wrapped by builder */
 
-var Common, Data, Select;
 
-Common =   require('common');
-Data =     require('data');
+var _ =        require('_');
+var Common =   require('common');
+// var Data =     require('data');
 
-Select = Common.extend({
+var Select = Common.extend({
 
   el: "[data-view=\"select\"]",
 
@@ -1268,8 +1345,8 @@ Select = Common.extend({
     // this.dict = new Dict(this.options.conf || {});
     this.conf = this.options.conf || {};
 
-    this.data = new Data();
-    this.data.url = '/api/dict/' + this.conf.sid;
+    // this.data = new Data();
+    // this.data.url = '/api/dict/' + this.conf.sid;
 
     this.columns = this.conf.columns || {};
     this.fields =  _.pluck(this.columns, 'field') || {};
@@ -1301,13 +1378,21 @@ Select = Common.extend({
         create =         this.create();
         selectOnTab =    true;
         preload =        false;
-        break;
-      default:
+      break;
+      case 'select':
         plugins =        [];
         valuefield =     this.conf.returnfieldname;
         create =         false;
         selectOnTab =    false;
         preload =        true;
+      break;
+      case 'folders':
+        plugins =        [];
+        valuefield =     'id';
+        create =         false;
+        selectOnTab =    false;
+        preload =        false;
+      break;
     }
 
     this.$select = this.$el.selectize({
@@ -1337,9 +1422,8 @@ Select = Common.extend({
     _this = this;
 
     if (this.selectize) {
-      if (this.options.type === 'select') {
-        // this.updateOptions();
-
+      if ((this.options.type === 'select') || (this.options.type === 'folders')) {
+        console.log('this.options.type:', this.options.type);
         this.selectize.on('change', function(value) {
           _this.trigger('select', value);
         });
@@ -1437,11 +1521,27 @@ Select.prototype.setSearchFields = function(fields, line, escape) {
   return str;
 };
 
+Select.prototype.addItem = function(item, silent) {
+  if (silent == null) {
+    silent = true;
+  }
+  if ((item) && (this.selectize)) {
+    this.selectize.addItem(item, false);
+  }
+};
 
 Select.prototype.addOption = function(data) {
   if ((data) && (this.selectize)) {
-    // this.selectize.addOption(data);
     this.selectize.addOption(this.checkDataItem(data));
+  }
+};
+
+Select.prototype.addOptions = function(data) {
+  var _this = this;
+  if ((data) && (this.selectize)) {
+    _.each(data, function(item) {
+      _this.selectize.addOption(_this.checkDataItem(item));
+    });
   }
 };
 
@@ -1475,18 +1575,22 @@ Select.prototype.create = function() {
 Select.prototype.renderItem = function() {
   var _this = this;
   return function (item, escape) {
-    if (item[_this.conf.keyfieldname]) {
-      if ((_this.conf.renderItemSearch) && (_this.conf.renderItemSearch !== _this.selectfield)) {
-        return _this.setLineVals(_this.conf.renderItemSearch, item, escape);
-      } else {
-        if (item[_this.selectfield]) {
-          return '<div>' + item[_this.selectfield] + '</div>';
+    if (_this.options.type !== 'folders') {
+      if (item[_this.conf.keyfieldname]) {
+        if ((_this.conf.renderitemsearch !== '') && (_this.conf.renderitemsearch !== _this.selectfield)) {
+          return _this.setLineVals(_this.conf.renderitemsearch, item, escape);
         } else {
-          return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          if (item[_this.selectfield]) {
+            return '<div>' + item[_this.selectfield] + '</div>';
+          } else {
+            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          }
         }
+      } else {
+        return '<div>' + escape(item.value) + '</div>';
       }
     } else {
-      return '<div>' + escape(item.value) + '</div>';
+      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
   };
 };
@@ -1494,20 +1598,39 @@ Select.prototype.renderItem = function() {
 Select.prototype.renderOption = function() {
   var _this = this;
   return function (item, escape) {
-    if (item[_this.conf.keyfieldname]) {
-      if ((_this.conf.renderOptionSearch) && (_this.conf.renderOptionSearch !== _this.selectfield)) {
-        return _this.setLineVals(_this.conf.renderOptionSearch, item, escape);
-      } else {
-        if (item[_this.selectfield]) {
-          return '<div>' + item[_this.selectfield] + '</div>';
+    if (_this.options.type !== 'folders') {
+      if (item[_this.conf.keyfieldname]) {
+        if ((_this.conf.renderoptionsearch !== '') && (_this.conf.renderoptionsearch !== _this.selectfield)) {
+          return _this.setLineVals(_this.conf.renderoptionsearch, item, escape);
         } else {
-          return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          if (item[_this.selectfield]) {
+            return '<div>' + item[_this.selectfield] + '</div>';
+          } else {
+            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+          }
         }
+      } else {
+        return '<div>' + escape(item.value) + '</div>';
       }
     } else {
-      return '<div>' + escape(item.value) + '</div>';
+      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
   };
+};
+
+Select.prototype.renderFolder = function(item, escape) {
+  var color;
+  var str = "";
+  if (item.color) {
+    color = window.colorToHex(item.color);
+  } else {
+    color = 'f5f5f5';
+  }
+  str += '<span class="label" style="color:#000;background-color:#' + color + ';">&nbsp;</span>&nbsp;&nbsp;';
+  // str += escape(item.depth) + ' ';
+  // str += escape(item.id) + ' ';
+  str += escape(item.caption);
+  return str;
 };
 
 Select.prototype.load = function(_this) {
@@ -1524,7 +1647,10 @@ Select.prototype.load = function(_this) {
       query = '';
     }
 
-    _this.data.fetch({
+    $.ajax({
+      type: "GET",
+      url: '/api/dict/' + _this.conf.sid,
+      dataType: 'json',
       timeout: _this.options.timeout       || 1000,
       data: {
         query: query                       || '',
@@ -1532,13 +1658,14 @@ Select.prototype.load = function(_this) {
         keys:  _this.conf.keys             || {},
         vals:  _this.conf.vals             || {}
       },
-      success: function() {        
-        fn(_this.checkData(_this.data.toJSON()));
+      success: function(data) {
+        fn(_this.checkData(data));
       },
       error: function() {
         fn();
       }
     });
+
   };
 };
 
@@ -1972,11 +2099,7 @@ buf.push('</td>');
   }
 }).call(this);
 
-buf.push('<td><button');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data edit')) + ""), 'type':("button"), 'data-action':("edit"), "class": ('btn') + ' ' + ('btn-warning') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
-buf.push('><i class="fa fa-lg fa-edit"></i></button>&nbsp;<button');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (gettext('Line data remove')) + ""), 'type':("button"), 'data-action':("delete"), "class": ('btn') + ' ' + ('btn-danger') + ' ' + ('btn-xs') }, {"data-toggle":true,"title":true,"type":true,"data-action":true}));
-buf.push('><i class="fa fa-lg fa-trash-o"></i></button></td></tr>');
+buf.push('</tr>');
 }
 return buf.join("");
 };
@@ -1989,7 +2112,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="error"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <h4>' + escape((interp = gettext('Error on server')) == null ? '' : interp) + '</h4></td></tr>');
 }
 return buf.join("");
@@ -2003,7 +2126,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="loading"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <div class="progress progress-striped active"><div style="width:100%;" class="progress-bar"></div></div></td></tr>');
 }
 return buf.join("");
@@ -2017,7 +2140,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="nothing"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <h4>' + escape((interp = gettext('Information not found')) == null ? '' : interp) + '</h4></td></tr>');
 }
 return buf.join("");

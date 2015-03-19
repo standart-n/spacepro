@@ -11,10 +11,10 @@ Search = Common.extend({
   initialize: function() {
     var def, _this;
 
-    this.$query = this.$el.find('input');
+    this.$select = this.$el.find('input');
 
     this.select = new Select({
-      el:   this.$query,
+      el:   this.$select,
       type: 'search',
       conf: this.options.conf || {}
     });
@@ -23,32 +23,24 @@ Search = Common.extend({
 
     this.select.on('search', function(query) {
       _this.search(query);
-    });
-
-    this.$el.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
-    });
-    
+    });    
   }
 });
 
 Search.prototype.getQuery = function() {
-  return this.$query.val();
+  return this.$select.val();
 };
 
 Search.prototype.clean = function() {
-  this.$query.val('');
+  this.$select.val('');
 };
 
 Search.prototype.focus = function() {
-  this.$query.focus();
+  this.$select.focus();
 };
 
 Search.prototype.search = function(query) {
-  var value, selectize;
-  value = query || this.$query.val();
-  // this.select.clearOptions();
+  var value = query || this.$select.val();
   this.trigger('search', value);
 };
 

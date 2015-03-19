@@ -6,6 +6,7 @@ var Data =       require('data');
 var Dict =       require('dict');
 var Search =     require('search');
 var Insert =     require('insert');
+var Folders =    require('folders');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
@@ -19,10 +20,12 @@ var Gsender = Common.extend({
 
     this.dict = new Dict(this.options.conf || {});
 
-    this.$thead = this.$el.find('thead');
-    this.$worksheet = this.$el.find('tbody');
-    this.$search = this.$el.find("[data-view=\"search\"]");
-    this.$insert = this.$el.find("[data-view=\"insert\"]");
+    this.$thead =       this.$el.find('thead');
+    this.$worksheet =   this.$el.find('tbody');
+    this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
+    this.$search =      this.$el.find("[data-view=\"search\"]");
+    this.$insert =      this.$el.find("[data-view=\"insert\"]");
+    this.$folders =     this.$el.find("[data-view=\"folders\"]");
 
     this.dict.set('type', this.$el.data("dict-type") || 'parent');
     this.dict.cleanVals();
@@ -37,7 +40,6 @@ var Gsender = Common.extend({
       this.search = new Search({
         el:    this.$search,
         conf:  this.options.conf || {}
-        // conf:  this.dict.toJSON()
       });
 
       this.data.on('add', function(data) {
@@ -46,8 +48,26 @@ var Gsender = Common.extend({
 
       this.search.on('search', function(query) {
         _this.dict.set({
-          limit: 20,
           query: query
+        });
+        _this.sendRequest('search');
+      });
+    }
+
+    if (this.toolbar.folders === true) {
+
+      this.folders = new Folders({
+        el:    this.$folders,
+        conf:  this.options.conf
+      });
+
+      if (this.options.conf.initfolder_id) {
+        this.dict.set('folder_id', this.options.conf.initfolder_id);
+      }
+
+      this.folders.on('select', function(folder_id) {
+        _this.dict.set({
+          folder_id: folder_id
         });
         _this.sendRequest('search');
       });
@@ -69,6 +89,11 @@ var Gsender = Common.extend({
         }
       });
     }
+
+    this.$toolbar.find("[data-toggle=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
 
     this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
       container: 'body'
@@ -302,10 +327,11 @@ Gsender.prototype.sendRequest = function(type, model) {
     this.data.fetch({
       timeout: this.dict.get('timeout'),
       data: {
-        limit: this.dict.get('limit')         || null,
-        query: this.dict.get('query')         || '',
-        keys:  this.dict.get('keys')          || {},
-        vals:  this.dict.get('vals')          || {}
+        limit:     this.dict.get('limit')         || null,
+        folder_id: this.dict.get('folder_id')     || null,
+        query:     this.dict.get('query')         || '',
+        keys:      this.dict.get('keys')          || {},
+        vals:      this.dict.get('vals')          || {}
       },
       success: success,
       error:   error

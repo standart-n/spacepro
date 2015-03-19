@@ -14,9 +14,6 @@ Insert = Common.extend({
   initialize: function() {
     var _this;
 
-    // this.dict = new Dict(this.options.conf || {});
-
-
     this.$body =        this.$el.find("[data-type=\"modal-body\"]");
     this.$form =        this.$el.find("[data-view=\"form\"]");
     this.$button =      this.$el.find("[data-type=\"button\"]");

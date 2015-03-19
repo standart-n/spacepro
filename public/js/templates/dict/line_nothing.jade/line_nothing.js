@@ -5,7 +5,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="nothing"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 2) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <h4>' + escape((interp = gettext('Information not found')) == null ? '' : interp) + '</h4></td></tr>');
 }
 return buf.join("");
