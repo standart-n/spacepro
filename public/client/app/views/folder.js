@@ -1,9 +1,8 @@
 
-
 var Common =   require('common');
 var Select =   require('select');
 
-var Folders = Common.extend({
+var Folder = Common.extend({
 
   el: "[data-view=\"folders\"]",
 
@@ -23,8 +22,12 @@ var Folders = Common.extend({
 
     this.select.addOptions(this.options.conf.folders || []);
 
-    if (this.options.conf.initfolder_id) {
-      this.select.addItem(this.options.conf.initfolder_id, true);
+    if (store.get(this.options.conf.sid + '#folder_id')) {
+      this.select.addItem(store.get(this.options.conf.sid + '#folder_id'), true);
+    } else {
+      if (this.options.conf.initfolder_id) {
+        this.select.addItem(this.options.conf.initfolder_id, true);
+      }
     }
 
     var _this = this;
@@ -36,21 +39,21 @@ var Folders = Common.extend({
   }
 });
 
-Folders.prototype.getQuery = function() {
+Folder.prototype.getQuery = function() {
   return this.$select.val();
 };
 
-Folders.prototype.clean = function() {
+Folder.prototype.clean = function() {
   this.$select.val('');
 };
 
-Folders.prototype.focus = function() {
+Folder.prototype.focus = function() {
   this.$select.focus();
 };
 
-Folders.prototype.search = function(query) {
+Folder.prototype.search = function(query) {
   var value = query || this.$select.val();
   this.trigger('select', value);
 };
 
-module.exports = Folders;
+module.exports = Folder;

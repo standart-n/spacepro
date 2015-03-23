@@ -8,6 +8,7 @@ require('jquery');
 require('bootstrap');
 require('selectize');
 require('moment');
+require('store');
 
 window.jade.templates = {};
 window.jade.templates.line_data =      require('line_data.jade');

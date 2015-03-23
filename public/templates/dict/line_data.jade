@@ -4,26 +4,29 @@ tr(data-uuid = "#{line[keyfieldname]}")
     label
       input(type = "checkbox")
   - each column in columns
+    - var value = line[column.field] || ''
     - if (column.visible === true)
-      td(class = "#{column.hidden_class}", data-col-field = "#{column.field}")
-        - if ((line[column.field] != null) && (line[column.field] !== ''))        
-          - if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-            span(data-toggle = "tooltip", title = "#{moment(line[column.field]).fromNow()}")
-              span #{moment(line[column.field]).format('DD.MM.YYYY')}
-              &nbsp;
-              small #{moment(line[column.field]).format('HH:mm')}
-          - else
-            - if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
-              - var groups = window.parseGroupLine(line[column.field]);
-              - each group in groups
-                span.badge(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") &nbsp;
-            - else
-              - if (line[column.field].length > 103)
-                //- span(data-toggle = "tooltip", title = "#{line[column.field]}") #{line[column.field].slice(0, 100)}
-                span #{line[column.field].slice(0, 100)}
-                  b ...
-              - else              
-                | #{line[column.field]}
+      - if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+        td(class = "#{column.hidden_class}", data-col-field = "#{column.field}", data-col-type = "date")
+          span(data-toggle = "tooltip", title = "#{moment(value).fromNow()}")
+            span #{moment(value).format('DD.MM.YYYY')}
+            &nbsp;
+            small #{moment(value).format('HH:mm')}
+      - else
+        - if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+          td(class = "#{column.hidden_class}", data-col-field = "#{column.field}", data-col-type = "groups")
+            - var groups = window.parseGroupLine(value);
+            - each group in groups
+              span.badge-group(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") &nbsp;
+        - else
+          td(class = "#{column.hidden_class}", data-col-field = "#{column.field}", data-col-type = "text")
+            - if (value.length > 103)
+              //- span(data-toggle = "tooltip", title = "#{value}") #{value.slice(0, 100)}
+              span #{value.slice(0, 100)}
+                b ...
+            - else              
+              | #{value}
+
   //-td
   //-  button.btn.btn-warning.btn-xs(data-toggle = "tooltip", title = "#{gettext('Line data edit')}", type = "button", data-action = "edit")
   //-    i.fa.fa-lg.fa-edit

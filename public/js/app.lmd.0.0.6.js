@@ -319,6 +319,7 @@ require('jquery');
 require('bootstrap');
 require('selectize');
 require('moment');
+require('store');
 
 window.jade.templates = {};
 window.jade.templates.line_data =      require('line_data.jade');
@@ -466,33 +467,49 @@ if(!jQuery)throw new Error("Bootstrap requires jQuery");+function(a){"use strict
 function plural(e,a){var t=e.split("_");return 1===a%10&&11!==a%100?t[0]:a%10>=2&&4>=a%10&&(10>a%100||a%100>=20)?t[1]:t[2]}function relativeTimeWithPlural(e,a,t){var _={mm:"минута_минуты_минут",hh:"час_часа_часов",dd:"день_дня_дней",MM:"месяц_месяца_месяцев",yy:"год_года_лет"};return"m"===t?a?"минута":"минуту":e+" "+plural(_[t],+e)}function monthsCaseReplace(e,a){var t={nominative:"январь_февраль_март_апрель_май_июнь_июль_август_сентябрь_октябрь_ноябрь_декабрь".split("_"),accusative:"января_февраля_марта_апреля_мая_июня_июля_августа_сентября_октября_ноября_декабря".split("_")},_=/D[oD]? *MMMM?/.test(a)?"accusative":"nominative";return t[_][e.month()]}function weekdaysCaseReplace(e,a){var t={nominative:"воскресенье_понедельник_вторник_среда_четверг_пятница_суббота".split("_"),accusative:"воскресенье_понедельник_вторник_среду_четверг_пятницу_субботу".split("_")},_=/\[ ?[Вв] ?(?:прошлую|следующую)? ?\] ?dddd/.test(a)?"accusative":"nominative";return t[_][e.day()]}require("moment").lang("ru",{months:monthsCaseReplace,monthsShort:"янв_фев_мар_апр_май_июн_июл_авг_сен_окт_ноя_дек".split("_"),weekdays:weekdaysCaseReplace,weekdaysShort:"вск_пнд_втр_срд_чтв_птн_сбт".split("_"),weekdaysMin:"вс_пн_вт_ср_чт_пт_сб".split("_"),longDateFormat:{LT:"HH:mm",L:"DD.MM.YYYY",LL:"D MMMM YYYY г.",LLL:"D MMMM YYYY г., LT",LLLL:"dddd, D MMMM YYYY г., LT"},calendar:{sameDay:"[Сегодня в] LT",nextDay:"[Завтра в] LT",lastDay:"[Вчера в] LT",nextWeek:function(){return 2===this.day()?"[Во] dddd [в] LT":"[В] dddd [в] LT"},lastWeek:function(){switch(this.day()){case 0:return"[В прошлое] dddd [в] LT";case 1:case 2:case 4:return"[В прошлый] dddd [в] LT";case 3:case 5:case 6:return"[В прошлую] dddd [в] LT"}},sameElse:"L"},relativeTime:{future:"через %s",past:"%s назад",s:"несколько секунд",m:relativeTimeWithPlural,mm:relativeTimeWithPlural,h:"час",hh:relativeTimeWithPlural,d:"день",dd:relativeTimeWithPlural,M:"месяц",MM:relativeTimeWithPlural,y:"год",yy:relativeTimeWithPlural},ordinal:function(e,a){switch(a){case"M":case"d":case"DDD":return e+"-й";case"D":return e+"-го";case"w":case"W":return e+"-я";default:return e}},week:{dow:1,doy:7}});
 }),
 "app": (function (require, exports, module) { /* wrapped by builder */
-var Backbone, Gsender, Sidebar;
 
-Backbone =  require('backbone');
-Gsender =   require('gsender');
-Sidebar =   require('sidebar');
+var _ =         require('_');
+var Backbone =  require('backbone');
+var Gsender =   require('gsender');
+var Sidebar =   require('sidebar');
 
 module.exports = Backbone.Router.extend({
 
   initialize: function() {
     var _this = this;
+    var dicts = [];
 
     this.sidebar = new Sidebar();
     
     $('[data-view=\"dict\"]').each(function(i, el) {
-      var sid, conf;
 
-      sid = $(el).data("dict-sid") || '';
-      conf = window[sid + '_data'] || {};
+      var sid = $(el).data("dict-sid") || '';
+      var conf = window[sid + '_data'] || {};
 
       window[sid] = new Gsender({
         el:   conf.el,
         conf: conf
       });
 
-    });     
-  }
+      dicts.push(sid);
+    });
 
+    $(document).find("[data-toggle-tab=\"tooltip\"]").tooltip({
+      container: 'body',
+      placement: 'top'
+    });
+
+    $(window).on('scroll', function() {
+      if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+        _.each(dicts, function(sid) {
+          if (window[sid]) {
+            window[sid].trigger('scroll.end');
+          }
+        });
+      }
+    });
+
+  }
 });
 }),
 "data": (function (require, exports, module) { /* wrapped by builder */
@@ -550,6 +567,10 @@ Dict = Backbone.Model.extend({
       columns:                 {},
       childs:                  {},
       childsInfo:              {},
+      filter_id:               null,
+      filters:                 [],
+      folder_id:               null,
+      folders:                 [],
       foldergroup:             '',
       initfolder_id:           null,
       folders_visible:         0,
@@ -661,27 +682,153 @@ module.exports = Line_id;
 
 }),
 "common": (function (require, exports, module) { /* wrapped by builder */
-var Backbone, Common;
 
-Backbone = require('backbone');
+var _ =        require('_');
+var Backbone = require('backbone');
 
-Common = Backbone.View.extend({
+var Common = Backbone.View.extend({
 
   initialize: function() {}
 
 });
 
+Common.prototype.setSearchVals = function(str, line, escape) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    if (typeof value === 'string') {
+      if (typeof escape === 'function') {
+        value = escape(value.toString().trim());
+      } else {
+        value = "" + value.toString().trim() + "";
+      }
+    }
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  key;
+    re =       new RegExp(pattern, 'ig');
+    str =      str.replace(re, value);
+  });
+
+  str = str.replace(/\|\|/gi, "");
+  str = str.replace(/\'\ \'/gi, " ");
+
+  return str;
+};
+
+Common.prototype.setLineVals = function(str, line, escape) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    if (typeof value === 'string') {
+      if (typeof escape === 'function') {
+        value = escape(value.toString().trim());
+      } else {
+        value = "'" + value.trim() + "'";
+      }
+    }
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  ':' + key;
+    re =       new RegExp(pattern, 'ig');
+    str =      str.replace(re, value);
+  });
+
+  return str;
+};
 
 module.exports = Common;
 
 }),
-"folders": (function (require, exports, module) { /* wrapped by builder */
-
+"filter": (function (require, exports, module) { /* wrapped by builder */
 
 var Common =   require('common');
 var Select =   require('select');
 
-var Folders = Common.extend({
+var Filter = Common.extend({
+
+  el: "[data-view=\"filters\"]",
+
+  initialize: function() {
+
+    if (!this.options.conf) {
+      this.options.conf = {};
+    }
+
+    this.$select = this.$el.find('select');
+
+    this.select = new Select({
+      el:   this.$select,
+      type: 'filters',
+      conf: this.options.conf || {}
+    });
+
+    this.select.addOption({
+      id:      -1,
+      caption: 'Фильтр не выбран'
+    });
+
+    this.select.addOptions(this.options.conf.filters || []);
+
+    if (store.get(this.options.conf.sid + '#filter_id')) {
+      this.select.addItem(store.get(this.options.conf.sid + '#filter_id'), true);
+    } else {
+      if (this.options.conf.initfilter_id) {
+        this.select.addItem(this.options.conf.initfolder_id, true);
+      } else {
+        this.select.addItem(-1, true);
+      }
+    }
+
+    var _this = this;
+
+    this.select.on('select', function(value) {
+      _this.search(value);
+    });    
+    
+  }
+});
+
+Filter.prototype.getQuery = function() {
+  return this.$select.val();
+};
+
+Filter.prototype.clean = function() {
+  this.$select.val('');
+};
+
+Filter.prototype.focus = function() {
+  this.$select.focus();
+};
+
+Filter.prototype.search = function(query) {
+  var value = query || this.$select.val();
+  this.trigger('select', value);
+};
+
+module.exports = Filter;
+
+}),
+"folder": (function (require, exports, module) { /* wrapped by builder */
+
+var Common =   require('common');
+var Select =   require('select');
+
+var Folder = Common.extend({
 
   el: "[data-view=\"folders\"]",
 
@@ -701,8 +848,12 @@ var Folders = Common.extend({
 
     this.select.addOptions(this.options.conf.folders || []);
 
-    if (this.options.conf.initfolder_id) {
-      this.select.addItem(this.options.conf.initfolder_id, true);
+    if (store.get(this.options.conf.sid + '#folder_id')) {
+      this.select.addItem(store.get(this.options.conf.sid + '#folder_id'), true);
+    } else {
+      if (this.options.conf.initfolder_id) {
+        this.select.addItem(this.options.conf.initfolder_id, true);
+      }
     }
 
     var _this = this;
@@ -714,25 +865,24 @@ var Folders = Common.extend({
   }
 });
 
-Folders.prototype.getQuery = function() {
+Folder.prototype.getQuery = function() {
   return this.$select.val();
 };
 
-Folders.prototype.clean = function() {
+Folder.prototype.clean = function() {
   this.$select.val('');
 };
 
-Folders.prototype.focus = function() {
+Folder.prototype.focus = function() {
   this.$select.focus();
 };
 
-Folders.prototype.search = function(query) {
+Folder.prototype.search = function(query) {
   var value = query || this.$select.val();
   this.trigger('select', value);
 };
 
-module.exports = Folders;
-
+module.exports = Folder;
 }),
 "gsender": (function (require, exports, module) { /* wrapped by builder */
 
@@ -743,7 +893,8 @@ var Data =       require('data');
 var Dict =       require('dict');
 var Search =     require('search');
 var Insert =     require('insert');
-var Folders =    require('folders');
+var Folder =     require('folder');
+var Filter =     require('filter');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
@@ -757,12 +908,14 @@ var Gsender = Common.extend({
 
     this.dict = new Dict(this.options.conf || {});
 
+    this.$caption =     $(document).find("[data-dict-caption=\"" + this.dict.get('sid') + "\"]");
     this.$thead =       this.$el.find('thead');
     this.$worksheet =   this.$el.find('tbody');
     this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
     this.$search =      this.$el.find("[data-view=\"search\"]");
     this.$insert =      this.$el.find("[data-view=\"insert\"]");
     this.$folders =     this.$el.find("[data-view=\"folders\"]");
+    this.$filters =     this.$el.find("[data-view=\"filters\"]");
 
     this.dict.set('type', this.$el.data("dict-type") || 'parent');
     this.dict.cleanVals();
@@ -793,19 +946,50 @@ var Gsender = Common.extend({
 
     if (this.toolbar.folders === true) {
 
-      this.folders = new Folders({
+      this.folders = new Folder({
         el:    this.$folders,
         conf:  this.options.conf
       });
 
-      if (this.options.conf.initfolder_id) {
-        this.dict.set('folder_id', this.options.conf.initfolder_id);
+      if (store.get(this.dict.get('sid') + '#folder_id')) {
+          this.dict.set('folder_id', store.get(this.dict.get('sid') + '#folder_id'));
+      } else {
+        if (this.options.conf.initfolder_id) {
+          this.dict.set('folder_id', this.options.conf.initfolder_id);
+        }
       }
 
       this.folders.on('select', function(folder_id) {
         _this.dict.set({
           folder_id: folder_id
         });
+        store.set(_this.dict.get('sid') + '#folder_id', folder_id);
+        _this.sendRequest('search');
+      });
+    }
+
+    if (this.toolbar.filters === true) {
+
+      this.filters = new Filter({
+        el:    this.$filters,
+        conf:  this.options.conf
+      });
+
+      if (store.get(this.dict.get('sid') + '#filter_id')) {
+        this.dict.set('filter_id', store.get(this.dict.get('sid') + '#filter_id'));
+      } else {
+        if (this.options.conf.initfilter_id) {
+          this.dict.set('filter_id', this.options.conf.initfilter_id);
+        } else {
+          this.dict.set('filter_id', -1);
+        }
+      }
+
+      this.filters.on('select', function(filter_id) {
+        _this.dict.set({
+          filter_id: filter_id
+        });
+        store.set(_this.dict.get('sid') + '#filter_id', filter_id);
         _this.sendRequest('search');
       });
     }
@@ -818,6 +1002,7 @@ var Gsender = Common.extend({
       });
 
       this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        console.log('insert', _this.dict.get('sid'));
         e.preventDefault();
         if (_this.insert.autoinsert === true) {
           _this.insert.request();
@@ -837,13 +1022,6 @@ var Gsender = Common.extend({
       // placement: 'top'
     });
 
-    // this.$el.on('scroll', function() {
-    //   if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-    //     _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-    //     _this.sendRequest('scroll');
-    //   }
-    // });
-
     this.$el.on('mouseover', function() {
       $(this).css({
         'cursor': 'pointer'
@@ -860,7 +1038,7 @@ var Gsender = Common.extend({
 
     this.$el.on('dblclick', 'td', function() {
       var $tr = $(this).parent();
-      // alert($(this).data('col-value'));
+      console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
     });
 
     this.$el.on('click', "[data-action=\"delete\"]", function() {      
@@ -889,10 +1067,18 @@ var Gsender = Common.extend({
       // _this.$el.trigger('remove.line', line.toJSON());
     });
 
+    this.on('scroll.end', function() {
+      if (_this.isActive()) {
+        if (!_this.isScrolling) {
+          _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
+          _this.sendRequest('scroll');
+        }
+      }
+    });
+
     if (_this.dict.get('type') === 'parent') {
       _this.sendRequest('onload');
     }
-
   }
 });
 
@@ -900,9 +1086,16 @@ Gsender.prototype.update = function(vals) {
   if (this.dict.get('type') === 'child') {
     this.dict.set('limit', 50);
     this.dict.cleanVals(vals);
-    if (this.search != null) {      
-      this.search.select.conf.keys = this.dict.get('keys');
-      this.search.select.conf.vals = this.dict.get('vals');
+    vals = this.dict.get('vals');
+    var keys = this.dict.get('keys');
+    var controls = this.compareKeyVals(keys, vals);
+    this.updateCaption(controls);
+    if (this.search != null) {
+      this.search.select.conf.keys = keys;
+      this.search.select.conf.vals = vals;
+    }
+    if (this.insert != null) {
+      this.insert.vals = _.extend(this.insert.vals, controls);
     }
     this.sendRequest('update');
   }
@@ -1040,7 +1233,9 @@ Gsender.prototype.sendRequest = function(type, model) {
     break;
     case 'scroll':
       method = "fetch";
+      this.isScrolling = true;
       this.showLoading('after');
+      this.updateScrollTime();
     break;
     case 'remove':
       method = "remove";
@@ -1064,11 +1259,12 @@ Gsender.prototype.sendRequest = function(type, model) {
     this.data.fetch({
       timeout: this.dict.get('timeout'),
       data: {
-        limit:     this.dict.get('limit')         || null,
-        folder_id: this.dict.get('folder_id')     || null,
-        query:     this.dict.get('query')         || '',
-        keys:      this.dict.get('keys')          || {},
-        vals:      this.dict.get('vals')          || {}
+        limit:        this.dict.get('limit')         || null,
+        folder_id:    this.dict.get('folder_id')     || null,
+        filter_id:    this.dict.get('filter_id')     || null,
+        query:        this.dict.get('query')         || '',
+        keys:         this.dict.get('keys')          || {},
+        vals:         this.dict.get('vals')          || {}
       },
       success: success,
       error:   error
@@ -1089,12 +1285,6 @@ Gsender.prototype.sendRequest = function(type, model) {
       success: success,
       error:   error
     });
-    // model.destroy({
-    //   timeout: timeout,
-    //   // data:    data,
-    //   success: success,
-    //   error:   error
-    // });
   }
   
 };
@@ -1119,7 +1309,10 @@ Gsender.prototype.checkResponse = function(type) {
       this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
       this.colorActiveLine();
       this.updateChilds();
-    break;      
+    break;
+    case 'scroll':
+      this.isScrolling = false;
+    break;
   }
 
   if (this.data.length < 1) {
@@ -1127,6 +1320,56 @@ Gsender.prototype.checkResponse = function(type) {
   }
 
   this.$el.trigger('response:' + type);
+};
+
+Gsender.prototype.isActive = function() {
+  return this.$el.css('display') !== 'none';
+};
+
+Gsender.prototype.updateCaption = function(controls) {
+  var caption = this.dict.get('showcaption') || '';
+  caption = this.setCaptionVals(caption, controls);
+  this.$caption.html(caption);
+};
+
+Gsender.prototype.compareKeyVals = function(keys, vals) {
+  var controls = {};
+  _.each(keys, function(item, key) {
+    if (vals[item]) {
+      controls[key] = vals[item];
+    }
+  });
+  return controls;
+};
+
+Gsender.prototype.setCaptionVals = function(str, line) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    value =    value.toString().trim();
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  ':' + key + ':';
+    re =       new RegExp(pattern, 'ig');
+    if (str.match(re)) {
+      if (value.length > 10) {
+        value = '<b>' + value.slice(0, 10) + '</b>...';
+      } else {
+        value = '<b>' + value + '</b>';
+      }
+      str = str.replace(re, value);
+    }
+  });
+  str = str.replace(/\"\"/g, '"');
+  str = str.replace(/\"<b>\"/g, '"<b>');
+  return str;
 };
 
 module.exports = Gsender;
@@ -1335,7 +1578,6 @@ var Select = Common.extend({
 
   initialize: function() {
     var _this;
-    var searchfields = [];
     var plugins = [];
     var valuefield;
     var create;
@@ -1348,8 +1590,9 @@ var Select = Common.extend({
     // this.data = new Data();
     // this.data.url = '/api/dict/' + this.conf.sid;
 
-    this.columns = this.conf.columns || {};
-    this.fields =  _.pluck(this.columns, 'field') || {};
+    this.searchfields = [];
+    this.columns =      this.conf.columns || {};
+    this.fields =       _.pluck(this.columns, 'field') || [];
 
     this.cfselect = this.conf.cfselect || {};
     this.selectfield = this.cfselect.selectfieldexpression || '';
@@ -1357,18 +1600,15 @@ var Select = Common.extend({
       this.selectfield = this.selectfield.toString().toLowerCase();
     }
 
+    // if (this.fields.length < 1) {
+    //   this.fields.push(this.selectfield);
+    // }
+
+    this.getSearchfields();
+
     _this = this;
 
-    _.each(this.fields, function(value, key) {
-      var re1 = new RegExp("^" + value, 'ig');
-      var re2 = new RegExp("\\W" + value, 'ig');
-      if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
-        searchfields.push(value);
-      }
-    });
-
-    this.searchfields = searchfields;
-
+  
     // console.log(this.conf.sid, this.selectfield, searchfields);
 
     switch (this.options.type) {
@@ -1387,6 +1627,13 @@ var Select = Common.extend({
         preload =        true;
       break;
       case 'folders':
+        plugins =        [];
+        valuefield =     'id';
+        create =         false;
+        selectOnTab =    false;
+        preload =        false;
+      break;
+      case 'filters':
         plugins =        [];
         valuefield =     'id';
         create =         false;
@@ -1422,8 +1669,7 @@ var Select = Common.extend({
     _this = this;
 
     if (this.selectize) {
-      if ((this.options.type === 'select') || (this.options.type === 'folders')) {
-        console.log('this.options.type:', this.options.type);
+      if ((this.options.type === 'select') || (this.options.type === 'folders') || (this.options.type === 'filters')) {
         this.selectize.on('change', function(value) {
           _this.trigger('select', value);
         });
@@ -1442,63 +1688,17 @@ var Select = Common.extend({
   }
 });
 
-Select.prototype.setLineVals = function(str, line, escape) {
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern;
-    if (typeof value === 'string') {
-      if (typeof escape === 'function') {
-        value = escape(value.toString().trim());
-      } else {
-        value = "'" + value.trim() + "'";
+Select.prototype.getSearchfields = function() {
+  var _this = this;
+  _.each(this.fields, function(value, key) {
+    var re1 = new RegExp("^" + value, 'ig');
+    var re2 = new RegExp("\\W" + value, 'ig');
+    if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
+      if (!_this.searchfields.value) {
+        _this.searchfields.push(value);
       }
     }
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  ':' + key;
-    re =       new RegExp(pattern, 'ig');
-    str =      str.replace(re, value);
   });
-
-  return str;
-};
-
-Select.prototype.setSearchVals = function(str, line, escape) {
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern;
-    if (typeof value === 'string') {
-      if (typeof escape === 'function') {
-        value = escape(value.toString().trim());
-      } else {
-        value = "" + value.toString().trim() + "";
-      }
-    }
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  key;
-    re =       new RegExp(pattern, 'ig');
-    str =      str.replace(re, value);
-  });
-
-  str = str.replace(/\|\|/gi, "");
-  str = str.replace(/\'\ \'/gi, " ");
-
-  return str;
 };
 
 Select.prototype.setSearchFields = function(fields, line, escape) {
@@ -1574,47 +1774,62 @@ Select.prototype.create = function() {
 
 Select.prototype.renderItem = function() {
   var _this = this;
+  var result;
   return function (item, escape) {
-    if (_this.options.type !== 'folders') {
-      if (item[_this.conf.keyfieldname]) {
-        if ((_this.conf.renderitemsearch !== '') && (_this.conf.renderitemsearch !== _this.selectfield)) {
-          return _this.setLineVals(_this.conf.renderitemsearch, item, escape);
-        } else {
-          if (item[_this.selectfield]) {
-            return '<div>' + item[_this.selectfield] + '</div>';
+    switch (_this.options.type) {
+      case 'folders':
+        result = '<div>' + _this.renderFolder(item, escape) + '</div>';
+      break;
+      case 'filters':
+        result = '<div>' + _this.renderFilter(item, escape) + '</div>';
+      break;
+      default:
+        // if (item[_this.conf.keyfieldname]) {
+        if (typeof(item) === 'object') {
+          if ((_this.conf.renderitemsearch !== '') && (_this.conf.renderitemsearch !== _this.selectfield)) {
+            result = _this.setLineVals(_this.conf.renderitemsearch, item, escape);
           } else {
-            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            if (item[_this.selectfield]) {
+              result = '<div>' + item[_this.selectfield] + '</div>';
+            } else {
+              result = '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            }
           }
+        } else {
+          result = '<div>' + escape(item.value) + '</div>';
         }
-      } else {
-        return '<div>' + escape(item.value) + '</div>';
-      }
-    } else {
-      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
+    return result;
   };
 };
 
 Select.prototype.renderOption = function() {
   var _this = this;
+  var result;
   return function (item, escape) {
-    if (_this.options.type !== 'folders') {
-      if (item[_this.conf.keyfieldname]) {
-        if ((_this.conf.renderoptionsearch !== '') && (_this.conf.renderoptionsearch !== _this.selectfield)) {
-          return _this.setLineVals(_this.conf.renderoptionsearch, item, escape);
-        } else {
-          if (item[_this.selectfield]) {
-            return '<div>' + item[_this.selectfield] + '</div>';
+    switch (_this.options.type) {
+      case 'folders':
+        result = '<div>' + _this.renderFolder(item, escape) + '</div>';
+      break;
+      case 'filters':
+        result = '<div>' + _this.renderFilter(item, escape) + '</div>';
+      break;
+      default:
+        if (typeof(item) === 'object') {
+          if ((_this.conf.renderoptionsearch !== '') && (_this.conf.renderoptionsearch !== _this.selectfield)) {
+            result = _this.setLineVals(_this.conf.renderoptionsearch, item, escape);
           } else {
-            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            if (item[_this.selectfield]) {
+              result = '<div>' + item[_this.selectfield] + '</div>';
+            } else {
+              result = '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            }
           }
+        } else {
+          result = '<div>' + escape(item.value) + '</div>';
         }
-      } else {
-        return '<div>' + escape(item.value) + '</div>';
-      }
-    } else {
-      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
+    return result;
   };
 };
 
@@ -1630,6 +1845,11 @@ Select.prototype.renderFolder = function(item, escape) {
   // str += escape(item.depth) + ' ';
   // str += escape(item.id) + ' ';
   str += escape(item.caption);
+  return str;
+};
+
+Select.prototype.renderFilter = function(item, escape) {
+  var str = escape(item.caption);
   return str;
 };
 
@@ -1682,9 +1902,27 @@ Select.prototype.checkData = function(data) {
 Select.prototype.checkDataItem = function(item) {
   var str = '';
   if (typeof(item) === 'object') {
-    str = this.setSearchFields(this.searchfields, item);
-    item.value = str;
-    item.text = str;
+    if ((this.searchfields.length < 1) && (this.fields.length < 1)) {
+      this.fields = _.keys(item);
+      this.getSearchfields();
+    }
+
+    switch (this.options.type) {
+      case 'folders':
+        str = item.caption;
+        item.value = str;
+        item.text = str;
+      break;
+      case 'filters':
+        str = item.caption;
+        item.value = str;
+        item.text = str;
+      break;
+      default: 
+        str = this.setSearchFields(this.searchfields, item);
+        item.value = str;
+        item.text = str;
+    }
   }
   return item;
 };
@@ -1969,24 +2207,25 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
     for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
       var column = columns[$index];
 
+ var value = line[column.field] || ''
  if (column.visible === true)
 {
+ if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+{
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>');
- if ((line[column.field] != null) && (line[column.field] !== ''))        
-{
- if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-{
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
-buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('><span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
 }
  else
 {
- if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+ if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
- var groups = window.parseGroupLine(line[column.field]);
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ var groups = window.parseGroupLine(value);
 // iterate groups
 ;(function(){
   if ('number' == typeof groups.length) {
@@ -1995,7 +2234,7 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
       var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -2005,28 +2244,31 @@ buf.push('>&nbsp;</span>');
       $$l++;      var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
   }
 }).call(this);
 
+buf.push('</td>');
 }
  else
 {
- if (line[column.field].length > 103)
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ if (value.length > 103)
 {
-buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
  else              
 {
-buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
-}
-}
-}
+buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
+}
+}
 }
     }
 
@@ -2035,24 +2277,25 @@ buf.push('</td>');
     for (var $index in columns) {
       $$l++;      var column = columns[$index];
 
+ var value = line[column.field] || ''
  if (column.visible === true)
 {
+ if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+{
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>');
- if ((line[column.field] != null) && (line[column.field] !== ''))        
-{
- if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-{
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
-buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('><span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
 }
  else
 {
- if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+ if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
- var groups = window.parseGroupLine(line[column.field]);
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ var groups = window.parseGroupLine(value);
 // iterate groups
 ;(function(){
   if ('number' == typeof groups.length) {
@@ -2061,7 +2304,7 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
       var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -2071,28 +2314,31 @@ buf.push('>&nbsp;</span>');
       $$l++;      var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
   }
 }).call(this);
 
+buf.push('</td>');
 }
  else
 {
- if (line[column.field].length > 103)
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ if (value.length > 103)
 {
-buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
  else              
 {
-buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
-}
-}
-}
+buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
+}
+}
 }
     }
 
@@ -5655,5 +5901,202 @@ var jQuery = require("$");
 
 	return Selectize;
 }));
+}),
+"store": (function (require) { /* wrapped by builder */
+/* added by builder */
+var jQuery = require("$");
+
+"use strict"
+// Module export pattern from
+// https://github.com/umdjs/umd/blob/master/returnExports.js
+;(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals (root is window)
+        root.store = factory();
+  }
+}(this, function () {
+	
+	// Store.js
+	var store = {},
+		win = window,
+		doc = win.document,
+		localStorageName = 'localStorage',
+		scriptTag = 'script',
+		storage
+
+	store.disabled = false
+	store.version = '1.3.17'
+	store.set = function(key, value) {}
+	store.get = function(key, defaultVal) {}
+	store.has = function(key) { return store.get(key) !== undefined }
+	store.remove = function(key) {}
+	store.clear = function() {}
+	store.transact = function(key, defaultVal, transactionFn) {
+		if (transactionFn == null) {
+			transactionFn = defaultVal
+			defaultVal = null
+		}
+		if (defaultVal == null) {
+			defaultVal = {}
+		}
+		var val = store.get(key, defaultVal)
+		transactionFn(val)
+		store.set(key, val)
+	}
+	store.getAll = function() {}
+	store.forEach = function() {}
+
+	store.serialize = function(value) {
+		return JSON.stringify(value)
+	}
+	store.deserialize = function(value) {
+		if (typeof value != 'string') { return undefined }
+		try { return JSON.parse(value) }
+		catch(e) { return value || undefined }
+	}
+
+	// Functions to encapsulate questionable FireFox 3.6.13 behavior
+	// when about.config::dom.storage.enabled === false
+	// See https://github.com/marcuswestin/store.js/issues#issue/13
+	function isLocalStorageNameSupported() {
+		try { return (localStorageName in win && win[localStorageName]) }
+		catch(err) { return false }
+	}
+
+	if (isLocalStorageNameSupported()) {
+		storage = win[localStorageName]
+		store.set = function(key, val) {
+			if (val === undefined) { return store.remove(key) }
+			storage.setItem(key, store.serialize(val))
+			return val
+		}
+		store.get = function(key, defaultVal) {
+			var val = store.deserialize(storage.getItem(key))
+			return (val === undefined ? defaultVal : val)
+		}
+		store.remove = function(key) { storage.removeItem(key) }
+		store.clear = function() { storage.clear() }
+		store.getAll = function() {
+			var ret = {}
+			store.forEach(function(key, val) {
+				ret[key] = val
+			})
+			return ret
+		}
+		store.forEach = function(callback) {
+			for (var i=0; i<storage.length; i++) {
+				var key = storage.key(i)
+				callback(key, store.get(key))
+			}
+		}
+	} else if (doc.documentElement.addBehavior) {
+		var storageOwner,
+			storageContainer
+		// Since #userData storage applies only to specific paths, we need to
+		// somehow link our data to a specific path.  We choose /favicon.ico
+		// as a pretty safe option, since all browsers already make a request to
+		// this URL anyway and being a 404 will not hurt us here.  We wrap an
+		// iframe pointing to the favicon in an ActiveXObject(htmlfile) object
+		// (see: http://msdn.microsoft.com/en-us/library/aa752574(v=VS.85).aspx)
+		// since the iframe access rules appear to allow direct access and
+		// manipulation of the document element, even for a 404 page.  This
+		// document can be used instead of the current document (which would
+		// have been limited to the current path) to perform #userData storage.
+		try {
+			storageContainer = new ActiveXObject('htmlfile')
+			storageContainer.open()
+			storageContainer.write('<'+scriptTag+'>document.w=window</'+scriptTag+'><iframe src="/favicon.ico"></iframe>')
+			storageContainer.close()
+			storageOwner = storageContainer.w.frames[0].document
+			storage = storageOwner.createElement('div')
+		} catch(e) {
+			// somehow ActiveXObject instantiation failed (perhaps some special
+			// security settings or otherwse), fall back to per-path storage
+			storage = doc.createElement('div')
+			storageOwner = doc.body
+		}
+		var withIEStorage = function(storeFunction) {
+			return function() {
+				var args = Array.prototype.slice.call(arguments, 0)
+				args.unshift(storage)
+				// See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
+				// and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
+				storageOwner.appendChild(storage)
+				storage.addBehavior('#default#userData')
+				storage.load(localStorageName)
+				var result = storeFunction.apply(store, args)
+				storageOwner.removeChild(storage)
+				return result
+			}
+		}
+
+		// In IE7, keys cannot start with a digit or contain certain chars.
+		// See https://github.com/marcuswestin/store.js/issues/40
+		// See https://github.com/marcuswestin/store.js/issues/83
+		var forbiddenCharsRegex = new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]", "g")
+		var ieKeyFix = function(key) {
+			return key.replace(/^d/, '___$&').replace(forbiddenCharsRegex, '___')
+		}
+		store.set = withIEStorage(function(storage, key, val) {
+			key = ieKeyFix(key)
+			if (val === undefined) { return store.remove(key) }
+			storage.setAttribute(key, store.serialize(val))
+			storage.save(localStorageName)
+			return val
+		})
+		store.get = withIEStorage(function(storage, key, defaultVal) {
+			key = ieKeyFix(key)
+			var val = store.deserialize(storage.getAttribute(key))
+			return (val === undefined ? defaultVal : val)
+		})
+		store.remove = withIEStorage(function(storage, key) {
+			key = ieKeyFix(key)
+			storage.removeAttribute(key)
+			storage.save(localStorageName)
+		})
+		store.clear = withIEStorage(function(storage) {
+			var attributes = storage.XMLDocument.documentElement.attributes
+			storage.load(localStorageName)
+			while (attributes.length) {
+				storage.removeAttribute(attributes[0].name)
+			}
+			storage.save(localStorageName)
+		})
+		store.getAll = function(storage) {
+			var ret = {}
+			store.forEach(function(key, val) {
+				ret[key] = val
+			})
+			return ret
+		}
+		store.forEach = withIEStorage(function(storage, callback) {
+			var attributes = storage.XMLDocument.documentElement.attributes
+			for (var i=0, attr; attr=attributes[i]; ++i) {
+				callback(attr.name, store.deserialize(storage.getAttribute(attr.name)))
+			}
+		})
+	}
+
+	try {
+		var testKey = '__storejs__'
+		store.set(testKey, testKey)
+		if (store.get(testKey) != testKey) { store.disabled = true }
+		store.remove(testKey)
+	} catch(e) {
+		store.disabled = true
+	}
+	store.enabled = !store.disabled
+	
+	return store
+}));
+
 })
 },{},{});

@@ -6,15 +6,15 @@
     .col-md-12
       ul.nav.nav-pills
         li.active
-          a(href = "#dddd", data-toggle = "tab") 
+          a(href = "#dddd", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{parentDict.sid}") 
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
-            span.hidden-xs.hidden-sm #{parentDict.showcaption}
+            .hidden-xs.hidden-sm(data-dict-caption = "#{parentDict.sid}") #{parentDict.showcaption}
         - each childInfo in parentDict.childsInfo
           - var child = wdicts_data[childInfo.wdict]
           li
-            a(href = "##{child.sid}", data-toggle = "tab") 
+            a(href = "##{child.sid}", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{child.sid}") 
               i(class = "fa fa-fw fa-lg #{child.faIcon}")
-              span.hidden-xs.hidden-sm #{child.showcaption}
+              .hidden-xs.hidden-sm(data-dict-caption = "#{child.sid}") #{child.showcaption}
 
       .tab-content
         .tab-pane.active(id = "dddd", data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
@@ -29,15 +29,19 @@
                   .form-group.col-xs-12.col-md-6.col-lg-4(data-view = "search")
                     input.form-control(width = "100%", type = "search", placeholder = "#{gettext('Toolbar search')}")
                 - if (parentDict.toolbar.folders === true)
-                  .form-group.col-xs-12.col-md-6.col-lg-4(data-view = "folders")
+                  .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "folders")
                     select.form-control(placeholder = "#{gettext('Toolbar folders')}")
-                - if (parentDict.toolbar.insert === true)
-                  a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}") 
-                    i.fa.fa-plus
-                - if (parentDict.toolbar.remove === true)
-                  &nbsp;
-                  a.btn.btn-danger(href = "#", data-action = "delete_many", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
-                    i.fa.fa-minus
+                - if (parentDict.toolbar.filters === true)
+                  .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "filters")
+                    select.form-control(placeholder = "#{gettext('Toolbar filters')}")
+                .form-group.col-xs-12.col-md-3.col-lg-2
+                  - if (parentDict.toolbar.insert === true)
+                    a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}") 
+                      i.fa.fa-plus
+                    &nbsp;
+                  - if (parentDict.toolbar.remove === true)
+                    a.btn.btn-danger(href = "#", data-action = "delete_many", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
+                      i.fa.fa-minus
 
           .row
             .col-md-12
@@ -56,6 +60,9 @@
         - each childInfo in parentDict.childsInfo
           - var child = wdicts_data[childInfo.wdict]
           .tab-pane(id = "#{child.sid}", data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
+
+            include insert
+
             br
             .row
               .col-md-12
@@ -66,13 +73,17 @@
                   - if (child.toolbar.folders === true)
                     .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "folders")
                       select.form-control(placeholder = "#{gettext('Toolbar folders')}")
-                  - if (child.toolbar.insert === true)
-                    a.btn.btn-success(href = "#", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}")
-                      i.fa.fa-plus
-                  - if (child.toolbar.remove === true)
-                    &nbsp;
-                    a.btn.btn-danger(href = "#", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
-                      i.fa.fa-minus
+                  - if (child.toolbar.filters === true)
+                    .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "filters")
+                      select.form-control(placeholder = "#{gettext('Toolbar filters')}")
+                  .form-group.col-xs-12.col-md-3.col-lg-2
+                    - if (child.toolbar.insert === true)
+                      a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}")
+                        i.fa.fa-plus
+                      &nbsp;
+                    - if (child.toolbar.remove === true)
+                      a.btn.btn-danger(href = "#", data-action = "delete_many", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
+                        i.fa.fa-minus
 
             .row
 

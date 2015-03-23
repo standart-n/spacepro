@@ -16,6 +16,12 @@
       "require": {
         "jQuery": "$"
       }
+    },
+    "store": {
+      "path": "public/lib/store/store.js",
+      "require": {
+        "jQuery": "$"
+      }
     }
   },
   "main": "main"

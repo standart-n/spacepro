@@ -14,24 +14,25 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
     for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
       var column = columns[$index];
 
+ var value = line[column.field] || ''
  if (column.visible === true)
 {
+ if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+{
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>');
- if ((line[column.field] != null) && (line[column.field] !== ''))        
-{
- if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-{
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
-buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('><span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
 }
  else
 {
- if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+ if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
- var groups = window.parseGroupLine(line[column.field]);
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ var groups = window.parseGroupLine(value);
 // iterate groups
 ;(function(){
   if ('number' == typeof groups.length) {
@@ -40,7 +41,7 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
       var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -50,28 +51,31 @@ buf.push('>&nbsp;</span>');
       $$l++;      var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
   }
 }).call(this);
 
+buf.push('</td>');
 }
  else
 {
- if (line[column.field].length > 103)
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ if (value.length > 103)
 {
-buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
  else              
 {
-buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
-}
-}
-}
+buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
+}
+}
 }
     }
 
@@ -80,24 +84,25 @@ buf.push('</td>');
     for (var $index in columns) {
       $$l++;      var column = columns[$index];
 
+ var value = line[column.field] || ''
  if (column.visible === true)
 {
+ if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
+{
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true}));
-buf.push('>');
- if ((line[column.field] != null) && (line[column.field] !== ''))        
-{
- if (line[column.field].toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-{
-buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line[column.field]).fromNow()) + "") }, {"data-toggle":true,"title":true}));
-buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line[column.field]).format('HH:mm')) == null ? '' : interp) + '</small></span>');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('><span');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
 }
  else
 {
- if (line[column.field].toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+ if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
- var groups = window.parseGroupLine(line[column.field]);
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ var groups = window.parseGroupLine(value);
 // iterate groups
 ;(function(){
   if ('number' == typeof groups.length) {
@@ -106,7 +111,7 @@ buf.push('><span>' + escape((interp = moment(line[column.field]).format('DD.MM.Y
       var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -116,28 +121,31 @@ buf.push('>&nbsp;</span>');
       $$l++;      var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
   }
 }).call(this);
 
+buf.push('</td>');
 }
  else
 {
- if (line[column.field].length > 103)
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push('>');
+ if (value.length > 103)
 {
-buf.push('<span>' + escape((interp = line[column.field].slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
+buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
  else              
 {
-buf.push('' + escape((interp = line[column.field]) == null ? '' : interp) + '');
-}
-}
-}
+buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
+}
+}
 }
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "spacepro",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "ERP by standart-n",
   "main": "spacepro.js",
   "bin": {
@@ -33,11 +33,12 @@
     "iconv-lite": "~0.2.11",
     "jade": "^0.35.0",
     "lodash": "^2.2.1",
-    "memcached": "~0.2.8",
+    "memcached": "^2.1.0",
     "memwatch": "^0.2.2",
     "mkpath": "~0.1.0",
     "moment": "~2.3.1",
     "mongoose": "~3.6.20",
+    "node-firebird": "^0.6.0",
     "remove": "^0.1.5",
     "than": "0.0.6",
     "validate": "~0.2.4",

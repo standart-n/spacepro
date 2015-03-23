@@ -10,7 +10,6 @@ var Select = Common.extend({
 
   initialize: function() {
     var _this;
-    var searchfields = [];
     var plugins = [];
     var valuefield;
     var create;
@@ -23,8 +22,9 @@ var Select = Common.extend({
     // this.data = new Data();
     // this.data.url = '/api/dict/' + this.conf.sid;
 
-    this.columns = this.conf.columns || {};
-    this.fields =  _.pluck(this.columns, 'field') || {};
+    this.searchfields = [];
+    this.columns =      this.conf.columns || {};
+    this.fields =       _.pluck(this.columns, 'field') || [];
 
     this.cfselect = this.conf.cfselect || {};
     this.selectfield = this.cfselect.selectfieldexpression || '';
@@ -32,18 +32,15 @@ var Select = Common.extend({
       this.selectfield = this.selectfield.toString().toLowerCase();
     }
 
+    // if (this.fields.length < 1) {
+    //   this.fields.push(this.selectfield);
+    // }
+
+    this.getSearchfields();
+
     _this = this;
 
-    _.each(this.fields, function(value, key) {
-      var re1 = new RegExp("^" + value, 'ig');
-      var re2 = new RegExp("\\W" + value, 'ig');
-      if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
-        searchfields.push(value);
-      }
-    });
-
-    this.searchfields = searchfields;
-
+  
     // console.log(this.conf.sid, this.selectfield, searchfields);
 
     switch (this.options.type) {
@@ -62,6 +59,13 @@ var Select = Common.extend({
         preload =        true;
       break;
       case 'folders':
+        plugins =        [];
+        valuefield =     'id';
+        create =         false;
+        selectOnTab =    false;
+        preload =        false;
+      break;
+      case 'filters':
         plugins =        [];
         valuefield =     'id';
         create =         false;
@@ -97,8 +101,7 @@ var Select = Common.extend({
     _this = this;
 
     if (this.selectize) {
-      if ((this.options.type === 'select') || (this.options.type === 'folders')) {
-        console.log('this.options.type:', this.options.type);
+      if ((this.options.type === 'select') || (this.options.type === 'folders') || (this.options.type === 'filters')) {
         this.selectize.on('change', function(value) {
           _this.trigger('select', value);
         });
@@ -117,63 +120,17 @@ var Select = Common.extend({
   }
 });
 
-Select.prototype.setLineVals = function(str, line, escape) {
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern;
-    if (typeof value === 'string') {
-      if (typeof escape === 'function') {
-        value = escape(value.toString().trim());
-      } else {
-        value = "'" + value.trim() + "'";
+Select.prototype.getSearchfields = function() {
+  var _this = this;
+  _.each(this.fields, function(value, key) {
+    var re1 = new RegExp("^" + value, 'ig');
+    var re2 = new RegExp("\\W" + value, 'ig');
+    if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
+      if (!_this.searchfields.value) {
+        _this.searchfields.push(value);
       }
     }
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  ':' + key;
-    re =       new RegExp(pattern, 'ig');
-    str =      str.replace(re, value);
   });
-
-  return str;
-};
-
-Select.prototype.setSearchVals = function(str, line, escape) {
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern;
-    if (typeof value === 'string') {
-      if (typeof escape === 'function') {
-        value = escape(value.toString().trim());
-      } else {
-        value = "" + value.toString().trim() + "";
-      }
-    }
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  key;
-    re =       new RegExp(pattern, 'ig');
-    str =      str.replace(re, value);
-  });
-
-  str = str.replace(/\|\|/gi, "");
-  str = str.replace(/\'\ \'/gi, " ");
-
-  return str;
 };
 
 Select.prototype.setSearchFields = function(fields, line, escape) {
@@ -249,47 +206,62 @@ Select.prototype.create = function() {
 
 Select.prototype.renderItem = function() {
   var _this = this;
+  var result;
   return function (item, escape) {
-    if (_this.options.type !== 'folders') {
-      if (item[_this.conf.keyfieldname]) {
-        if ((_this.conf.renderitemsearch !== '') && (_this.conf.renderitemsearch !== _this.selectfield)) {
-          return _this.setLineVals(_this.conf.renderitemsearch, item, escape);
-        } else {
-          if (item[_this.selectfield]) {
-            return '<div>' + item[_this.selectfield] + '</div>';
+    switch (_this.options.type) {
+      case 'folders':
+        result = '<div>' + _this.renderFolder(item, escape) + '</div>';
+      break;
+      case 'filters':
+        result = '<div>' + _this.renderFilter(item, escape) + '</div>';
+      break;
+      default:
+        // if (item[_this.conf.keyfieldname]) {
+        if (typeof(item) === 'object') {
+          if ((_this.conf.renderitemsearch !== '') && (_this.conf.renderitemsearch !== _this.selectfield)) {
+            result = _this.setLineVals(_this.conf.renderitemsearch, item, escape);
           } else {
-            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            if (item[_this.selectfield]) {
+              result = '<div>' + item[_this.selectfield] + '</div>';
+            } else {
+              result = '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            }
           }
+        } else {
+          result = '<div>' + escape(item.value) + '</div>';
         }
-      } else {
-        return '<div>' + escape(item.value) + '</div>';
-      }
-    } else {
-      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
+    return result;
   };
 };
 
 Select.prototype.renderOption = function() {
   var _this = this;
+  var result;
   return function (item, escape) {
-    if (_this.options.type !== 'folders') {
-      if (item[_this.conf.keyfieldname]) {
-        if ((_this.conf.renderoptionsearch !== '') && (_this.conf.renderoptionsearch !== _this.selectfield)) {
-          return _this.setLineVals(_this.conf.renderoptionsearch, item, escape);
-        } else {
-          if (item[_this.selectfield]) {
-            return '<div>' + item[_this.selectfield] + '</div>';
+    switch (_this.options.type) {
+      case 'folders':
+        result = '<div>' + _this.renderFolder(item, escape) + '</div>';
+      break;
+      case 'filters':
+        result = '<div>' + _this.renderFilter(item, escape) + '</div>';
+      break;
+      default:
+        if (typeof(item) === 'object') {
+          if ((_this.conf.renderoptionsearch !== '') && (_this.conf.renderoptionsearch !== _this.selectfield)) {
+            result = _this.setLineVals(_this.conf.renderoptionsearch, item, escape);
           } else {
-            return '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            if (item[_this.selectfield]) {
+              result = '<div>' + item[_this.selectfield] + '</div>';
+            } else {
+              result = '<div>' + _this.setSearchFields(_this.searchfields, item, escape) + '</div>';
+            }
           }
+        } else {
+          result = '<div>' + escape(item.value) + '</div>';
         }
-      } else {
-        return '<div>' + escape(item.value) + '</div>';
-      }
-    } else {
-      return '<div>' + _this.renderFolder(item, escape) + '</div>';
     }
+    return result;
   };
 };
 
@@ -305,6 +277,11 @@ Select.prototype.renderFolder = function(item, escape) {
   // str += escape(item.depth) + ' ';
   // str += escape(item.id) + ' ';
   str += escape(item.caption);
+  return str;
+};
+
+Select.prototype.renderFilter = function(item, escape) {
+  var str = escape(item.caption);
   return str;
 };
 
@@ -357,9 +334,27 @@ Select.prototype.checkData = function(data) {
 Select.prototype.checkDataItem = function(item) {
   var str = '';
   if (typeof(item) === 'object') {
-    str = this.setSearchFields(this.searchfields, item);
-    item.value = str;
-    item.text = str;
+    if ((this.searchfields.length < 1) && (this.fields.length < 1)) {
+      this.fields = _.keys(item);
+      this.getSearchfields();
+    }
+
+    switch (this.options.type) {
+      case 'folders':
+        str = item.caption;
+        item.value = str;
+        item.text = str;
+      break;
+      case 'filters':
+        str = item.caption;
+        item.value = str;
+        item.text = str;
+      break;
+      default: 
+        str = this.setSearchFields(this.searchfields, item);
+        item.value = str;
+        item.text = str;
+    }
   }
   return item;
 };

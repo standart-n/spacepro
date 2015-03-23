@@ -6,7 +6,8 @@ var Data =       require('data');
 var Dict =       require('dict');
 var Search =     require('search');
 var Insert =     require('insert');
-var Folders =    require('folders');
+var Folder =     require('folder');
+var Filter =     require('filter');
 
 // AddDeviceValue = require('addDeviceValue.pl');
 
@@ -20,12 +21,14 @@ var Gsender = Common.extend({
 
     this.dict = new Dict(this.options.conf || {});
 
+    this.$caption =     $(document).find("[data-dict-caption=\"" + this.dict.get('sid') + "\"]");
     this.$thead =       this.$el.find('thead');
     this.$worksheet =   this.$el.find('tbody');
     this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
     this.$search =      this.$el.find("[data-view=\"search\"]");
     this.$insert =      this.$el.find("[data-view=\"insert\"]");
     this.$folders =     this.$el.find("[data-view=\"folders\"]");
+    this.$filters =     this.$el.find("[data-view=\"filters\"]");
 
     this.dict.set('type', this.$el.data("dict-type") || 'parent');
     this.dict.cleanVals();
@@ -56,19 +59,50 @@ var Gsender = Common.extend({
 
     if (this.toolbar.folders === true) {
 
-      this.folders = new Folders({
+      this.folders = new Folder({
         el:    this.$folders,
         conf:  this.options.conf
       });
 
-      if (this.options.conf.initfolder_id) {
-        this.dict.set('folder_id', this.options.conf.initfolder_id);
+      if (store.get(this.dict.get('sid') + '#folder_id')) {
+          this.dict.set('folder_id', store.get(this.dict.get('sid') + '#folder_id'));
+      } else {
+        if (this.options.conf.initfolder_id) {
+          this.dict.set('folder_id', this.options.conf.initfolder_id);
+        }
       }
 
       this.folders.on('select', function(folder_id) {
         _this.dict.set({
           folder_id: folder_id
         });
+        store.set(_this.dict.get('sid') + '#folder_id', folder_id);
+        _this.sendRequest('search');
+      });
+    }
+
+    if (this.toolbar.filters === true) {
+
+      this.filters = new Filter({
+        el:    this.$filters,
+        conf:  this.options.conf
+      });
+
+      if (store.get(this.dict.get('sid') + '#filter_id')) {
+        this.dict.set('filter_id', store.get(this.dict.get('sid') + '#filter_id'));
+      } else {
+        if (this.options.conf.initfilter_id) {
+          this.dict.set('filter_id', this.options.conf.initfilter_id);
+        } else {
+          this.dict.set('filter_id', -1);
+        }
+      }
+
+      this.filters.on('select', function(filter_id) {
+        _this.dict.set({
+          filter_id: filter_id
+        });
+        store.set(_this.dict.get('sid') + '#filter_id', filter_id);
         _this.sendRequest('search');
       });
     }
@@ -81,6 +115,7 @@ var Gsender = Common.extend({
       });
 
       this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+        console.log('insert', _this.dict.get('sid'));
         e.preventDefault();
         if (_this.insert.autoinsert === true) {
           _this.insert.request();
@@ -100,13 +135,6 @@ var Gsender = Common.extend({
       // placement: 'top'
     });
 
-    // this.$el.on('scroll', function() {
-    //   if (_this.$el.scrollTop() + _this.$el.height() === _this.$el.find('.container').height()) {
-    //     _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-    //     _this.sendRequest('scroll');
-    //   }
-    // });
-
     this.$el.on('mouseover', function() {
       $(this).css({
         'cursor': 'pointer'
@@ -123,7 +151,7 @@ var Gsender = Common.extend({
 
     this.$el.on('dblclick', 'td', function() {
       var $tr = $(this).parent();
-      // alert($(this).data('col-value'));
+      console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
     });
 
     this.$el.on('click', "[data-action=\"delete\"]", function() {      
@@ -152,10 +180,18 @@ var Gsender = Common.extend({
       // _this.$el.trigger('remove.line', line.toJSON());
     });
 
+    this.on('scroll.end', function() {
+      if (_this.isActive()) {
+        if (!_this.isScrolling) {
+          _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
+          _this.sendRequest('scroll');
+        }
+      }
+    });
+
     if (_this.dict.get('type') === 'parent') {
       _this.sendRequest('onload');
     }
-
   }
 });
 
@@ -163,9 +199,16 @@ Gsender.prototype.update = function(vals) {
   if (this.dict.get('type') === 'child') {
     this.dict.set('limit', 50);
     this.dict.cleanVals(vals);
-    if (this.search != null) {      
-      this.search.select.conf.keys = this.dict.get('keys');
-      this.search.select.conf.vals = this.dict.get('vals');
+    vals = this.dict.get('vals');
+    var keys = this.dict.get('keys');
+    var controls = this.compareKeyVals(keys, vals);
+    this.updateCaption(controls);
+    if (this.search != null) {
+      this.search.select.conf.keys = keys;
+      this.search.select.conf.vals = vals;
+    }
+    if (this.insert != null) {
+      this.insert.vals = _.extend(this.insert.vals, controls);
     }
     this.sendRequest('update');
   }
@@ -303,7 +346,9 @@ Gsender.prototype.sendRequest = function(type, model) {
     break;
     case 'scroll':
       method = "fetch";
+      this.isScrolling = true;
       this.showLoading('after');
+      this.updateScrollTime();
     break;
     case 'remove':
       method = "remove";
@@ -327,11 +372,12 @@ Gsender.prototype.sendRequest = function(type, model) {
     this.data.fetch({
       timeout: this.dict.get('timeout'),
       data: {
-        limit:     this.dict.get('limit')         || null,
-        folder_id: this.dict.get('folder_id')     || null,
-        query:     this.dict.get('query')         || '',
-        keys:      this.dict.get('keys')          || {},
-        vals:      this.dict.get('vals')          || {}
+        limit:        this.dict.get('limit')         || null,
+        folder_id:    this.dict.get('folder_id')     || null,
+        filter_id:    this.dict.get('filter_id')     || null,
+        query:        this.dict.get('query')         || '',
+        keys:         this.dict.get('keys')          || {},
+        vals:         this.dict.get('vals')          || {}
       },
       success: success,
       error:   error
@@ -352,12 +398,6 @@ Gsender.prototype.sendRequest = function(type, model) {
       success: success,
       error:   error
     });
-    // model.destroy({
-    //   timeout: timeout,
-    //   // data:    data,
-    //   success: success,
-    //   error:   error
-    // });
   }
   
 };
@@ -382,7 +422,10 @@ Gsender.prototype.checkResponse = function(type) {
       this.dict.set('selectRowUUID', this.getUUIDbyFirstRecord());
       this.colorActiveLine();
       this.updateChilds();
-    break;      
+    break;
+    case 'scroll':
+      this.isScrolling = false;
+    break;
   }
 
   if (this.data.length < 1) {
@@ -390,6 +433,56 @@ Gsender.prototype.checkResponse = function(type) {
   }
 
   this.$el.trigger('response:' + type);
+};
+
+Gsender.prototype.isActive = function() {
+  return this.$el.css('display') !== 'none';
+};
+
+Gsender.prototype.updateCaption = function(controls) {
+  var caption = this.dict.get('showcaption') || '';
+  caption = this.setCaptionVals(caption, controls);
+  this.$caption.html(caption);
+};
+
+Gsender.prototype.compareKeyVals = function(keys, vals) {
+  var controls = {};
+  _.each(keys, function(item, key) {
+    if (vals[item]) {
+      controls[key] = vals[item];
+    }
+  });
+  return controls;
+};
+
+Gsender.prototype.setCaptionVals = function(str, line) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    value =    value.toString().trim();
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  ':' + key + ':';
+    re =       new RegExp(pattern, 'ig');
+    if (str.match(re)) {
+      if (value.length > 10) {
+        value = '<b>' + value.slice(0, 10) + '</b>...';
+      } else {
+        value = '<b>' + value + '</b>';
+      }
+      str = str.replace(re, value);
+    }
+  });
+  str = str.replace(/\"\"/g, '"');
+  str = str.replace(/\"<b>\"/g, '"<b>');
+  return str;
 };
 
 module.exports = Gsender;

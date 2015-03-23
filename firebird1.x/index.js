@@ -1930,29 +1930,35 @@ function fetchBlobs(statement, transaction, rows, callback) {
                                         if (err) {callback(err); return}
                                         var blr = new BlrReader(ret.buffer);
                                         var data = blr.readSegment();
-                                        if (buffer) {
-                                            var tmp = buffer;
-                                            buffer = new Buffer(tmp.length + data.length);
-                                            tmp.copy(buffer);
-                                            data.copy(buffer, tmp.length);
-                                        } else {
-                                            buffer = data;
-                                        }
-                                        if (ret.handle == 2) { // ???
-                                            if (statement.output[col].subType == isc_blob_text) {
-                                                if (buffer) {
-                                                    rows.data[row][col] = buffer.toString(DEFAULT_ENCODING);
-                                                } else {
-                                                    rows.data[row][col] = null;
-                                                }
-
+                                        if (data) {
+                                            if (buffer) {
+                                                var tmp = buffer;
+                                                buffer = new Buffer(tmp.length + data.length);
+                                                tmp.copy(buffer);
+                                                data.copy(buffer, tmp.length);
                                             } else {
-                                                rows.data[row][col] = buffer
+                                                buffer = data;
                                             }
+                                            if (ret.handle == 2) { // ???
+                                                if (statement.output[col].subType == isc_blob_text) {
+                                                    if (buffer) {
+                                                        rows.data[row][col] = buffer.toString(DEFAULT_ENCODING);
+                                                    } else {
+                                                        rows.data[row][col] = null;
+                                                    }
+
+                                                } else {
+                                                    rows.data[row][col] = buffer
+                                                }
+                                                callback();
+                                                statement.connection.closeBlob(blob);
+                                            } else {
+                                                read();
+                                            }
+                                        } else {
+                                            rows.data[row][col] = null;
                                             callback();
                                             statement.connection.closeBlob(blob);
-                                        } else {
-                                            read();
                                         }
                                     }
                                 );
