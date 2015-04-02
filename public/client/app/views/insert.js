@@ -1,13 +1,9 @@
 
-var _, Common, Data, Dict, Search, Select;
+var _ =        require('underscore');
+var Common =   require('common');
+var Select =   require('select');
 
-Common =   require('common');
-Data =     require('data');
-Dict =     require('dict');
-Select =   require('select');
-_ =        require('underscore');
-
-Insert = Common.extend({
+var Insert = Common.extend({
 
   el: "[data-view=\"insert\"]",
 
@@ -50,7 +46,7 @@ Insert.prototype.checkFields = function() {
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = _this.sid + "_" + sid;
       conf = window[sid + '_data'];
-      // console.log(_this.sid, sid, conf);
+      console.log('Insert.prototype.checkFields', _this.sid, sid, conf);
       _this.$form.append(jade.templates.insert_select({
         id:   id,
         conf: conf,

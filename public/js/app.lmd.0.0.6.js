@@ -1030,16 +1030,20 @@ var Gsender = Common.extend({
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
-      _this.unColorActiveLine();
-      _this.dict.set('selectRowUUID', $tr.data('uuid'));
-      _this.colorActiveLine();
-      _this.updateChilds();
+      if (!$tr.hasClass('active')) {
+        _this.unColorActiveLine();
+        _this.dict.set('selectRowUUID', $tr.data('uuid'));
+        _this.colorActiveLine();
+        _this.updateChilds();
+      } else {
+          console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
+      }
     });
 
-    this.$el.on('dblclick', 'td', function() {
-      var $tr = $(this).parent();
-      console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
-    });
+    // this.$el.on('dblclick', 'td', function() {
+    //   var $tr = $(this).parent();
+    //   console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
+    // });
 
     this.$el.on('click', "[data-action=\"delete\"]", function() {      
       var $tr = $(this).parent().parent();
@@ -1068,7 +1072,7 @@ var Gsender = Common.extend({
     });
 
     this.on('scroll.end', function() {
-      if (_this.isActive()) {
+      if (_this.isActiveDict()) {
         if (!_this.isScrolling) {
           _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
           _this.sendRequest('scroll');
@@ -1322,7 +1326,7 @@ Gsender.prototype.checkResponse = function(type) {
   this.$el.trigger('response:' + type);
 };
 
-Gsender.prototype.isActive = function() {
+Gsender.prototype.isActiveDict = function() {
   return this.$el.css('display') !== 'none';
 };
 
@@ -1428,7 +1432,7 @@ Insert.prototype.checkFields = function() {
       sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = _this.sid + "_" + sid;
       conf = window[sid + '_data'];
-      // console.log(_this.sid, sid, conf);
+      console.log('Insert.prototype.checkFields', _this.sid, sid, conf);
       _this.$form.append(jade.templates.insert_select({
         id:   id,
         conf: conf,

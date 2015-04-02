@@ -1210,7 +1210,8 @@ function doCallback(obj, callback) {
     }
 
     if (isError(obj)) {
-        callback(new Error(obj.message));
+        // callback(new Error(obj.message));
+        callback(obj);
         return;
     }
 

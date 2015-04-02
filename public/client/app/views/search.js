@@ -1,10 +1,8 @@
 
-var Common, Search, Select;
+var Common =   require('common');
+var Select =   require('select');
 
-Common =   require('common');
-Select =   require('select');
-
-Search = Common.extend({
+var Search = Common.extend({
 
   el: "[data-view=\"search\"]",
 

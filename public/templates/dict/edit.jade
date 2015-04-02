@@ -1,14 +1,14 @@
 
-.modal.fade.dict-insert(data-view = "insert", data-type = "modal", role = "dialog", tabindex = "-1")
+.modal.fade.dict-edit(data-view = "edit", data-type = "modal", role = "dialog", tabindex = "-1")
   .modal-dialog
     .modal-content
       .modal-header
         button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;     
-        h4.modal-title #{gettext('Add new record')}
+        h4.modal-title #{gettext('Edit record')}
 
       .modal-body(data-type = "modal-body")
         form.form-horizontal(role = "form", data-view = "form")
           
       .modal-footer
-        button.btn.btn-success(data-type = "button", type = "button", disabled = "disabled") #{gettext('Save new record')}
-        button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel new record')}
+        button.btn.btn-success(data-type = "button", type = "button", disabled = "disabled") #{gettext('Save edit record')}
+        button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel edit record')}
