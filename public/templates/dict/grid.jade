@@ -20,6 +20,7 @@
         .tab-pane.active(id = "dddd", data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
 
           include insert
+          include edit
 
           br
           .row
@@ -62,6 +63,7 @@
           .tab-pane(id = "#{child.sid}", data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
 
             include insert
+            include edit
 
             br
             .row

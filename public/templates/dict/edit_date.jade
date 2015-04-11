@@ -1,0 +1,12 @@
+
+form.form-horizontal(role = "form", data-view = "form")
+  .form-group
+    //- label.col-sm-12.control-label #{conf.showcaption}
+    //- .col-sm-12
+    //-   h3 #{conf.showcaption}
+    .col-sm-6
+      input.form-control(data-control = "#{id}_date", value = "#{moment(value).format('DD.MM.YYYY')}")
+    .col-sm-6
+      .bootstrap-timepicker
+        input.form-control(data-control = "#{id}_time")
+

@@ -10,6 +10,7 @@
     "<%= file.replace('.po','') %>.po": "public/client/plugins/**/*.po.js",
     "<%= file.replace('.tpl','') %>.tpl": "public/client/plugins/**/*.tpl.js",
     "line_<%= file.replace('line_','') %>.jade": "public/js/templates/dict/line_*.jade/*.js",
+    "edit_<%= file.replace('edit_','') %>.jade": "public/js/templates/dict/edit_*.jade/*.js",
     "insert_<%= file.replace('insert_','') %>.jade": "public/js/templates/dict/insert_*.jade/*.js",
     "selectize": {
       "path": "public/lib/selectize/selectize.js",
@@ -22,7 +23,9 @@
       "require": {
         "jQuery": "$"
       }
-    }
+    },
+    "datepicker": "public/lib/datepicker/datepicker.min.js",
+    "timepicker": "public/lib/timepicker/timepicker.min.js"
   },
   "main": "main"
 }

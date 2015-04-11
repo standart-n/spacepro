@@ -6,10 +6,9 @@ var Data =       require('data');
 var Dict =       require('dict');
 var Search =     require('search');
 var Insert =     require('insert');
+var Edit =       require('edit');
 var Folder =     require('folder');
 var Filter =     require('filter');
-
-// AddDeviceValue = require('addDeviceValue.pl');
 
 var Gsender = Common.extend({
 
@@ -27,6 +26,7 @@ var Gsender = Common.extend({
     this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
     this.$search =      this.$el.find("[data-view=\"search\"]");
     this.$insert =      this.$el.find("[data-view=\"insert\"]");
+    this.$edit =        this.$el.find("[data-view=\"edit\"]");
     this.$folders =     this.$el.find("[data-view=\"folders\"]");
     this.$filters =     this.$el.find("[data-view=\"filters\"]");
 
@@ -115,15 +115,15 @@ var Gsender = Common.extend({
       });
 
       this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-        console.log('insert', _this.dict.get('sid'));
         e.preventDefault();
-        if (_this.insert.autoinsert === true) {
-          _this.insert.request();
-        } else {
-          _this.$insert.modal('show');
-        }
+        _this.insert.open();
       });
     }
+
+    this.edit = new Edit({
+      el:    this.$edit,
+      conf:  this.options.conf
+    });
 
     this.$toolbar.find("[data-toggle=\"tooltip\"]").tooltip({
       container: 'body',
@@ -143,20 +143,17 @@ var Gsender = Common.extend({
 
     this.$el.on('click', 'td', function() {
       var $tr = $(this).parent();
+      var uuid = $tr.data('uuid');
       if (!$tr.hasClass('active')) {
         _this.unColorActiveLine();
-        _this.dict.set('selectRowUUID', $tr.data('uuid'));
+        _this.dict.set('selectRowUUID', uuid);
         _this.colorActiveLine();
         _this.updateChilds();
       } else {
         console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
+        _this.edit.open($(this).data('col-field'), $(this).data('col-type'), _this.data.get(uuid).toJSON(), _this.dict.get('fields'));
       }
     });
-
-    // this.$el.on('dblclick', 'td', function() {
-    //   var $tr = $(this).parent();
-    //   console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
-    // });
 
     this.$el.on('click', "[data-action=\"delete\"]", function() {      
       var $tr = $(this).parent().parent();
@@ -319,11 +316,8 @@ Gsender.prototype.hideLoading = function() {
 };
 
 Gsender.prototype.sendRequest = function(type, model) {
-  var method,
-    url,
-    success,
-    error,
-    _this = this;
+  var _this = this;
+  var method;
 
   if (type == null) {
     type = 'scroll';
@@ -360,20 +354,26 @@ Gsender.prototype.sendRequest = function(type, model) {
   }
 
 
-  success = function() {
+  var success = function(res) {
+    if (!res.err) {
+      _this.dict.set('fields', res.fields || {});
+      _this.data.add(res.data);
+    }
     _this.hideLoading();
     _this.hideErrorOnServer();
     _this.hideInformationNotFound();
     _this.checkResponse(type);
   };
 
-  error = function() {
+  var error = function() {
     _this.hideLoading();
     _this.showErrorOnServer();
   };
 
   if (method === 'fetch') {
-    this.data.fetch({
+    $.ajax({
+      url: '/api/dict/' + this.dict.get('sid'),
+      type: 'GET',
       timeout: this.dict.get('timeout'),
       data: {
         limit:        this.dict.get('limit')         || null,
@@ -386,6 +386,19 @@ Gsender.prototype.sendRequest = function(type, model) {
       success: success,
       error:   error
     });
+    // this.data.fetch({
+    //   timeout: this.dict.get('timeout'),
+    //   data: {
+    //     limit:        this.dict.get('limit')         || null,
+    //     folder_id:    this.dict.get('folder_id')     || null,
+    //     filter_id:    this.dict.get('filter_id')     || null,
+    //     query:        this.dict.get('query')         || '',
+    //     keys:         this.dict.get('keys')          || {},
+    //     vals:         this.dict.get('vals')          || {}
+    //   },
+    //   success: success,
+    //   error:   error
+    // });
   }
 
   if (method === 'remove') {

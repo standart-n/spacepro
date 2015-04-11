@@ -34,29 +34,36 @@ var Insert = Common.extend({
   }
 });
 
+Insert.prototype.open = function() {
+  if (this.autoinsert === true) {
+    this.request();
+  } else {
+    this.$el.modal('show');
+  }
+};
+
 Insert.prototype.checkFields = function() {
   var _this = this;
 
-  _.each(this.addfields, function(value, key) {
+  _.each(this.addfields, function(addfield, key) {
     var id, sid, conf, select, caption, field;
     _this.controls[key] = 'none';
-    value = value.toString().trim();
-    if (value.match(/^WDICTS\./i)) {
+    addfield = addfield.toString().trim();
+    if (addfield.match(/^WDICTS\./i)) {
       _this.autoinsert = false;
-      sid = value.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
-      id = _this.sid + "_" + sid;
+      sid = addfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
+      id = "insert_" + _this.sid + "_" + sid;
       conf = window[sid + '_data'];
-      console.log('Insert.prototype.checkFields', _this.sid, sid, conf);
       _this.$form.append(jade.templates.insert_select({
         id:   id,
-        conf: conf,
+        conf: conf
       }));
       select = new Select({
         el:   "[data-control=\"" + id + "\"]",
         type: 'select',
         conf: conf
       });
-      select.on('select', function(value) {
+      select.on('select', function(addfield) {
         if (_this.checkCompleteFields()) {
           _this.$button.removeAttr('disabled');
         }
@@ -67,9 +74,9 @@ Insert.prototype.checkFields = function() {
         value:  ''
       };
     }
-    if (value === 'default') {
+    if (addfield === 'default') {
       _this.autoinsert = false;
-      id = _this.sid + "_" + key;
+      id = "insert_" + _this.sid + "_" + key;
       field = _.findWhere(_this.columns, {
         field: key
       });
@@ -83,10 +90,10 @@ Insert.prototype.checkFields = function() {
         value:  ''
       };
     }
-    if (value.match(/^select/i)) {
+    if (addfield.match(/^select/i)) {
       _this.controls[key] = {
         type: 'sql',
-        value: value
+        value: addfield
       };
     }
   });

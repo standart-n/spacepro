@@ -26,6 +26,7 @@ Dict = Backbone.Model.extend({
       keys:                    {},
       vals:                    {},
       columns:                 {},
+      fields:                  {},
       childs:                  {},
       childsInfo:              {},
       filter_id:               null,

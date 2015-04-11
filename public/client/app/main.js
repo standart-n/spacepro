@@ -9,14 +9,21 @@ require('bootstrap');
 require('selectize');
 require('moment');
 require('store');
+require('datepicker');
+require('timepicker');
 
 window.jade.templates = {};
-window.jade.templates.line_data =      require('line_data.jade');
-window.jade.templates.line_nothing =   require('line_nothing.jade');
-window.jade.templates.line_error =     require('line_error.jade');
-window.jade.templates.line_loading =   require('line_loading.jade');
-window.jade.templates.insert_select =  require('insert_select.jade');
-window.jade.templates.insert_default = require('insert_default.jade');
+window.jade.templates.line_data =        require('line_data.jade');
+window.jade.templates.line_nothing =     require('line_nothing.jade');
+window.jade.templates.line_error =       require('line_error.jade');
+window.jade.templates.line_loading =     require('line_loading.jade');
+window.jade.templates.insert_select =    require('insert_select.jade');
+window.jade.templates.insert_default =   require('insert_default.jade');
+window.jade.templates.edit_header =      require('edit_header.jade');
+window.jade.templates.edit_select =      require('edit_select.jade');
+window.jade.templates.edit_groups =      require('edit_groups.jade');
+window.jade.templates.edit_text =        require('edit_text.jade');
+window.jade.templates.edit_date =        require('edit_date.jade');
 
 var Backbone =    require('backbone');
 var App =         require('app');
