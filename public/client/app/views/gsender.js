@@ -118,6 +118,10 @@ var Gsender = Common.extend({
         e.preventDefault();
         _this.insert.open();
       });
+
+      this.$insert.on('update', function() {
+        _this.sendRequest('search');
+      });
     }
 
     this.edit = new Edit({
@@ -150,12 +154,12 @@ var Gsender = Common.extend({
         _this.colorActiveLine();
         _this.updateChilds();
       } else {
-        console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
+        // console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
         _this.edit.open($(this).data('col-field'), $(this).data('col-type'), _this.data.get(uuid).toJSON(), _this.dict.get('fields'));
       }
     });
 
-    this.$el.on('click', "[data-action=\"delete\"]", function() {      
+    this.$el.on('click', "[data-action=\"delete\"]", function() {
       var $tr = $(this).parent().parent();
       _this.dict.set('selectRowUUID', $tr.data('uuid'));
       _this.sendRequest('remove', _this.getSelectLine());
@@ -353,11 +357,18 @@ Gsender.prototype.sendRequest = function(type, model) {
     break;
   }
 
-
   var success = function(res) {
     if (!res.err) {
       _this.dict.set('fields', res.fields || {});
       _this.data.add(res.data);
+    } else {
+      $.noty({
+        text:         res.err,
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      3000
+      });
     }
     _this.hideLoading();
     _this.hideErrorOnServer();
@@ -365,12 +376,14 @@ Gsender.prototype.sendRequest = function(type, model) {
     _this.checkResponse(type);
   };
 
-  var error = function() {
+  var error = function(e) {
     _this.hideLoading();
     _this.showErrorOnServer();
+    console.error(e);
   };
 
   if (method === 'fetch') {
+
     $.ajax({
       url: '/api/dict/' + this.dict.get('sid'),
       type: 'GET',

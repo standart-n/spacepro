@@ -2,7 +2,6 @@
 window.JSON = require('json2');
 window.jade = require('runtime');
 
-
 require('jquery');
 // require('jquery-ui');
 require('bootstrap');
@@ -11,6 +10,7 @@ require('moment');
 require('store');
 require('datepicker');
 require('timepicker');
+require('noty');
 
 window.jade.templates = {};
 window.jade.templates.line_data =        require('line_data.jade');
@@ -19,6 +19,7 @@ window.jade.templates.line_error =       require('line_error.jade');
 window.jade.templates.line_loading =     require('line_loading.jade');
 window.jade.templates.insert_select =    require('insert_select.jade');
 window.jade.templates.insert_default =   require('insert_default.jade');
+window.jade.templates.edit_default =     require('edit_default.jade');
 window.jade.templates.edit_header =      require('edit_header.jade');
 window.jade.templates.edit_select =      require('edit_select.jade');
 window.jade.templates.edit_groups =      require('edit_groups.jade');
@@ -29,6 +30,14 @@ var Backbone =    require('backbone');
 var App =         require('app');
 
 $(function() {
+
+  // $.noty({
+  //   text:"This is an alert",
+  //   layout:"topCenter",
+  //   type:"alert",
+  //   closeButton:false,
+  //   timeout:2000
+  // });
 
   if (window.console == null) {
     window.console = {
@@ -65,17 +74,18 @@ $(function() {
 
   window.colorToHex = function(c) {
     var x='00000'+(((c&0xff)<<16)+(c&0xff00)+(c>>16)).toString(16);
-    return x.slice(-6);               
+    return x.slice(-6);
   };
 
   window.parseGroupLine = function(gr) {
     var groups = [];
-    gr.replace(/(-?\d+)=\{(\d+)\|(-?\d+)\}([\D]+)/ig, function(text, id, color, icon, title) {
+    gr.replace(/(-?\d+)=\{(\d+)\|(-?\d+)\}([\D]+)/ig, function(text, id, color, icon, caption) {
       groups.push({
         id:       id                       || 0,
-        color:    window.colorToHex(color) || "#ccc",
+        color:    color                    || '',
+        hex:      window.colorToHex(color) || "#ccc",
         icon:     icon                     || -1,
-        title:    title                    || ''
+        caption:  caption                  || ''
       });
     });
     return groups;

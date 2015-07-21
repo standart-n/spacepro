@@ -1,0 +1,31 @@
+
+form.form-horizontal(role = "form", data-view = "form")
+  .form-group
+    .col-sm-6
+      h4 Выбранные группы
+      - var groups_active = window.parseGroupLine(value);
+      - each group in groups_active
+        .row        
+          .col-sm-1
+            span.badge-group(style = "color:#000; background-color:##{group.color};") &nbsp;
+          .col-sm-10
+            a.btn.btn-xs.btn-success(href = "#") #{group.title}
+    .col-sm-6
+      h4 Все группы
+      //- .well.well-small(id = "#{id}_all")
+      - each group in groups
+        - if (group.depth > 1)
+          .row        
+            .col-sm-1
+              span.badge-group(style = "color:#000; background-color:##{window.colorToHex(group.color)};") &nbsp;
+            .col-sm-10
+              //- a.col-sm-10.btn.btn-xs.btn-link(href = "##{group.id}_#{group.depth}_#{group.caption}")
+              a.btn.btn-xs.btn-default(href = "##{group.id}_#{group.depth}_#{group.caption}") #{group.caption}
+                //- span.badge-group(style = "color:#000; background-color:##{window.colorToHex(group.color)};") &nbsp;
+                //-&nbsp;
+                //- span #{group.caption}
+            //- .col-sm-2
+            //- i.fa.fa-plus
+            //- br
+
+    #{value}

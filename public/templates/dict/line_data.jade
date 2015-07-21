@@ -17,7 +17,7 @@ tr(data-uuid = "#{line[keyfieldname]}")
           td(class = "#{column.hidden_class}", data-col-field = "#{column.field}", data-col-type = "groups")
             - var groups = window.parseGroupLine(value);
             - each group in groups
-              span.badge-group(data-toggle = "tooltip", title = "#{group.title}", style = "color:#000; background-color:##{group.color};") &nbsp;
+              span.badge-group(data-toggle = "tooltip", title = "#{group.caption}", style = "color:#000; background-color:##{group.hex};") &nbsp;
         - else
           td(class = "#{column.hidden_class}", data-col-field = "#{column.field}", data-col-type = "text")
             - if (value.length > 103)

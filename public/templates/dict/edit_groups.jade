@@ -1,7 +1,9 @@
 
 form.form-horizontal(role = "form", data-view = "form")
-  .form-group
+  .form-group(data-control = "#{id}")
     .col-sm-6
-      select.form-control(data-control = "#{id}_active", miltiple, size = "10")
+      h4 Выбранные группы
+      div(data-view = "check-groups")
     .col-sm-6
-      select.form-control(data-control = "#{id}_all", miltiple, size = "10")
+      h4 Все группы
+      div(data-view = "all-groups")

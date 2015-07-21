@@ -310,8 +310,10 @@ Select.prototype.load = function(_this) {
         keys:  _this.conf.keys             || {},
         vals:  _this.conf.vals             || {}
       },
-      success: function(data) {
-        fn(_this.checkData(data));
+      success: function(res) {
+        if (!res.err) {
+          fn(_this.checkData(res.data));
+        }
       },
       error: function() {
         fn();

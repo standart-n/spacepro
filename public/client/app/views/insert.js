@@ -2,6 +2,7 @@
 var _ =        require('underscore');
 var Common =   require('common');
 var Select =   require('select');
+// var noty =     require('noty');
 
 var Insert = Common.extend({
 
@@ -64,9 +65,7 @@ Insert.prototype.checkFields = function() {
         conf: conf
       });
       select.on('select', function(addfield) {
-        if (_this.checkCompleteFields()) {
-          _this.$button.removeAttr('disabled');
-        }
+        _this.checkCompleteFields();
       });
       _this.controls[key] = {
         type:   'select',
@@ -87,6 +86,7 @@ Insert.prototype.checkFields = function() {
       }));
       _this.controls[key] = {
         type:   'default',
+        input:  _this.$form.find("[data-control=\"" + id + "\"]"),
         value:  ''
       };
     }
@@ -100,6 +100,7 @@ Insert.prototype.checkFields = function() {
 };
 
 Insert.prototype.request = function() {
+  var _this = this;
   $.ajax({
     url: '/api/dict/' + this.sid,
     type: 'GET',
@@ -108,11 +109,37 @@ Insert.prototype.request = function() {
       controls: this.vals
     },
     timeout: this.options.timeout || 1000,
-    success: function() {
-      alert('success');
+    success: function(res) {
+      if (!res.err) {
+        _this.$el.modal('hide');
+        _this.$el.trigger('update');
+        $.noty({
+          text:         'Запись успешно добавлена!',
+          layout:       'topCenter',
+          type:         'success',
+          closeButton:  false,
+          timeout:      2000
+        });
+      } else {
+        $.noty({
+          text:         'Произошла ошибка при добавлении записи!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Insert.prototype.request', res.err);
+      }
     },
-    error: function() {
-      alert('error');
+    error: function(e) {
+      $.noty({
+        text:         'Произошла ошибка при запросе к серверу!',
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      3000
+      });
+      console.error('Insert.prototype.request error', e);
     }
   });
 };
@@ -127,12 +154,21 @@ Insert.prototype.checkCompleteFields = function() {
         _this.vals[key] = _this.controls[key].select.getValue();
         break;
       default:
-        _this.vals[key] = _this.controls[key].value;        
+        if (_this.controls[key].input) {
+          _this.vals[key] = _this.controls[key].input.val();
+        } else {          
+          _this.vals[key] = _this.controls[key].value;
+        }
     }
     if (_this.vals[key] === '') {
       result = false;
     }
   });
+  if (!result) {
+    _this.$button.attr('disabled', 'disabled');
+  } else {
+    _this.$button.removeAttr('disabled');
+  }
   return result;
 };
 

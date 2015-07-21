@@ -1,7 +1,8 @@
 
-var _ =        require('underscore');
-var Common =   require('common');
-var Select =   require('select');
+var _ =            require('underscore');
+var Common =       require('common');
+var Select =       require('select');
+var GroupEdit =    require('groupedit');
 
 var Edit = Common.extend({
 
@@ -22,7 +23,9 @@ var Edit = Common.extend({
     this.controls =     {};
     this.vals =         {};
     
-    // this.checkFields();
+    this.$button.on('click', function() {
+      _this.request();
+    });
 
     _this = this;
 
@@ -31,25 +34,30 @@ var Edit = Common.extend({
 });
 
 Edit.prototype.open = function(field, type, line, fields) {
-
-  var id, sid, conf, select;
+  var id, sid, conf, select, groupEdit, groups, control;
+  var showdefault = true;
   var value = line[field];
   var fieldInfo = fields[field];
-  var editfield = this.editfields[field];
   var column = _.findWhere(this.columns, {
     field: field
   });
   var caption = column.caption || '';
 
-  if (editfield) {
-    editfield = editfield.toString().trim();
-    if (this.editfields[editfield]) {
-      editfield = this.editfields[editfield].toString().trim();
+  this.editfield = this.editfields[field];
+
+  if (this.editfield) {
+
+    console.log(fieldInfo.mtype);
+
+    this.editfield = this.editfield.toString().trim();
+    if (this.editfields[this.editfield]) {
+      field = this.editfield;
+      this.editfield = this.editfields[this.editfield].toString().trim();
     }
-    editfield = editfield.toLowerCase();
+    this.editfield = this.editfield.toLowerCase();
     
-    if (editfield.match(/^WDICTS\./i)) {
-      sid = editfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
+    if (this.editfield.match(/^WDICTS\./i)) {
+      sid = this.editfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
       id = "edit_" + this.sid + "_" + sid;
       conf = window[sid + '_data'];
       this.$header.html(jade.templates.edit_header({
@@ -64,29 +72,51 @@ Edit.prototype.open = function(field, type, line, fields) {
         type: 'select',
         conf: conf
       });
+      this.controls = {
+        field:      field,
+        fieldInfo:  fieldInfo,
+        line:       line,
+        type:       'select',
+        val:  function() {
+          return select.getValue();
+        }
+      };
+      showdefault = false;
       this.$el.modal('show');
     }
     
-    if (editfield === 'strings') {
+    if ((this.editfield === 'strings') || (fieldInfo.mtype === 'blob')) {
       id = "edit_" + this.sid + "_" + field;
       this.$header.html(jade.templates.edit_header({
         caption: caption
       }));
       this.$body.html(jade.templates.edit_text({
-        id:       id,
-        value:    value
+        id:         id,
+        fieldInfo:  fieldInfo,
+        value:      value
       }));
+      this.controls = {
+        field:      field,
+        fieldInfo:  fieldInfo,
+        line:       line,
+        type:       type,
+        val:  function() {
+          return $("[data-control=\"" + id + "\"]").val();
+        }
+      };
+      showdefault = false;
       this.$el.modal('show');
     }
 
-    if ((editfield === 'default') && (fieldInfo.mtype === 'timestamp')) {
+    if ((this.editfield === 'default') && (fieldInfo.mtype === 'timestamp')) {
       id = "edit_" + this.sid + "_" + sid;
       this.$header.html(jade.templates.edit_header({
         caption: caption
       }));
       this.$body.html(jade.templates.edit_date({
-        id:       id,
-        value:    value
+        id:         id,
+        fieldInfo:  fieldInfo,
+        value:      value
       }));
       $("[data-control=\"" + id + "_date\"]").datepicker({
         format: 'dd.mm.yyyy'
@@ -99,24 +129,154 @@ Edit.prototype.open = function(field, type, line, fields) {
       });
       $('.icon-chevron-up').addClass('fa').addClass('fa-chevron-up').removeClass('icon-chevron-up');
       $('.icon-chevron-down').addClass('fa').addClass('fa-chevron-down').removeClass('icon-chevron-down');
+      this.controls = {
+        field:      field,
+        fieldInfo:  fieldInfo,
+        line:       line,
+        type:       type,
+        val:  function() {
+          // return $("[data-control=\"" + id + "_date\"]").val() + ' ' + $("[data-control=\"" + id + "_time\"]").val();
+          return new Date();
+          // return {
+          //   date: $("[data-control=\"" + id + "_date\"]").val(),
+          //   time: $("[data-control=\"" + id + "_time\"]").val()
+          // };
+        }
+      };
+      showdefault = false;
       this.$el.modal('show');
     }
 
-    if ((editfield === 'default') && (field === 'mmbsh')) {
+    if ((this.editfield === 'default') && (field === 'mmbsh')) {
       id = "edit_" + this.sid + "_" + field;
+      groups = this.conf.groups || [];
       this.$header.html(jade.templates.edit_header({
         caption: caption
       }));
       this.$body.html(jade.templates.edit_groups({
-        id:       id,
-        value:    value
+        id:         id,
+        fieldInfo:  fieldInfo,
+        value:      value,
+        groups:     groups
       }));
+      groupEdit = new GroupEdit({
+        el:   "[data-control=\"" + id + "\"]",
+        value:       value,
+        groups:      groups
+      });
+      this.controls = {
+        field:      field,
+        fieldInfo:  fieldInfo,
+        line:       line,
+        type:       type,
+        val:  function() {
+          return groupEdit.result();
+        }
+      };
       this.$el.modal('show');
     }
 
+    if ((this.editfield === 'default') && (showdefault)) {
+      id = "edit_" + this.sid + "_" + field;
+      this.$header.html(jade.templates.edit_header({
+        caption: caption
+      }));
+      this.$body.html(jade.templates.edit_default({
+        id:         id,
+        fieldInfo:  fieldInfo,
+        value:      value
+      }));
+      this.controls = {
+        field:      field,
+        fieldInfo:  fieldInfo,
+        line:       line,
+        type:       type,
+        input:      this.$body.find("[data-control=\"" + id + "\"]"),
+        val:  function() {
+          return $("[data-control=\"" + id + "\"]").val();
+        }
+      };
+      this.$el.modal('show');
+    }
+
+  } else {
+
+    $.noty({
+      text:         'Данное поле не редактируется!',
+      layout:       'topCenter',
+      type:         'alert',
+      closeButton:  false,
+      timeout:      2000
+    });
+
+  }
+};
+
+Edit.prototype.checkCompleteFields = function() {
+  var _this = this;
+  var result = false;
+
+  if (this.editfield) {
+    result = {
+      field:      this.controls.field,
+      fieldInfo:  this.controls.fieldInfo,
+      type:       this.controls.type,
+      line:       this.controls.line,
+      val:        this.controls.val()
+    };
   }
 
-  // this.$el.modal('show');
+  return result;
+};
+
+Edit.prototype.request = function() {
+  var _this = this;
+  var controls = this.checkCompleteFields();
+
+  if (controls) {
+    $.ajax({
+      url: '/api/dict/' + this.sid,
+      type: 'GET',
+      data: {
+        _method: 'POST',
+        controls: controls
+      },
+      timeout: this.options.timeout || 1000,
+      success: function(res) {
+        if (!res.err) {
+          _this.$el.modal('hide');
+          _this.$el.trigger('update');
+          $.noty({
+            text:         'Запись успешно изменена!',
+            layout:       'topCenter',
+            type:         'success',
+            closeButton:  false,
+            timeout:      2000
+          });
+        } else {
+          $.noty({
+            text:         'Произошла ошибка при редактировании записи!',
+            layout:       'topCenter',
+            type:         'error',
+            closeButton:  false,
+            timeout:      3000
+          });
+          console.error('Insert.prototype.request', res.err);
+        }
+      },
+      error: function(e) {
+        $.noty({
+          text:         'Произошла ошибка при запросе к серверу!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Edit.prototype.request error', e);
+      }
+    });
+  }
+
 };
 
 

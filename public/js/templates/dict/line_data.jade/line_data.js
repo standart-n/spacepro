@@ -41,7 +41,7 @@ buf.push('>');
       var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.caption) + ""), 'style':("color:#000; background-color:#" + (group.hex) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -51,7 +51,7 @@ buf.push('>&nbsp;</span>');
       $$l++;      var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.caption) + ""), 'style':("color:#000; background-color:#" + (group.hex) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -111,7 +111,7 @@ buf.push('>');
       var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.caption) + ""), 'style':("color:#000; background-color:#" + (group.hex) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 
@@ -121,7 +121,7 @@ buf.push('>&nbsp;</span>');
       $$l++;      var group = groups[$index];
 
 buf.push('<span');
-buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.title) + ""), 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (group.caption) + ""), 'style':("color:#000; background-color:#" + (group.hex) + ";"), "class": ('badge-group') }, {"data-toggle":true,"title":true,"style":true}));
 buf.push('>&nbsp;</span>');
     }
 

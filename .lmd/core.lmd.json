@@ -35,6 +35,12 @@
         "jQuery": "$"
       }
     },
+    "noty": {
+      "path": "public/lib/noty/jquery.noty.js",
+      "require": {
+        "jQuery": "$"
+      }
+    },
     "moment": "public/lib/moment/moment.min.js",
     "moment-ru": "public/lib/moment/lang/ru.js"
   },
