@@ -32,26 +32,32 @@ module.exports = Backbone.View.extend({
         $(this).removeClass('open').addClass('close');
 
         span =        $content.attr('class');
-        spanNum =     parseInt(span.replace( /^\D+/g, ''));
-        newSpanNum =  spanNum + 2;
-        newSpan =     'span' + newSpanNum;
-        
-        $brand.addClass('noBg');
-        $sidebar.hide();
-        $content.addClass('full').trigger('transform');
+
+        if (span) {
+          spanNum =     parseInt(span.replace( /^\D+/g, ''));
+          newSpanNum =  spanNum + 2;
+          newSpan =     'span' + newSpanNum;
+          
+          $brand.addClass('noBg');
+          $sidebar.hide();
+          $content.addClass('full').trigger('transform');
+        }
 
       } else {
 
         $(this).removeClass('close').addClass('open');
       
         span =        $content.attr('class');
-        spanNum =     parseInt(span.replace( /^\D+/g, ''));
-        newSpanNum =  spanNum - 2;
-        newSpan =     'span' + newSpanNum;
-        
-        $brand.removeClass('noBg');
-        $sidebar.show();
-        $content.removeClass('full').trigger('transform');
+
+        if (span) {
+          spanNum =     parseInt(span.replace( /^\D+/g, ''));
+          newSpanNum =  spanNum - 2;
+          newSpan =     'span' + newSpanNum;
+          
+          $brand.removeClass('noBg');
+          $sidebar.show();
+          $content.removeClass('full').trigger('transform');
+        }
 
       }
 

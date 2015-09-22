@@ -110,8 +110,8 @@ var Gsender = Common.extend({
     if (this.toolbar.insert === true) {
 
       this.insert = new Insert({
-        el:    this.$insert,
-        conf:  this.options.conf
+        el:         this.$insert,
+        conf:       this.options.conf
       });
 
       this.$el.on('click', "[data-action=\"insert\"]", function(e) {
@@ -127,6 +127,10 @@ var Gsender = Common.extend({
     this.edit = new Edit({
       el:    this.$edit,
       conf:  this.options.conf
+    });
+
+    this.$edit.on('update', function() {
+      _this.sendRequest('search');
     });
 
     this.$toolbar.find("[data-toggle=\"tooltip\"]").tooltip({
@@ -154,7 +158,6 @@ var Gsender = Common.extend({
         _this.colorActiveLine();
         _this.updateChilds();
       } else {
-        // console.log('dblclick', $(this).data('col-field'), $(this).data('col-type'));
         _this.edit.open($(this).data('col-field'), $(this).data('col-type'), _this.data.get(uuid).toJSON(), _this.dict.get('fields'));
       }
     });

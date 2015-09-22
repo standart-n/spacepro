@@ -16,7 +16,7 @@ buf.push('><meta');
 buf.push(attrs({ terse: true, 'name':("Copyright"), 'Lang':("ru"), 'content':("2013 " + (author) + "") }, {"name":true,"Lang":true,"content":true}));
 buf.push('><meta name="robots" content="all"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta');
 buf.push(attrs({ terse: true, 'http-equiv':("Content-Language"), 'content':("" + (lang) + "") }, {"http-equiv":true,"content":true}));
-buf.push('><meta http-equiv="Content-Type" content="text/html; charset = utf-8"><link href="/img/favicon.ico" rel="shortcut icon" type="image/x-icon">');
+buf.push('><meta http-equiv="Content-Type" content="text/html; charset = utf-8"><link href="/img/favicon.ico" rel="shortcut" type="image/x-icon"><link href="/img/favicon.png" rel="icon" type="image/png">');
  css.forEach(function(file){
 {
 buf.push('<link');
@@ -24,7 +24,12 @@ buf.push(attrs({ terse: true, 'href':("css/" + (file) + ""), 'rel':("stylesheet"
 buf.push('>');
 }
  })
-buf.push('</head><body><header class="navbar"><div class="container"><button type="button" data-toggle="collapse" data-target=".sidebar-nav.nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a id="main-menu-toggle" class="hidden-xs open"><i class="fa fa-bars"></i></a><a href="/" class="navbar-brand col-lg-2 col-sm-1 col-xs-12"><i class="fa fa-rocket fa-lg fa-inverse fa-fw"></i><span class="hidden-sm">SpacePro</span></a><div class="header-nav nav-no-collapse"><ul class="nav navbar-nav pull-right"><li><a href="#auth/logout" class="btn"><i class="fa fa-power-off fa-fw"></i>&nbsp;<small>' + escape((interp = gettext('Logout')) == null ? '' : interp) + '</small></a></li></ul></div></div></header><div class="container"><div class="row"><div id="sidebar-left" class="col-lg-2 col-sm-1"><div class="sidebar-nav nav-collapse collapse navbar-collapse bs-navbar-collapse"><ul class="nav nav-tabs nav-stacked main-menu">');
+buf.push('</head><body><header class="navbar"><div class="container"><button type="button" data-toggle="collapse" data-target=".sidebar-nav.nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a id="main-menu-toggle" class="hidden-xs open"><i class="fa fa-bars"></i></a><a href="/" class="navbar-brand col-lg-2 col-sm-1 col-xs-12"><i class="fa fa-rocket fa-lg fa-inverse fa-fw"></i><span class="hidden-sm">SpacePro</span></a><div class="header-nav nav-no-collapse"><ul class="nav navbar-nav pull-right"><li><a href="#auth/logout" class="btn"><i class="fa fa-power-off fa-fw"></i>&nbsp;<small>' + escape((interp = gettext('Logout')) == null ? '' : interp) + '</small></a></li></ul></div></div></header><div class="container"><div class="row">');
+ if (webDicts != undefined)
+{
+ if (webDicts.active != undefined)
+{
+buf.push('<div id="sidebar-left" class="col-lg-2 col-sm-1"><div class="sidebar-nav nav-collapse collapse navbar-collapse bs-navbar-collapse"><ul class="nav nav-tabs nav-stacked main-menu">');
 // iterate webDicts.dicts
 ;(function(){
   if ('number' == typeof webDicts.dicts.length) {
@@ -390,7 +395,10 @@ buf.push('</tr></thead><tbody></tbody></table></div></div></div>');
   }
 }).call(this);
 
-buf.push('</div></div></div></div></div></div>');
+buf.push('</div></div></div></div>');
+}
+}
+buf.push('</div></div>');
  js.forEach(function(file){
 {
 buf.push('<script');

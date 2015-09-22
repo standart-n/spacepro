@@ -14,7 +14,7 @@ buf.push('/><meta');
 buf.push(attrs({ 'name':("Copyright"), 'Lang':("ru"), 'content':("2013 " + (author) + "") }, {"name":true,"Lang":true,"content":true}));
 buf.push('/><meta name="robots" content="all"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta');
 buf.push(attrs({ 'http-equiv':("Content-Language"), 'content':("" + (lang) + "") }, {"http-equiv":true,"content":true}));
-buf.push('/><meta http-equiv="Content-Type" content="text/html; charset = utf-8"/><link href="/img/favicon.ico" rel="shortcut icon" type="image/x-icon"/>');
+buf.push('/><meta http-equiv="Content-Type" content="text/html; charset = utf-8"/><link href="/img/favicon.ico" rel="shortcut" type="image/x-icon"/><link href="/img/favicon.png" rel="icon" type="image/png"/>');
  css.forEach(function(file){
 {
 buf.push('<link');

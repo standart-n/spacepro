@@ -4,13 +4,18 @@ html(lang = "#{lang}", dir = "#{lang_dir}")
     include ../includes/head
 
   body
+
     include ../index/navbar
 
     .container
       .row
 
-        include ../index/sidebar
+        - if (webDicts != undefined)
+          - if (webDicts.active != undefined)
 
-        include ../dict/grid
+
+            include ../index/sidebar
+
+            include ../dict/grid
 
     include ../includes/js

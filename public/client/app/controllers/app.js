@@ -6,6 +6,10 @@ var Sidebar =   require('sidebar');
 
 module.exports = Backbone.Router.extend({
 
+  routes: {
+    'auth/logout':   'logout'
+  },
+
   initialize: function() {
     var _this = this;
     var dicts = [];
@@ -40,5 +44,21 @@ module.exports = Backbone.Router.extend({
       }
     });
 
+  },
+
+  logout: function() {
+    $.ajax({
+      url: '/api/auth/logout',
+      timeout: 10000,
+      complete: function(xhr, textStatus) {
+        if (textStatus === 'success') {
+          var res = JSON.parse(xhr.responseText);
+          if (!res.err) {
+            window.location.href = "/";    
+          }
+        }
+      }
+    });
   }
+
 });

@@ -36,10 +36,22 @@ var Insert = Common.extend({
 });
 
 Insert.prototype.open = function() {
-  if (this.autoinsert === true) {
-    this.request();
+  var privileges =  this.conf.privileges || {};
+  var I =           privileges.I         || [];
+  if (I === true) {
+    if (this.autoinsert === true) {
+      this.request();
+    } else {
+      this.$el.modal('show');
+    }
   } else {
-    this.$el.modal('show');
+    $.noty({
+      text:         'Добавление новой записи запрещено!',
+      layout:       'topCenter',
+      type:         'error',
+      closeButton:  false,
+      timeout:      500
+    });    
   }
 };
 
