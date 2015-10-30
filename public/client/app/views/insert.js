@@ -1,10 +1,13 @@
 
 var _ =        require('underscore');
-var Common =   require('common');
+var Modal =    require('modal');
 var Select =   require('select');
 // var noty =     require('noty');
 
-var Insert = Common.extend({
+var template_insert_select =    require('insert_select.jade');
+var template_insert_default =   require('insert_default.jade');
+
+var Insert = Modal.extend({
 
   el: "[data-view=\"insert\"]",
 
@@ -30,15 +33,40 @@ var Insert = Common.extend({
     this.$button.on('click', function() {
       if (_this.checkCompleteFields()) {
         _this.request();
+      } else {
+        $.noty({
+          text:         'Вы заполнили не все поля!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      10000
+        });
       }
     });
   }
 });
 
+
+Insert.prototype.checkPrivilegies = function() {
+  var privileges =      this.conf.privileges || {};
+  var A =               privileges.A         || false;
+  var I =               privileges.I         || [];
+
+  if (A) {
+    return true;
+  } else {
+    if (I === true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+};
+
 Insert.prototype.open = function() {
-  var privileges =  this.conf.privileges || {};
-  var I =           privileges.I         || [];
-  if (I === true) {
+
+  if (this.checkPrivilegies()) {
     if (this.autoinsert === true) {
       this.request();
     } else {
@@ -59,15 +87,17 @@ Insert.prototype.checkFields = function() {
   var _this = this;
 
   _.each(this.addfields, function(addfield, key) {
-    var id, sid, conf, select, caption, field;
+    var sid, conf, select, caption, field;
+
+    var id = guid();
+
     _this.controls[key] = 'none';
     addfield = addfield.toString().trim();
     if (addfield.match(/^WDICTS\./i)) {
       _this.autoinsert = false;
       sid = addfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
-      id = "insert_" + _this.sid + "_" + sid;
       conf = window[sid + '_data'];
-      _this.$form.append(jade.templates.insert_select({
+      _this.$form.append(template_insert_select({
         id:   id,
         conf: conf
       }));
@@ -76,9 +106,9 @@ Insert.prototype.checkFields = function() {
         type: 'select',
         conf: conf
       });
-      select.on('select', function(addfield) {
-        _this.checkCompleteFields();
-      });
+      // select.on('select', function(addfield) {
+      //   _this.checkCompleteFields();
+      // });
       _this.controls[key] = {
         type:   'select',
         select: select,
@@ -87,12 +117,11 @@ Insert.prototype.checkFields = function() {
     }
     if (addfield === 'default') {
       _this.autoinsert = false;
-      id = "insert_" + _this.sid + "_" + key;
       field = _.findWhere(_this.columns, {
         field: key
       });
       caption = field.caption || '';
-      _this.$form.append(jade.templates.insert_default({
+      _this.$form.append(template_insert_default({
         id:       id,
         caption:  caption
       }));
@@ -120,7 +149,7 @@ Insert.prototype.request = function() {
       _method: 'PUT',
       controls: this.vals
     },
-    timeout: this.options.timeout || 1000,
+    timeout: 10000,
     success: function(res) {
       if (!res.err) {
         _this.$el.modal('hide');
@@ -176,11 +205,11 @@ Insert.prototype.checkCompleteFields = function() {
       result = false;
     }
   });
-  if (!result) {
-    _this.$button.attr('disabled', 'disabled');
-  } else {
-    _this.$button.removeAttr('disabled');
-  }
+  // if (!result) {
+  //   _this.$button.attr('disabled', 'disabled');
+  // } else {
+  //   _this.$button.removeAttr('disabled');
+  // }
   return result;
 };
 

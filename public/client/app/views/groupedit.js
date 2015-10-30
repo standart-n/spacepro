@@ -1,6 +1,6 @@
 
-var _ =        require('_');
-var Common =   require('common');
+var _ =       require('_');
+var Common =  require('common');
 
 var GroupEdit = Common.extend({
 
@@ -35,7 +35,7 @@ var GroupEdit = Common.extend({
       } else {
         _this.$allGroups.append(   _this.render("all",   groups, "default", true));
       }
-      _this.result();
+      // _this.result();
     });
 
   }
@@ -77,27 +77,29 @@ GroupEdit.prototype.render = function(type, ms, cl, colorize) {
   }
   _.each(ms, function(group, key) {
     group = _this.allGroups[key];
-    if ((type !== 'all') || (!$(_this.$checkGroups).find('[data-group-id=\"' + group.id + '\"]').length)) {
-      if (group.depth > 1) {
-        s += '<div class = "row", data-group-id = "#{group.id}", data-group-type = "#{type}">';
-        if (colorize) {
-          s +=   '<div class = "col-sm-1">';
-          s +=     '<span class = "badge-group", style = "color:#000; background-color:##{group.hex};">';
-          s +=       '&nbsp;';
-          s +=     '</span>';
+    if (group) {
+      if ((type !== 'all') || (!$(_this.$checkGroups).find('[data-group-id=\"' + group.id + '\"]').length)) {
+        if (group.depth > 1) {
+          s += '<div class = "row", data-group-id = "#{group.id}", data-group-type = "#{type}">';
+          if (colorize) {
+            s +=   '<div class = "col-sm-1">';
+            s +=     '<span class = "badge-group", style = "color:#000; background-color:##{group.hex};">';
+            s +=       '&nbsp;';
+            s +=     '</span>';
+            s +=   '</div>';
+          }
+          s +=   '<div class = "col-sm-10">';
+          s +=     '<a class = "btn btn-xs btn-#{class}", data-action = "group-edit", href = "#">';
+          s +=       '#{group.caption}';
+          s +=     '</a>';
           s +=   '</div>';
+          s += '</div>';
+          s = s.replace(/\#\{class}/g,           cl);
+          s = s.replace(/\#\{type}/g,            type);
+          s = s.replace(/\#\{group\.id\}/g,      group.id);
+          s = s.replace(/\#\{group\.hex\}/g,     group.hex);
+          s = s.replace(/\#\{group\.caption\}/g, group.caption);
         }
-        s +=   '<div class = "col-sm-10">';
-        s +=     '<a class = "btn btn-xs btn-#{class}", data-action = "group-edit", href = "#">';
-        s +=       '#{group.caption}';
-        s +=     '</a>';
-        s +=   '</div>';
-        s += '</div>';
-        s = s.replace(/\#\{class}/g,           cl);
-        s = s.replace(/\#\{type}/g,            type);
-        s = s.replace(/\#\{group\.id\}/g,      group.id);
-        s = s.replace(/\#\{group\.hex\}/g,     group.hex);
-        s = s.replace(/\#\{group\.caption\}/g, group.caption);
       }
     }
   });

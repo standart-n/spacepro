@@ -313,6 +313,7 @@ sb.on('stats:before-require-count', function (moduleName, module) {
 window.JSON = require('json2');
 window.jade = require('runtime');
 
+require('units');
 require('jquery');
 // require('jquery-ui');
 require('bootstrap');
@@ -322,23 +323,12 @@ require('store');
 require('datepicker');
 require('timepicker');
 require('noty');
-
-window.jade.templates = {};
-window.jade.templates.line_data =        require('line_data.jade');
-window.jade.templates.line_nothing =     require('line_nothing.jade');
-window.jade.templates.line_error =       require('line_error.jade');
-window.jade.templates.line_loading =     require('line_loading.jade');
-window.jade.templates.insert_select =    require('insert_select.jade');
-window.jade.templates.insert_default =   require('insert_default.jade');
-window.jade.templates.edit_default =     require('edit_default.jade');
-window.jade.templates.edit_header =      require('edit_header.jade');
-window.jade.templates.edit_select =      require('edit_select.jade');
-window.jade.templates.edit_groups =      require('edit_groups.jade');
-window.jade.templates.edit_text =        require('edit_text.jade');
-window.jade.templates.edit_date =        require('edit_date.jade');
+require('cookie');
 
 var Backbone =    require('backbone');
 var App =         require('app');
+
+// console.log('user_id', $.cookie('user_id'));
 
 $(function() {
 
@@ -402,6 +392,13 @@ $(function() {
     return groups;
   };
 
+  window.guid = function() {
+    var s4 = function() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+  };
+
   window.aid = function() {
     return Math.floor(Math.random() * Math.pow(10, 10));
   };
@@ -423,6 +420,855 @@ $(function() {
 });
 
 }),{
+"uchet": (function (require, exports, module) { /* wrapped by builder */
+
+var Gsender =    require('gsender');
+var Tel =        require('tel');
+var Peredal =    require('peredal');
+var Solution =   require('solution');
+
+var Uchet = Gsender.extend({
+
+  el: "[data-view=\"dict\"]",
+
+});
+
+Uchet.prototype.begin = function() {
+
+  this.peredal = new Peredal({
+    el:    this.$el.find("[data-view=\"edit\"]"),
+    conf:  this.options.conf
+  });
+
+  this.peredal.triggers();
+  
+
+  this.solution = new Solution({
+    el:    this.$el.find("[data-view=\"edit\"]"),
+    conf:  this.options.conf
+  });
+
+  this.tel = new Tel({
+    el:    this.$el.find("[data-view=\"edit\"]"),
+    conf:  this.options.conf
+  });
+
+}
+
+Uchet.prototype.onEdit = function(e) {  
+  var cancel = false;
+  if ((e.field === 'problem') || (e.field === 'solution')) {
+    cancel = true;
+    this.solution.editor(e);
+  }
+  if (e.field === 'speredal') {
+    cancel = true;
+    this.peredal.editor(e);
+  }
+  if (e.field === 'tel2') {
+    cancel = true;
+    this.tel.editor(e);
+  }
+  return cancel;
+};
+
+module.exports = Uchet;
+
+}),
+"srq": (function (require, exports, module) { /* wrapped by builder */
+
+var Gsender =   require('gsender');
+var Select =    require('select');
+
+var template_edit_header = require('edit_header.jade');
+var template_edit_footer = require('edit_footer.jade');
+var template_edit_select = require('edit_select.jade');
+
+var Srq = Gsender.extend({
+
+  el: "[data-view=\"dict\"]",
+
+});
+
+Srq.prototype.onCustomDrawCell = function(e) {
+  var keyfieldname = e.keyfieldname || '';
+  var line = e.line || {};
+
+  if (parseInt(line.uchet_id) > 0) {
+    this.$el.find("[data-uuid=\"" + line[keyfieldname] + "\"]").addClass('success');
+  }
+
+};
+
+Srq.prototype.begin = function() {
+  var _this = this;
+
+  var $toolbar = this.$el.find("[data-view=\"toolbar-units\"]");
+  $toolbar.append('<a href="#srq_get" data-view="srq-get" class="btn btn-success">Забрать заявку</a>');
+
+  $(document).on('click', "[data-view=\"srq-get\"]", function(e) {
+    e.preventDefault();
+    var id = guid();
+    var operation_id = guid();
+    var line = _this.getSelectLine();
+
+    var $header = _this.$edit.find("[data-view=\"modal-header\"]");
+    var $footer = _this.$edit.find("[data-view=\"modal-footer\"]");
+    var $body = _this.$edit.find("[data-view=\"modal-body\"]");
+
+    var conf = {};
+    var ids = {};
+
+    _this.line =             line.toJSON();
+    _this.line.personal_id = $.cookie('user_id') || 0;
+    _this.srq_id =            _this.line.d$uuid;
+
+    ids.users = id + '_users';
+    ids.points = id + '_points';    
+    conf.users = window.users_data || {};
+    conf.points = window.points_data || {};
+
+    $header.html(template_edit_header({
+      caption: 'Забрать заявку'
+    }));
+
+    $footer.html(template_edit_footer({
+      operation_id: operation_id
+    }));
+
+    $body.empty();
+
+    $body.append(template_edit_select({
+      id:   ids.users,
+      conf: conf.users
+    }));
+
+    $body.append(template_edit_select({
+      id:   ids.points,
+      conf: conf.points
+    }));
+
+    _this.selectUsers = new Select({
+      el:           "[data-control=\"" + ids.users + "\"]",
+      type:         'select',
+      conf:         conf.users,
+      initOptions:  "initvalue=personal_id",
+      line:         _this.line
+    });
+    _this.selectPoints = new Select({
+      el:           "[data-control=\"" + ids.points + "\"]",
+      type:         'select',
+      conf:         conf.points,
+      initOptions:  "initvalue=point_id",
+      line:         _this.line
+    });
+
+    _this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
+      _this.request();
+    });
+
+    _this.$edit.modal('show');
+
+  });
+
+};
+
+Srq.prototype.result = function() {
+  return {
+    user_id:   this.selectUsers.getValue(),
+    point_id:  this.selectPoints.getValue(),
+    line:      this.line
+  };
+};
+
+
+Srq.prototype.request = function() {
+  var _this = this;
+  var controls = {};
+
+  controls = this.result();
+
+  if (controls) {
+
+    console.log('ajax speredal');
+
+    $.ajax({
+      url: '/api/units/srq/get/' + this.srq_id,
+      type: 'GET',
+      data: {
+        _method:   'POST',
+        controls:  controls
+      },
+      timeout: 10000,
+      success: function(res) {
+        if (!res.err) {
+          _this.$edit.modal('hide');
+          _this.$edit.trigger('update');
+          
+          $.noty({
+            text:         'Запись успешно изменена!',
+            layout:       'topCenter',
+            type:         'success',
+            closeButton:  false,
+            timeout:      2000
+          });
+        } else {
+          $.noty({
+            text:         'Произошла ошибка при редактировании записи!',
+            layout:       'topCenter',
+            type:         'error',
+            closeButton:  false,
+            timeout:      3000
+          });
+          console.error('Edit.prototype.request', res.err);
+        }
+      },
+      error: function(e) {
+        $.noty({
+          text:         'Произошла ошибка при запросе к серверу!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Pereda.prototype.request error', e);
+      }
+    });
+  }
+
+};
+
+
+module.exports = Srq;
+
+}),
+"peredal": (function (require, exports, module) { /* wrapped by builder */
+
+var Edit = require('edit');
+
+var template_edit_header =      require('edit_header.jade');
+var template_edit_footer =      require('edit_footer.jade');
+var template_edit_users =       require('template_edit_users.jade');
+
+var Peredal = Edit.extend({
+
+});
+
+Peredal.prototype.triggers = function() {
+  var _this = this;
+
+  this.$el.on('click', '[data-action=\"user-edit\"]', function(e) {
+    e.preventDefault();
+    var $line =  $(this).parent().parent();
+    var id =     $line.data('user-id').toString();
+    var type =   $line.data('user-type');
+    var user =   _.where(_this.allUsers, {'id': id}) || {};
+    $line.remove();
+    if (type === 'allUsers') {
+      _this.$usersByUchetId.append(  _this.render('usersByUchetId',  user));
+    } else {
+      _this.$allUsers.append(        _this.render('allUsers',        user));
+    }
+  });
+
+};
+
+Peredal.prototype.result = function() {
+  var old = _.pluck(this.usersByUchetId,'id');
+  var add = [];
+  var del = [];
+  var now = [];
+  this.$usersByUchetId.find('.row').each(function() {
+    var id = $(this).data('user-id');
+    now.push(id.toString());    
+  });
+  del = _.difference(old, now);
+  add = _.difference(now, old);
+  return {
+    old: old,
+    now: now,
+    add: add,
+    del: del
+  };
+};
+
+Peredal.prototype.editor = function(e) {
+  var _this = this;
+  var id = guid();
+  var operation_id = guid();
+
+  this.uchet_id  = e.line.id || 0;
+
+  this.init(e.field, e.type, e.line, e.fields);
+
+  if (this.checkPrivilegies()) {
+
+    if (this.field === 'speredal') {
+
+      this.$header.html(template_edit_header({
+        caption: this.caption
+      }));
+      this.$body.html(template_edit_users({
+        id: id
+      }));
+      this.$footer.html(template_edit_footer({
+        operation_id: operation_id
+      }));
+
+      this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
+        _this.request();
+      });
+
+      this.$el.modal('show');
+
+      this.$allUsers =        this.$el.find("[data-view=\"allUsers\"]");
+      this.$usersByUchetId =  this.$el.find("[data-view=\"usersByUchetId\"]");
+
+      this.getUserList(function(err, result) {
+
+        if (!err) {          
+
+          _this.allUsers =       result.allUsers;
+          _this.usersByUchetId = result.usersByUchetId;
+
+          _this.$usersByUchetId.html(  _this.render('usersByUchetId', result.usersByUchetId));
+          _this.$allUsers.html(        _this.render('allUsers',       result.allUsers));
+        }
+
+      });
+
+    }
+
+  }
+
+};
+
+Peredal.prototype.render = function(type, users, cl) {
+  var _this = this;
+  var s = "";
+
+  if (cl == null) {
+    cl = 'link';
+  }
+
+  _.each(users, function(user) {
+    if ((type !== 'allUsers') || (!(_this.$usersByUchetId).find('[data-user-id=\"' + user.id + '\"]').length)) {
+
+      s += '<div class="row", data-user-id="#{user.id}", data-user-type="#{type}">';
+      s +=   '<div class="col-sm-10">';
+      s +=     '<a class="btn btn-xs btn-#{class}", style="background-color:#fff;", data-action="user-edit", href="#">';
+      s +=       '#{user.username}';
+      s +=     '</a>';
+      s +=   '</div>';
+      s += '</div>';
+
+      s = s.replace(/\#\{class}/g,           cl);
+      s = s.replace(/\#\{type}/g,            type);
+      s = s.replace(/\#\{user\.id\}/g,       user.id);
+      s = s.replace(/\#\{user\.username\}/g, user.username);
+
+    }
+  });
+
+  return s;
+};
+
+Peredal.prototype.getUserList = function(fn) {
+
+  if (fn == null) {
+    fn = function() {};
+  }
+
+  $.ajax({
+    url: '/api/units/uchet/users/list/' + this.uchet_id,
+    type: 'GET',
+    timeout: 10000,
+    data: {
+    },
+    success: function(res) {
+      if (!res.err) {
+        fn(null, res.result);
+      } else {
+        fn(res.err);
+      }
+    },
+    error: function() {
+      fn('error');
+    }
+  });
+
+};
+
+Peredal.prototype.request = function() {
+  var _this = this;
+  var controls = {};
+
+
+  controls = this.result();
+
+  if (controls) {
+
+    console.log('ajax speredal');
+
+    $.ajax({
+      url: '/api/units/uchet/users/list/' + this.uchet_id,
+      type: 'GET',
+      data: {
+        _method:   'POST',
+        controls:  controls
+      },
+      timeout: 10000,
+      success: function(res) {
+        if (!res.err) {
+          _this.$el.modal('hide');
+          _this.$el.trigger('update');
+          $.noty({
+            text:         'Запись успешно изменена!',
+            layout:       'topCenter',
+            type:         'success',
+            closeButton:  false,
+            timeout:      2000
+          });
+        } else {
+          $.noty({
+            text:         'Произошла ошибка при редактировании записи!',
+            layout:       'topCenter',
+            type:         'error',
+            closeButton:  false,
+            timeout:      3000
+          });
+          console.error('Edit.prototype.request', res.err);
+        }
+      },
+      error: function(e) {
+        $.noty({
+          text:         'Произошла ошибка при запросе к серверу!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Peredal.prototype.request error', e);
+      }
+    });
+  }
+
+};
+
+
+module.exports = Peredal;
+
+}),
+"solution": (function (require, exports, module) { /* wrapped by builder */
+
+var Edit =                             require('edit');
+var template_edit_header =             require('edit_header.jade');
+var template_edit_footer =             require('edit_footer.jade');
+var template_edit_solution =           require('template_edit_solution.jade');
+var template_edit_solution_history =   require('template_edit_solution_history.jade');
+
+var Solution = Edit.extend({
+
+});
+
+Solution.prototype.editor = function(e) {
+  var _this = this;
+  var id = guid();
+  var operation_id = guid();
+
+  this.uchet_id  = e.line.id || 0;
+
+  this.init(e.field, e.type, e.line, e.fields);
+
+  if (this.checkPrivilegies()) {
+    if ((this.field === 'solution') || (this.field === 'problem')) {
+
+      this.author_id = e.line.user_id;
+      this.isOwner = this.author_id == $.cookie('user_id') ? true : false;
+
+      this.$header.html(template_edit_header({
+        caption: this.caption
+      }));
+
+      this.$body.html(template_edit_solution({
+        id:         id,
+        isOwner:    this.isOwner,
+        field:      this.field,
+        fieldInfo:  this.fieldInfo,
+        value:      this.value,
+        conf:       this.conf
+      }));
+
+      this.$footer.html(template_edit_footer({
+        operation_id: operation_id
+      }));
+
+      this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
+        _this.request();
+      });
+
+      // this.$history =  this.$el.find("[data-view=\"history\"]");
+      this.$history =  this.$el.find("[data-view=\"modal-bottom\"]");
+      this.$solution = this.$el.find("[data-view=\"solution\"]");
+
+      this.$el.modal('show');
+
+      this.getHistoryByUchetId(function(err, history) {
+
+        if (!err) {
+
+          _this.$history.html(template_edit_solution_history({
+            history: history
+          }));
+
+        } else {
+
+          this.$history.empty();
+
+        }
+
+      });
+
+    }
+  }
+
+};
+
+Solution.prototype.getHistoryByUchetId = function(fn) {
+
+  if (fn == null) {
+    fn = function() {};
+  }
+
+  $.ajax({
+    url: '/api/units/uchet/messages/list',
+    // url: '/api/units/uchet/messages/list/' + this.uchet_id,
+    type: 'GET',
+    timeout: 10000,
+    data: {
+      controls: {
+        tek_id: this.uchet_id
+      }
+    },
+    success: function(res) {
+      if (!res.err) {
+        fn(null, res.result);
+      } else {
+        fn(res.err);
+      }
+    },
+    error: function() {
+      fn('error');
+    }
+  });
+
+};
+
+Solution.prototype.result = function() {
+  return {
+    field:     this.field,
+    isOwner:   this.isOwner,
+    author_id: this.author_id,
+    text:      this.$solution.val()
+  };
+};
+
+
+Solution.prototype.request = function() {
+  var _this = this;
+  var controls = {};
+
+
+  controls = this.result();
+
+  if (controls) {
+
+    console.log('ajax solution');
+
+    $.ajax({
+      url: '/api/units/uchet/messages/save/' + this.uchet_id,
+      type: 'GET',
+      data: {
+        _method:   'POST',
+        controls:  controls
+      },
+      timeout: 10000,
+      success: function(res) {
+        if (!res.err) {
+          _this.$el.modal('hide');
+          _this.$el.trigger('update');
+          $.noty({
+            text:         'Запись успешно изменена!',
+            layout:       'topCenter',
+            type:         'success',
+            closeButton:  false,
+            timeout:      2000
+          });
+        } else {
+          $.noty({
+            text:         'Произошла ошибка при редактировании записи!',
+            layout:       'topCenter',
+            type:         'error',
+            closeButton:  false,
+            timeout:      3000
+          });
+          console.error('Edit.prototype.request', res.err);
+        }
+      },
+      error: function(e) {
+        $.noty({
+          text:         'Произошла ошибка при запросе к серверу!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Solution.prototype.request error', e);
+      }
+    });
+  }
+
+};
+
+
+module.exports = Solution;
+
+}),
+"tel": (function (require, exports, module) { /* wrapped by builder */
+
+var Edit =                             require('edit');
+var template_edit_header =             require('edit_header.jade');
+var template_edit_footer =             require('edit_footer.jade');
+var template_edit_tel =                require('template_edit_tel.jade');
+
+var Tel = Edit.extend({
+
+});
+
+Tel.prototype.editor = function(e) {
+  var _this = this;
+  var id = guid();
+  var operation_id = guid();
+
+  this.point_id  = e.line.point_id || 0;
+
+  this.init(e.field, e.type, e.line, e.fields);
+
+  // if (this.checkPrivilegies()) {
+    if (this.field === 'tel2') {
+
+
+      this.$header.html(template_edit_header({
+        caption: this.caption
+      }));
+
+      this.$body.html(template_edit_tel({
+        id:         id,
+        field:      this.field,
+        fieldInfo:  this.fieldInfo,
+        value:      this.value,
+        conf:       this.conf
+      }));
+
+      this.$footer.html(template_edit_footer({
+        operation_id: operation_id
+      }));
+
+      this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
+        _this.request();
+      });
+
+      this.$tel = this.$el.find("[data-view=\"tel\"]");
+
+      this.$el.modal('show');
+
+    }
+  // }
+
+};
+
+Tel.prototype.result = function() {
+  return {
+    field:     this.field,
+    text:      this.$tel.val()
+  };
+};
+
+
+Tel.prototype.request = function() {
+  var _this = this;
+  var controls = {};
+
+  controls = this.result();
+
+  if (controls) {
+
+    $.ajax({
+      url: '/api/units/uchet/tel/save/' + this.point_id,
+      type: 'GET',
+      data: {
+        _method:   'POST',
+        controls:  controls
+      },
+      timeout: 10000,
+      success: function(res) {
+        if (!res.err) {
+          _this.$el.modal('hide');
+          _this.$el.trigger('update');
+          $.noty({
+            text:         'Запись успешно изменена!',
+            layout:       'topCenter',
+            type:         'success',
+            closeButton:  false,
+            timeout:      2000
+          });
+        } else {
+          $.noty({
+            text:         'Произошла ошибка при редактировании записи!',
+            layout:       'topCenter',
+            type:         'error',
+            closeButton:  false,
+            timeout:      3000
+          });
+          console.error('Edit.prototype.request', res.err);
+        }
+      },
+      error: function(e) {
+        $.noty({
+          text:         'Произошла ошибка при запросе к серверу!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Tel.prototype.request error', e);
+      }
+    });
+  }
+
+};
+
+
+module.exports = Tel;
+
+}),
+"template_edit_solution.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<form role="form" data-view="form" class="form-horizontal"><div class="form-group"><div class="col-sm-12">');
+ if ((field === 'problem') && (isOwner))
+{
+buf.push('<textarea');
+buf.push(attrs({ 'data-view':("solution"), 'data-control':("" + (id) + ""), 'rows':("10"), "class": ('form-control') }, {"data-view":true,"data-control":true,"rows":true}));
+buf.push('>' + escape((interp = value) == null ? '' : interp) + '</textarea>');
+}
+ else
+{
+buf.push('<textarea');
+buf.push(attrs({ 'data-view':("solution"), 'data-control':("" + (id) + ""), 'rows':("10"), "class": ('form-control') }, {"data-view":true,"data-control":true,"rows":true}));
+buf.push('></textarea>');
+}
+buf.push('</div></div></form><div data-view="history"></div>');
+}
+return buf.join("");
+};
+}),
+"template_edit_solution_history.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+// iterate history
+;(function(){
+  if ('number' == typeof history.length) {
+
+    for (var $index = 0, $$l = history.length; $index < $$l; $index++) {
+      var line = history[$index];
+
+buf.push('<hr/><p><h4> <span>' + escape((interp = line.suser) == null ? '' : interp) + '</span><div');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line.insertdt).fromNow()) + ""), "class": ('pull-right') }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(line.insertdt).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line.insertdt).format('HH:mm')) == null ? '' : interp) + '</small></div></h4><div>' + escape((interp = line.answer) == null ? '' : interp) + '  </div></p>');
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in history) {
+      $$l++;      var line = history[$index];
+
+buf.push('<hr/><p><h4> <span>' + escape((interp = line.suser) == null ? '' : interp) + '</span><div');
+buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(line.insertdt).fromNow()) + ""), "class": ('pull-right') }, {"data-toggle":true,"title":true}));
+buf.push('><span>' + escape((interp = moment(line.insertdt).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(line.insertdt).format('HH:mm')) == null ? '' : interp) + '</small></div></h4><div>' + escape((interp = line.answer) == null ? '' : interp) + '  </div></p>');
+    }
+
+  }
+}).call(this);
+
+}
+return buf.join("");
+};
+}),
+"template_edit_srq.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<form role="form" data-view="form" class="form-horizontal"><div class="form-group"><div class="col-sm-12"><textarea');
+buf.push(attrs({ 'data-view':("srq-take"), 'data-control':("" + (id) + ""), 'rows':("10"), "class": ('form-control') }, {"data-view":true,"data-control":true,"rows":true}));
+buf.push('></textarea></div></div></form>');
+}
+return buf.join("");
+};
+}),
+"template_edit_srq_footer.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<button');
+buf.push(attrs({ 'data-view':("button"), 'type':("button"), 'data-request':("" + (operation_id) + ""), "class": ('btn') + ' ' + ('btn-success') }, {"data-view":true,"type":true,"data-request":true}));
+buf.push('>Забрать заявку</button><button type="button" data-dismiss="modal" class="btn btn-default">Отмена</button>');
+}
+return buf.join("");
+};
+}),
+"template_edit_tel.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<form role="form" data-view="form" class="form-horizontal"><div class="form-group"><div class="col-sm-12"><textarea');
+buf.push(attrs({ 'data-view':("tel"), 'data-control':("" + (id) + ""), 'rows':("15"), "class": ('form-control') }, {"data-view":true,"data-control":true,"rows":true}));
+buf.push('>' + escape((interp = value) == null ? '' : interp) + '</textarea></div></div></form>');
+}
+return buf.join("");
+};
+}),
+"template_edit_users.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<form role="form" data-view="form" class="form-horizontal"><div');
+buf.push(attrs({ 'data-control':("" + (id) + ""), "class": ('form-group') }, {"data-control":true}));
+buf.push('><div class="col-sm-6"><h4>Выбранные сотрудники</h4><div data-view="usersByUchetId"></div></div><div class="col-sm-6"><h4>Все сотрудники</h4><div data-view="allUsers"></div></div></div></form>');
+}
+return buf.join("");
+};
+}),
 "_": (function (require) { /* wrapped by builder */
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
@@ -476,6 +1322,12 @@ var jQuery = require("$");
 * http://www.apache.org/licenses/LICENSE-2.0
 */
 if(!jQuery)throw new Error("Bootstrap requires jQuery");+function(a){"use strict";function b(){var a=document.createElement("bootstrap"),b={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"};for(var c in b)if(void 0!==a.style[c])return{end:b[c]}}a.fn.emulateTransitionEnd=function(b){var c=!1,d=this;a(this).one(a.support.transition.end,function(){c=!0});var e=function(){c||a(d).trigger(a.support.transition.end)};return setTimeout(e,b),this},a(function(){a.support.transition=b()})}(window.jQuery),+function(a){"use strict";var b='[data-dismiss="alert"]',c=function(c){a(c).on("click",b,this.close)};c.prototype.close=function(b){function c(){f.trigger("closed.bs.alert").remove()}var d=a(this),e=d.attr("data-target");e||(e=d.attr("href"),e=e&&e.replace(/.*(?=#[^\s]*$)/,""));var f=a(e);b&&b.preventDefault(),f.length||(f=d.hasClass("alert")?d:d.parent()),f.trigger(b=a.Event("close.bs.alert")),b.isDefaultPrevented()||(f.removeClass("in"),a.support.transition&&f.hasClass("fade")?f.one(a.support.transition.end,c).emulateTransitionEnd(150):c())};var d=a.fn.alert;a.fn.alert=function(b){return this.each(function(){var d=a(this),e=d.data("bs.alert");e||d.data("bs.alert",e=new c(this)),"string"==typeof b&&e[b].call(d)})},a.fn.alert.Constructor=c,a.fn.alert.noConflict=function(){return a.fn.alert=d,this},a(document).on("click.bs.alert.data-api",b,c.prototype.close)}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.$element=a(c),this.options=a.extend({},b.DEFAULTS,d)};b.DEFAULTS={loadingText:"loading..."},b.prototype.setState=function(a){var b="disabled",c=this.$element,d=c.is("input")?"val":"html",e=c.data();a+="Text",e.resetText||c.data("resetText",c[d]()),c[d](e[a]||this.options[a]),setTimeout(function(){"loadingText"==a?c.addClass(b).attr(b,b):c.removeClass(b).removeAttr(b)},0)},b.prototype.toggle=function(){var a=this.$element.closest('[data-toggle="buttons"]');if(a.length){var b=this.$element.find("input").prop("checked",!this.$element.hasClass("active")).trigger("change");"radio"===b.prop("type")&&a.find(".active").removeClass("active")}this.$element.toggleClass("active")};var c=a.fn.button;a.fn.button=function(c){return this.each(function(){var d=a(this),e=d.data("bs.button"),f="object"==typeof c&&c;e||d.data("bs.button",e=new b(this,f)),"toggle"==c?e.toggle():c&&e.setState(c)})},a.fn.button.Constructor=b,a.fn.button.noConflict=function(){return a.fn.button=c,this},a(document).on("click.bs.button.data-api","[data-toggle^=button]",function(b){var c=a(b.target);c.hasClass("btn")||(c=c.closest(".btn")),c.button("toggle"),b.preventDefault()})}(window.jQuery),+function(a){"use strict";var b=function(b,c){this.$element=a(b),this.$indicators=this.$element.find(".carousel-indicators"),this.options=c,this.paused=this.sliding=this.interval=this.$active=this.$items=null,"hover"==this.options.pause&&this.$element.on("mouseenter",a.proxy(this.pause,this)).on("mouseleave",a.proxy(this.cycle,this))};b.DEFAULTS={interval:5e3,pause:"hover",wrap:!0},b.prototype.cycle=function(b){return b||(this.paused=!1),this.interval&&clearInterval(this.interval),this.options.interval&&!this.paused&&(this.interval=setInterval(a.proxy(this.next,this),this.options.interval)),this},b.prototype.getActiveIndex=function(){return this.$active=this.$element.find(".item.active"),this.$items=this.$active.parent().children(),this.$items.index(this.$active)},b.prototype.to=function(b){var c=this,d=this.getActiveIndex();return b>this.$items.length-1||0>b?void 0:this.sliding?this.$element.one("slid",function(){c.to(b)}):d==b?this.pause().cycle():this.slide(b>d?"next":"prev",a(this.$items[b]))},b.prototype.pause=function(b){return b||(this.paused=!0),this.$element.find(".next, .prev").length&&a.support.transition.end&&(this.$element.trigger(a.support.transition.end),this.cycle(!0)),this.interval=clearInterval(this.interval),this},b.prototype.next=function(){return this.sliding?void 0:this.slide("next")},b.prototype.prev=function(){return this.sliding?void 0:this.slide("prev")},b.prototype.slide=function(b,c){var d=this.$element.find(".item.active"),e=c||d[b](),f=this.interval,g="next"==b?"left":"right",h="next"==b?"first":"last",i=this;if(!e.length){if(!this.options.wrap)return;e=this.$element.find(".item")[h]()}this.sliding=!0,f&&this.pause();var j=a.Event("slide.bs.carousel",{relatedTarget:e[0],direction:g});if(!e.hasClass("active")){if(this.$indicators.length&&(this.$indicators.find(".active").removeClass("active"),this.$element.one("slid",function(){var b=a(i.$indicators.children()[i.getActiveIndex()]);b&&b.addClass("active")})),a.support.transition&&this.$element.hasClass("slide")){if(this.$element.trigger(j),j.isDefaultPrevented())return;e.addClass(b),e[0].offsetWidth,d.addClass(g),e.addClass(g),d.one(a.support.transition.end,function(){e.removeClass([b,g].join(" ")).addClass("active"),d.removeClass(["active",g].join(" ")),i.sliding=!1,setTimeout(function(){i.$element.trigger("slid")},0)}).emulateTransitionEnd(600)}else{if(this.$element.trigger(j),j.isDefaultPrevented())return;d.removeClass("active"),e.addClass("active"),this.sliding=!1,this.$element.trigger("slid")}return f&&this.cycle(),this}};var c=a.fn.carousel;a.fn.carousel=function(c){return this.each(function(){var d=a(this),e=d.data("bs.carousel"),f=a.extend({},b.DEFAULTS,d.data(),"object"==typeof c&&c),g="string"==typeof c?c:f.slide;e||d.data("bs.carousel",e=new b(this,f)),"number"==typeof c?e.to(c):g?e[g]():f.interval&&e.pause().cycle()})},a.fn.carousel.Constructor=b,a.fn.carousel.noConflict=function(){return a.fn.carousel=c,this},a(document).on("click.bs.carousel.data-api","[data-slide], [data-slide-to]",function(b){var c,d=a(this),e=a(d.attr("data-target")||(c=d.attr("href"))&&c.replace(/.*(?=#[^\s]+$)/,"")),f=a.extend({},e.data(),d.data()),g=d.attr("data-slide-to");g&&(f.interval=!1),e.carousel(f),(g=d.attr("data-slide-to"))&&e.data("bs.carousel").to(g),b.preventDefault()}),a(window).on("load",function(){a('[data-ride="carousel"]').each(function(){var b=a(this);b.carousel(b.data())})})}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.$element=a(c),this.options=a.extend({},b.DEFAULTS,d),this.transitioning=null,this.options.parent&&(this.$parent=a(this.options.parent)),this.options.toggle&&this.toggle()};b.DEFAULTS={toggle:!0},b.prototype.dimension=function(){var a=this.$element.hasClass("width");return a?"width":"height"},b.prototype.show=function(){if(!this.transitioning&&!this.$element.hasClass("in")){var b=a.Event("show.bs.collapse");if(this.$element.trigger(b),!b.isDefaultPrevented()){var c=this.$parent&&this.$parent.find("> .panel > .in");if(c&&c.length){var d=c.data("bs.collapse");if(d&&d.transitioning)return;c.collapse("hide"),d||c.data("bs.collapse",null)}var e=this.dimension();this.$element.removeClass("collapse").addClass("collapsing")[e](0),this.transitioning=1;var f=function(){this.$element.removeClass("collapsing").addClass("in")[e]("auto"),this.transitioning=0,this.$element.trigger("shown.bs.collapse")};if(!a.support.transition)return f.call(this);var g=a.camelCase(["scroll",e].join("-"));this.$element.one(a.support.transition.end,a.proxy(f,this)).emulateTransitionEnd(350)[e](this.$element[0][g])}}},b.prototype.hide=function(){if(!this.transitioning&&this.$element.hasClass("in")){var b=a.Event("hide.bs.collapse");if(this.$element.trigger(b),!b.isDefaultPrevented()){var c=this.dimension();this.$element[c](this.$element[c]())[0].offsetHeight,this.$element.addClass("collapsing").removeClass("collapse").removeClass("in"),this.transitioning=1;var d=function(){this.transitioning=0,this.$element.trigger("hidden.bs.collapse").removeClass("collapsing").addClass("collapse")};return a.support.transition?(this.$element[c](0).one(a.support.transition.end,a.proxy(d,this)).emulateTransitionEnd(350),void 0):d.call(this)}}},b.prototype.toggle=function(){this[this.$element.hasClass("in")?"hide":"show"]()};var c=a.fn.collapse;a.fn.collapse=function(c){return this.each(function(){var d=a(this),e=d.data("bs.collapse"),f=a.extend({},b.DEFAULTS,d.data(),"object"==typeof c&&c);e||d.data("bs.collapse",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.collapse.Constructor=b,a.fn.collapse.noConflict=function(){return a.fn.collapse=c,this},a(document).on("click.bs.collapse.data-api","[data-toggle=collapse]",function(b){var c,d=a(this),e=d.attr("data-target")||b.preventDefault()||(c=d.attr("href"))&&c.replace(/.*(?=#[^\s]+$)/,""),f=a(e),g=f.data("bs.collapse"),h=g?"toggle":d.data(),i=d.attr("data-parent"),j=i&&a(i);g&&g.transitioning||(j&&j.find('[data-toggle=collapse][data-parent="'+i+'"]').not(d).addClass("collapsed"),d[f.hasClass("in")?"addClass":"removeClass"]("collapsed")),f.collapse(h)})}(window.jQuery),+function(a){"use strict";function b(){a(d).remove(),a(e).each(function(b){var d=c(a(this));d.hasClass("open")&&(d.trigger(b=a.Event("hide.bs.dropdown")),b.isDefaultPrevented()||d.removeClass("open").trigger("hidden.bs.dropdown"))})}function c(b){var c=b.attr("data-target");c||(c=b.attr("href"),c=c&&/#/.test(c)&&c.replace(/.*(?=#[^\s]*$)/,""));var d=c&&a(c);return d&&d.length?d:b.parent()}var d=".dropdown-backdrop",e="[data-toggle=dropdown]",f=function(b){a(b).on("click.bs.dropdown",this.toggle)};f.prototype.toggle=function(d){var e=a(this);if(!e.is(".disabled, :disabled")){var f=c(e),g=f.hasClass("open");if(b(),!g){if("ontouchstart"in document.documentElement&&!f.closest(".navbar-nav").length&&a('<div class="dropdown-backdrop"/>').insertAfter(a(this)).on("click",b),f.trigger(d=a.Event("show.bs.dropdown")),d.isDefaultPrevented())return;f.toggleClass("open").trigger("shown.bs.dropdown"),e.focus()}return!1}},f.prototype.keydown=function(b){if(/(38|40|27)/.test(b.keyCode)){var d=a(this);if(b.preventDefault(),b.stopPropagation(),!d.is(".disabled, :disabled")){var f=c(d),g=f.hasClass("open");if(!g||g&&27==b.keyCode)return 27==b.which&&f.find(e).focus(),d.click();var h=a("[role=menu] li:not(.divider):visible a",f);if(h.length){var i=h.index(h.filter(":focus"));38==b.keyCode&&i>0&&i--,40==b.keyCode&&i<h.length-1&&i++,~i||(i=0),h.eq(i).focus()}}}};var g=a.fn.dropdown;a.fn.dropdown=function(b){return this.each(function(){var c=a(this),d=c.data("dropdown");d||c.data("dropdown",d=new f(this)),"string"==typeof b&&d[b].call(c)})},a.fn.dropdown.Constructor=f,a.fn.dropdown.noConflict=function(){return a.fn.dropdown=g,this},a(document).on("click.bs.dropdown.data-api",b).on("click.bs.dropdown.data-api",".dropdown form",function(a){a.stopPropagation()}).on("click.bs.dropdown.data-api",e,f.prototype.toggle).on("keydown.bs.dropdown.data-api",e+", [role=menu]",f.prototype.keydown)}(window.jQuery),+function(a){"use strict";var b=function(b,c){this.options=c,this.$element=a(b),this.$backdrop=this.isShown=null,this.options.remote&&this.$element.load(this.options.remote)};b.DEFAULTS={backdrop:!0,keyboard:!0,show:!0},b.prototype.toggle=function(a){return this[this.isShown?"hide":"show"](a)},b.prototype.show=function(b){var c=this,d=a.Event("show.bs.modal",{relatedTarget:b});this.$element.trigger(d),this.isShown||d.isDefaultPrevented()||(this.isShown=!0,this.escape(),this.$element.on("click.dismiss.modal",'[data-dismiss="modal"]',a.proxy(this.hide,this)),this.backdrop(function(){var d=a.support.transition&&c.$element.hasClass("fade");c.$element.parent().length||c.$element.appendTo(document.body),c.$element.show(),d&&c.$element[0].offsetWidth,c.$element.addClass("in").attr("aria-hidden",!1),c.enforceFocus();var e=a.Event("shown.bs.modal",{relatedTarget:b});d?c.$element.find(".modal-dialog").one(a.support.transition.end,function(){c.$element.focus().trigger(e)}).emulateTransitionEnd(300):c.$element.focus().trigger(e)}))},b.prototype.hide=function(b){b&&b.preventDefault(),b=a.Event("hide.bs.modal"),this.$element.trigger(b),this.isShown&&!b.isDefaultPrevented()&&(this.isShown=!1,this.escape(),a(document).off("focusin.bs.modal"),this.$element.removeClass("in").attr("aria-hidden",!0).off("click.dismiss.modal"),a.support.transition&&this.$element.hasClass("fade")?this.$element.one(a.support.transition.end,a.proxy(this.hideModal,this)).emulateTransitionEnd(300):this.hideModal())},b.prototype.enforceFocus=function(){a(document).off("focusin.bs.modal").on("focusin.bs.modal",a.proxy(function(a){this.$element[0]===a.target||this.$element.has(a.target).length||this.$element.focus()},this))},b.prototype.escape=function(){this.isShown&&this.options.keyboard?this.$element.on("keyup.dismiss.bs.modal",a.proxy(function(a){27==a.which&&this.hide()},this)):this.isShown||this.$element.off("keyup.dismiss.bs.modal")},b.prototype.hideModal=function(){var a=this;this.$element.hide(),this.backdrop(function(){a.removeBackdrop(),a.$element.trigger("hidden.bs.modal")})},b.prototype.removeBackdrop=function(){this.$backdrop&&this.$backdrop.remove(),this.$backdrop=null},b.prototype.backdrop=function(b){var c=this.$element.hasClass("fade")?"fade":"";if(this.isShown&&this.options.backdrop){var d=a.support.transition&&c;if(this.$backdrop=a('<div class="modal-backdrop '+c+'" />').appendTo(document.body),this.$element.on("click.dismiss.modal",a.proxy(function(a){a.target===a.currentTarget&&("static"==this.options.backdrop?this.$element[0].focus.call(this.$element[0]):this.hide.call(this))},this)),d&&this.$backdrop[0].offsetWidth,this.$backdrop.addClass("in"),!b)return;d?this.$backdrop.one(a.support.transition.end,b).emulateTransitionEnd(150):b()}else!this.isShown&&this.$backdrop?(this.$backdrop.removeClass("in"),a.support.transition&&this.$element.hasClass("fade")?this.$backdrop.one(a.support.transition.end,b).emulateTransitionEnd(150):b()):b&&b()};var c=a.fn.modal;a.fn.modal=function(c,d){return this.each(function(){var e=a(this),f=e.data("bs.modal"),g=a.extend({},b.DEFAULTS,e.data(),"object"==typeof c&&c);f||e.data("bs.modal",f=new b(this,g)),"string"==typeof c?f[c](d):g.show&&f.show(d)})},a.fn.modal.Constructor=b,a.fn.modal.noConflict=function(){return a.fn.modal=c,this},a(document).on("click.bs.modal.data-api",'[data-toggle="modal"]',function(b){var c=a(this),d=c.attr("href"),e=a(c.attr("data-target")||d&&d.replace(/.*(?=#[^\s]+$)/,"")),f=e.data("modal")?"toggle":a.extend({remote:!/#/.test(d)&&d},e.data(),c.data());b.preventDefault(),e.modal(f,this).one("hide",function(){c.is(":visible")&&c.focus()})}),a(document).on("show.bs.modal",".modal",function(){a(document.body).addClass("modal-open")}).on("hidden.bs.modal",".modal",function(){a(document.body).removeClass("modal-open")})}(window.jQuery),+function(a){"use strict";var b=function(a,b){this.type=this.options=this.enabled=this.timeout=this.hoverState=this.$element=null,this.init("tooltip",a,b)};b.DEFAULTS={animation:!0,placement:"top",selector:!1,template:'<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,container:!1},b.prototype.init=function(b,c,d){this.enabled=!0,this.type=b,this.$element=a(c),this.options=this.getOptions(d);for(var e=this.options.trigger.split(" "),f=e.length;f--;){var g=e[f];if("click"==g)this.$element.on("click."+this.type,this.options.selector,a.proxy(this.toggle,this));else if("manual"!=g){var h="hover"==g?"mouseenter":"focus",i="hover"==g?"mouseleave":"blur";this.$element.on(h+"."+this.type,this.options.selector,a.proxy(this.enter,this)),this.$element.on(i+"."+this.type,this.options.selector,a.proxy(this.leave,this))}}this.options.selector?this._options=a.extend({},this.options,{trigger:"manual",selector:""}):this.fixTitle()},b.prototype.getDefaults=function(){return b.DEFAULTS},b.prototype.getOptions=function(b){return b=a.extend({},this.getDefaults(),this.$element.data(),b),b.delay&&"number"==typeof b.delay&&(b.delay={show:b.delay,hide:b.delay}),b},b.prototype.getDelegateOptions=function(){var b={},c=this.getDefaults();return this._options&&a.each(this._options,function(a,d){c[a]!=d&&(b[a]=d)}),b},b.prototype.enter=function(b){var c=b instanceof this.constructor?b:a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type);return clearTimeout(c.timeout),c.hoverState="in",c.options.delay&&c.options.delay.show?(c.timeout=setTimeout(function(){"in"==c.hoverState&&c.show()},c.options.delay.show),void 0):c.show()},b.prototype.leave=function(b){var c=b instanceof this.constructor?b:a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type);return clearTimeout(c.timeout),c.hoverState="out",c.options.delay&&c.options.delay.hide?(c.timeout=setTimeout(function(){"out"==c.hoverState&&c.hide()},c.options.delay.hide),void 0):c.hide()},b.prototype.show=function(){var b=a.Event("show.bs."+this.type);if(this.hasContent()&&this.enabled){if(this.$element.trigger(b),b.isDefaultPrevented())return;var c=this.tip();this.setContent(),this.options.animation&&c.addClass("fade");var d="function"==typeof this.options.placement?this.options.placement.call(this,c[0],this.$element[0]):this.options.placement,e=/\s?auto?\s?/i,f=e.test(d);f&&(d=d.replace(e,"")||"top"),c.detach().css({top:0,left:0,display:"block"}).addClass(d),this.options.container?c.appendTo(this.options.container):c.insertAfter(this.$element);var g=this.getPosition(),h=c[0].offsetWidth,i=c[0].offsetHeight;if(f){var j=this.$element.parent(),k=d,l=document.documentElement.scrollTop||document.body.scrollTop,m="body"==this.options.container?window.innerWidth:j.outerWidth(),n="body"==this.options.container?window.innerHeight:j.outerHeight(),o="body"==this.options.container?0:j.offset().left;d="bottom"==d&&g.top+g.height+i-l>n?"top":"top"==d&&g.top-l-i<0?"bottom":"right"==d&&g.right+h>m?"left":"left"==d&&g.left-h<o?"right":d,c.removeClass(k).addClass(d)}var p=this.getCalculatedOffset(d,g,h,i);this.applyPlacement(p,d),this.$element.trigger("shown.bs."+this.type)}},b.prototype.applyPlacement=function(a,b){var c,d=this.tip(),e=d[0].offsetWidth,f=d[0].offsetHeight,g=parseInt(d.css("margin-top"),10),h=parseInt(d.css("margin-left"),10);isNaN(g)&&(g=0),isNaN(h)&&(h=0),a.top=a.top+g,a.left=a.left+h,d.offset(a).addClass("in");var i=d[0].offsetWidth,j=d[0].offsetHeight;if("top"==b&&j!=f&&(c=!0,a.top=a.top+f-j),/bottom|top/.test(b)){var k=0;a.left<0&&(k=-2*a.left,a.left=0,d.offset(a),i=d[0].offsetWidth,j=d[0].offsetHeight),this.replaceArrow(k-e+i,i,"left")}else this.replaceArrow(j-f,j,"top");c&&d.offset(a)},b.prototype.replaceArrow=function(a,b,c){this.arrow().css(c,a?50*(1-a/b)+"%":"")},b.prototype.setContent=function(){var a=this.tip(),b=this.getTitle();a.find(".tooltip-inner")[this.options.html?"html":"text"](b),a.removeClass("fade in top bottom left right")},b.prototype.hide=function(){function b(){"in"!=c.hoverState&&d.detach()}var c=this,d=this.tip(),e=a.Event("hide.bs."+this.type);return this.$element.trigger(e),e.isDefaultPrevented()?void 0:(d.removeClass("in"),a.support.transition&&this.$tip.hasClass("fade")?d.one(a.support.transition.end,b).emulateTransitionEnd(150):b(),this.$element.trigger("hidden.bs."+this.type),this)},b.prototype.fixTitle=function(){var a=this.$element;(a.attr("title")||"string"!=typeof a.attr("data-original-title"))&&a.attr("data-original-title",a.attr("title")||"").attr("title","")},b.prototype.hasContent=function(){return this.getTitle()},b.prototype.getPosition=function(){var b=this.$element[0];return a.extend({},"function"==typeof b.getBoundingClientRect?b.getBoundingClientRect():{width:b.offsetWidth,height:b.offsetHeight},this.$element.offset())},b.prototype.getCalculatedOffset=function(a,b,c,d){return"bottom"==a?{top:b.top+b.height,left:b.left+b.width/2-c/2}:"top"==a?{top:b.top-d,left:b.left+b.width/2-c/2}:"left"==a?{top:b.top+b.height/2-d/2,left:b.left-c}:{top:b.top+b.height/2-d/2,left:b.left+b.width}},b.prototype.getTitle=function(){var a,b=this.$element,c=this.options;return a=b.attr("data-original-title")||("function"==typeof c.title?c.title.call(b[0]):c.title)},b.prototype.tip=function(){return this.$tip=this.$tip||a(this.options.template)},b.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".tooltip-arrow")},b.prototype.validate=function(){this.$element[0].parentNode||(this.hide(),this.$element=null,this.options=null)},b.prototype.enable=function(){this.enabled=!0},b.prototype.disable=function(){this.enabled=!1},b.prototype.toggleEnabled=function(){this.enabled=!this.enabled},b.prototype.toggle=function(b){var c=b?a(b.currentTarget)[this.type](this.getDelegateOptions()).data("bs."+this.type):this;c.tip().hasClass("in")?c.leave(c):c.enter(c)},b.prototype.destroy=function(){this.hide().$element.off("."+this.type).removeData("bs."+this.type)};var c=a.fn.tooltip;a.fn.tooltip=function(c){return this.each(function(){var d=a(this),e=d.data("bs.tooltip"),f="object"==typeof c&&c;e||d.data("bs.tooltip",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.tooltip.Constructor=b,a.fn.tooltip.noConflict=function(){return a.fn.tooltip=c,this}}(window.jQuery),+function(a){"use strict";var b=function(a,b){this.init("popover",a,b)};if(!a.fn.tooltip)throw new Error("Popover requires tooltip.js");b.DEFAULTS=a.extend({},a.fn.tooltip.Constructor.DEFAULTS,{placement:"right",trigger:"click",content:"",template:'<div class="popover"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),b.prototype=a.extend({},a.fn.tooltip.Constructor.prototype),b.prototype.constructor=b,b.prototype.getDefaults=function(){return b.DEFAULTS},b.prototype.setContent=function(){var a=this.tip(),b=this.getTitle(),c=this.getContent();a.find(".popover-title")[this.options.html?"html":"text"](b),a.find(".popover-content")[this.options.html?"html":"text"](c),a.removeClass("fade top bottom left right in"),a.find(".popover-title").html()||a.find(".popover-title").hide()},b.prototype.hasContent=function(){return this.getTitle()||this.getContent()},b.prototype.getContent=function(){var a=this.$element,b=this.options;return a.attr("data-content")||("function"==typeof b.content?b.content.call(a[0]):b.content)},b.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".arrow")},b.prototype.tip=function(){return this.$tip||(this.$tip=a(this.options.template)),this.$tip};var c=a.fn.popover;a.fn.popover=function(c){return this.each(function(){var d=a(this),e=d.data("bs.popover"),f="object"==typeof c&&c;e||d.data("bs.popover",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.popover.Constructor=b,a.fn.popover.noConflict=function(){return a.fn.popover=c,this}}(window.jQuery),+function(a){"use strict";function b(c,d){var e,f=a.proxy(this.process,this);this.$element=a(c).is("body")?a(window):a(c),this.$body=a("body"),this.$scrollElement=this.$element.on("scroll.bs.scroll-spy.data-api",f),this.options=a.extend({},b.DEFAULTS,d),this.selector=(this.options.target||(e=a(c).attr("href"))&&e.replace(/.*(?=#[^\s]+$)/,"")||"")+" .nav li > a",this.offsets=a([]),this.targets=a([]),this.activeTarget=null,this.refresh(),this.process()}b.DEFAULTS={offset:10},b.prototype.refresh=function(){var b=this.$element[0]==window?"offset":"position";this.offsets=a([]),this.targets=a([]);var c=this;this.$body.find(this.selector).map(function(){var d=a(this),e=d.data("target")||d.attr("href"),f=/^#\w/.test(e)&&a(e);return f&&f.length&&[[f[b]().top+(!a.isWindow(c.$scrollElement.get(0))&&c.$scrollElement.scrollTop()),e]]||null}).sort(function(a,b){return a[0]-b[0]}).each(function(){c.offsets.push(this[0]),c.targets.push(this[1])})},b.prototype.process=function(){var a,b=this.$scrollElement.scrollTop()+this.options.offset,c=this.$scrollElement[0].scrollHeight||this.$body[0].scrollHeight,d=c-this.$scrollElement.height(),e=this.offsets,f=this.targets,g=this.activeTarget;if(b>=d)return g!=(a=f.last()[0])&&this.activate(a);for(a=e.length;a--;)g!=f[a]&&b>=e[a]&&(!e[a+1]||b<=e[a+1])&&this.activate(f[a])},b.prototype.activate=function(b){this.activeTarget=b,a(this.selector).parents(".active").removeClass("active");var c=this.selector+'[data-target="'+b+'"],'+this.selector+'[href="'+b+'"]',d=a(c).parents("li").addClass("active");d.parent(".dropdown-menu").length&&(d=d.closest("li.dropdown").addClass("active")),d.trigger("activate")};var c=a.fn.scrollspy;a.fn.scrollspy=function(c){return this.each(function(){var d=a(this),e=d.data("bs.scrollspy"),f="object"==typeof c&&c;e||d.data("bs.scrollspy",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.scrollspy.Constructor=b,a.fn.scrollspy.noConflict=function(){return a.fn.scrollspy=c,this},a(window).on("load",function(){a('[data-spy="scroll"]').each(function(){var b=a(this);b.scrollspy(b.data())})})}(window.jQuery),+function(a){"use strict";var b=function(b){this.element=a(b)};b.prototype.show=function(){var b=this.element,c=b.closest("ul:not(.dropdown-menu)"),d=b.attr("data-target");if(d||(d=b.attr("href"),d=d&&d.replace(/.*(?=#[^\s]*$)/,"")),!b.parent("li").hasClass("active")){var e=c.find(".active:last a")[0],f=a.Event("show.bs.tab",{relatedTarget:e});if(b.trigger(f),!f.isDefaultPrevented()){var g=a(d);this.activate(b.parent("li"),c),this.activate(g,g.parent(),function(){b.trigger({type:"shown.bs.tab",relatedTarget:e})})}}},b.prototype.activate=function(b,c,d){function e(){f.removeClass("active").find("> .dropdown-menu > .active").removeClass("active"),b.addClass("active"),g?(b[0].offsetWidth,b.addClass("in")):b.removeClass("fade"),b.parent(".dropdown-menu")&&b.closest("li.dropdown").addClass("active"),d&&d()}var f=c.find("> .active"),g=d&&a.support.transition&&f.hasClass("fade");g?f.one(a.support.transition.end,e).emulateTransitionEnd(150):e(),f.removeClass("in")};var c=a.fn.tab;a.fn.tab=function(c){return this.each(function(){var d=a(this),e=d.data("bs.tab");e||d.data("bs.tab",e=new b(this)),"string"==typeof c&&e[c]()})},a.fn.tab.Constructor=b,a.fn.tab.noConflict=function(){return a.fn.tab=c,this},a(document).on("click.bs.tab.data-api",'[data-toggle="tab"], [data-toggle="pill"]',function(b){b.preventDefault(),a(this).tab("show")})}(window.jQuery),+function(a){"use strict";var b=function(c,d){this.options=a.extend({},b.DEFAULTS,d),this.$window=a(window).on("scroll.bs.affix.data-api",a.proxy(this.checkPosition,this)).on("click.bs.affix.data-api",a.proxy(this.checkPositionWithEventLoop,this)),this.$element=a(c),this.affixed=this.unpin=null,this.checkPosition()};b.RESET="affix affix-top affix-bottom",b.DEFAULTS={offset:0},b.prototype.checkPositionWithEventLoop=function(){setTimeout(a.proxy(this.checkPosition,this),1)},b.prototype.checkPosition=function(){if(this.$element.is(":visible")){var c=a(document).height(),d=this.$window.scrollTop(),e=this.$element.offset(),f=this.options.offset,g=f.top,h=f.bottom;"object"!=typeof f&&(h=g=f),"function"==typeof g&&(g=f.top()),"function"==typeof h&&(h=f.bottom());var i=null!=this.unpin&&d+this.unpin<=e.top?!1:null!=h&&e.top+this.$element.height()>=c-h?"bottom":null!=g&&g>=d?"top":!1;this.affixed!==i&&(this.unpin&&this.$element.css("top",""),this.affixed=i,this.unpin="bottom"==i?e.top-d:null,this.$element.removeClass(b.RESET).addClass("affix"+(i?"-"+i:"")),"bottom"==i&&this.$element.offset({top:document.body.offsetHeight-h-this.$element.height()}))}};var c=a.fn.affix;a.fn.affix=function(c){return this.each(function(){var d=a(this),e=d.data("bs.affix"),f="object"==typeof c&&c;e||d.data("bs.affix",e=new b(this,f)),"string"==typeof c&&e[c]()})},a.fn.affix.Constructor=b,a.fn.affix.noConflict=function(){return a.fn.affix=c,this},a(window).on("load",function(){a('[data-spy="affix"]').each(function(){var b=a(this),c=b.data();c.offset=c.offset||{},c.offsetBottom&&(c.offset.bottom=c.offsetBottom),c.offsetTop&&(c.offset.top=c.offsetTop),b.affix(c)})})}(window.jQuery);
+}),
+"cookie": (function (require) { /* wrapped by builder */
+/* added by builder */
+var jQuery = require("$");
+
+!function($,document,undefined){function raw(s){return s}function decoded(s){return unRfc2068(decodeURIComponent(s.replace(pluses," ")))}function unRfc2068(value){return 0===value.indexOf('"')&&(value=value.slice(1,-1).replace(/\\"/g,'"').replace(/\\\\/g,"\\")),value}function fromJSON(value){return config.json?JSON.parse(value):value}var pluses=/\+/g,config=$.cookie=function(key,value,options){if(value!==undefined){if(options=$.extend({},config.defaults,options),null===value&&(options.expires=-1),"number"==typeof options.expires){var days=options.expires,t=options.expires=new Date;t.setDate(t.getDate()+days)}return value=config.json?JSON.stringify(value):String(value),document.cookie=[encodeURIComponent(key),"=",config.raw?value:encodeURIComponent(value),options.expires?"; expires="+options.expires.toUTCString():"",options.path?"; path="+options.path:"",options.domain?"; domain="+options.domain:"",options.secure?"; secure":""].join("")}for(var decode=config.raw?raw:decoded,cookies=document.cookie.split("; "),result=key?null:{},i=0,l=cookies.length;l>i;i++){var parts=cookies[i].split("="),name=decode(parts.shift()),cookie=decode(parts.join("="));if(key&&key===name){result=fromJSON(cookie);break}key||(result[name]=fromJSON(cookie))}return result};config.defaults={},$.removeCookie=function(key,options){return null!==$.cookie(key)?($.cookie(key,null,options),!0):!1}}(jQuery,document);
 }),
 "noty": (function (require) { /* wrapped by builder */
 /* added by builder */
@@ -764,6 +1616,18 @@ var jQuery = require("$");
 }));
 
 }),
+"units": (function (require, exports, module) { /* wrapped by builder */
+
+
+window.units = {
+  'uchet_user': 'uchet',
+  'uchet':      'uchet',
+  'srq_list':   'srq'
+};
+
+
+
+}),
 "moment": (function (require, exports, module) { /* wrapped by builder */
 // moment.js
 // version : 2.1.0
@@ -791,18 +1655,31 @@ module.exports = Backbone.Router.extend({
   initialize: function() {
     var _this = this;
     var dicts = [];
+    var units = window.units || {};
 
     this.sidebar = new Sidebar();
     
     $('[data-view=\"dict\"]').each(function(i, el) {
+      var unit;
+      var resource;
 
       var sid = $(el).data("dict-sid") || '';
       var conf = window[sid + '_data'] || {};
 
-      window[sid] = new Gsender({
-        el:   conf.el,
-        conf: conf
-      });
+      if (units[sid]) {
+        unit = units[sid];
+        resource = require(unit);
+        
+        window[sid] = new resource({
+          el:   conf.el,
+          conf: conf
+        });
+      } else {
+        window[sid] = new Gsender({
+          el:   conf.el,
+          conf: conf
+        });
+      }
 
       dicts.push(sid);
     });
@@ -832,6 +1709,9 @@ module.exports = Backbone.Router.extend({
         if (textStatus === 'success') {
           var res = JSON.parse(xhr.responseText);
           if (!res.err) {
+            $.removeCookie('user_id');
+            $.removeCookie('session_id');
+            $.removeCookie('workstation_id');
             window.location.href = "/";    
           }
         }
@@ -1022,6 +1902,56 @@ var Common = Backbone.View.extend({
 
 });
 
+Common.prototype.parseDictOptions = function(s) {
+  var res = {};
+  var options = s.toString().split(',') || [];
+  _.each(options, function(vals) {
+    var key, value;
+    if (vals.match(/\=/)) {
+      key =   vals.replace(/(.*)\=(.*)/,'$1');
+      value = vals.replace(/(.*)\=(.*)/,'$2');
+      res[key] = value;
+    }
+  });
+  return res;
+};
+
+// Common.prototype.getUnits = function(conf) {
+//   var units = {};
+//   if (window.units) {
+//     if (window.units[conf.sid]) {
+//       _.each(window.units[conf.sid], function(unit) {
+//         var resource = require(unit);
+//         units[unit] = new resource({
+//           el:   conf.el,
+//           conf: conf
+//         });
+//       });
+//     }
+//   }
+//   this.units = units;
+// };
+
+// Common.prototype.checkUnits = function(field, type) {
+//   var _this = this;
+//   var units = [];
+
+//   if (type == null) {
+//     type = 'editfields';
+//   }
+
+//   _.each(this.units || {}, function(unit, name) {
+//     if (unit[type]) {
+//       if (_.indexOf(unit[type], field) > -1){
+//         if (typeof (unit.onEdit) !== null) {
+//           units.push(name);
+//         }
+//       }
+//     } 
+//   });
+//   return units;
+// };
+
 Common.prototype.setSearchVals = function(str, line, escape) {
 
   if (str == null) {
@@ -1084,24 +2014,159 @@ Common.prototype.setLineVals = function(str, line, escape) {
 module.exports = Common;
 
 }),
+"delete": (function (require, exports, module) { /* wrapped by builder */
+
+var _ =        require('underscore');
+var Modal =    require('modal');
+// var noty =     require('noty');
+
+var Delete = Modal.extend({
+
+  el: "[data-view=\"delete\"]",
+
+  initialize: function() {
+    var _this;
+
+    this.$body =        this.$el.find("[data-type=\"modal-body\"]");
+    this.$form =        this.$el.find("[data-view=\"form\"]");
+    this.$button =      this.$el.find("[data-view=\"button\"]");
+
+    this.conf =         this.options.conf   || {};
+    this.sid =          this.conf.sid       || {};
+    
+    _this = this;
+
+    this.$button.on('click', function() {
+      _this.request();
+    });
+
+  }
+});
+
+Delete.prototype.init = function(line) {
+  var keyfieldname = this.options.conf.keyfieldname;
+  this.line = line;
+  this.line_id = line[keyfieldname];
+};
+
+Delete.prototype.checkPrivilegies = function() {
+  var privileges =      this.conf.privileges || {};
+  var A =               privileges.A         || false;
+  var D =               privileges.D         || [];
+
+  if (A) {
+    return true;
+  } else {
+    if (D === true) {
+      return true;
+    } else {
+      return false;
+    }
+  }  
+};
+
+Delete.prototype.open = function(gsender, e) {
+  var _this = this;
+  var sid, conf;
+
+  this.init(e.line);
+
+  if (this.checkPrivilegies()) {
+
+    this.$el.modal('show');      
+
+  } else {
+    $.noty({
+      text:         'Удаление записей запрещено!',
+      layout:       'topCenter',
+      type:         'error',
+      closeButton:  false,
+      timeout:      10000
+    });    
+  }
+};
+
+
+Delete.prototype.request = function() {
+  var _this = this;
+  $.ajax({
+    url: '/api/dict/' + this.sid,
+    type: 'GET',
+    data: {
+      line:    this.line || {},
+      vals:    this.vals || {},
+      keys:    this.keys || {},
+      _method: 'DELETE'
+    },
+    timeout: 10000,
+    success: function(res) {
+      if (!res.err) {
+        _this.$el.modal('hide');
+        _this.$el.trigger('update');
+        $.noty({
+          text:         'Запись успешно удалена!',
+          layout:       'topCenter',
+          type:         'success',
+          closeButton:  false,
+          timeout:      2000
+        });
+      } else {
+        $.noty({
+          text:         'Произошла ошибка при удалении записи!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      3000
+        });
+        console.error('Delete.prototype.request', res.err);
+      }
+    },
+    error: function(e) {
+      $.noty({
+        text:         'Произошла ошибка при запросе к серверу!',
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      3000
+      });
+      console.error('Delete.prototype.request error', e);
+    }
+  });
+};
+
+
+module.exports = Delete;
+
+
+}),
 "edit": (function (require, exports, module) { /* wrapped by builder */
 
 var _ =            require('underscore');
-var Common =       require('common');
+var Modal =        require('modal');
 var Select =       require('select');
 var GroupEdit =    require('groupedit');
 
-var Edit = Common.extend({
+var template_edit_default =     require('edit_default.jade');
+var template_edit_header =      require('edit_header.jade');
+var template_edit_footer =      require('edit_footer.jade');
+var template_edit_select =      require('edit_select.jade');
+var template_edit_groups =      require('edit_groups.jade');
+var template_edit_text =        require('edit_text.jade');
+var template_edit_date =        require('edit_date.jade');
+
+var Edit = Modal.extend({
 
   el: "[data-view=\"edit\"]",
 
   initialize: function() {
     var _this;
 
-    this.$header =      this.$el.find("[data-type=\"modal-header\"]");
-    this.$body =        this.$el.find("[data-type=\"modal-body\"]");
-    this.$form =        this.$el.find("[data-view=\"form\"]");
-    this.$button =      this.$el.find("[data-type=\"button\"]");
+    this.$header =      this.$el.find("[data-view=\"modal-header\"]");
+    this.$body =        this.$el.find("[data-view=\"modal-body\"]");
+    this.$form =        this.$el.find("[data-view=\"modal-form\"]");
+    this.$button =      this.$el.find("[data-view=\"button\"]");
+    this.$footer =      this.$el.find("[data-view=\"modal-footer\"]");
+    this.$bottom =      this.$el.find("[data-view=\"modal-bottom\"]");
 
     this.conf =         this.options.conf    || {};
     this.sid =          this.conf.sid        || {};
@@ -1109,10 +2174,15 @@ var Edit = Common.extend({
     this.columns =      this.conf.columns    || {};
     this.controls =     {};
     this.vals =         {};
+    this.showdefault =  true;
     
-    this.$button.on('click', function() {
-      _this.request();
-    });
+    // this.$button.on('click', function() {
+    //   _this.request();
+    // });
+
+    // this.$el.on('click', '[data-view=\"button\"]', function(e) {
+    //   _this.request();
+    // });
 
     _this = this;
 
@@ -1120,94 +2190,164 @@ var Edit = Common.extend({
 
 });
 
-Edit.prototype.open = function(field, type, line, fields) {
-  var id, sid, conf, select, groupEdit, groups, control;
-  var showdefault =     true;
-  var privileges =      this.conf.privileges || {};
-  var U =               privileges.U         || [];
-  var value =           line[field];
-  var fieldInfo =       fields[field];
-  var column =        _.findWhere(this.columns, {
-    field: field
-  });
-  var caption = column.caption || '';
+Edit.prototype.checkEditField = function(field) {
+  if (field == null) {
+    field = this.field;
+  }
 
   this.editfield = this.editfields[field];
 
   if (this.editfield) {
+    this.editfield = this.editfield.toString().trim();
+    if (this.editfields[this.editfield]) {
+      this.field = this.editfield;
+      this.editfield = this.editfields[this.editfield].toString().trim();
+    }
+    this.editfield = this.editfield.toLowerCase();
+    return this.editfield;
+  } else {
+    return false;
+  }
+};
 
+Edit.prototype.checkPrivilegies = function(field) {
+  var privileges =      this.conf.privileges || {};
+  var A =               privileges.A         || false;
+  var U =               privileges.U         || [];
+
+  if (field == null) {
+    field = this.field;
+  }
+
+  if (A) {
+    return true;
+  } else {
     if (_.indexOf(U, field.toUpperCase())>-1) {
+      return true;
+    } else {
+      return false;
+    }  
+  }
+};
 
-      console.log(fieldInfo.mtype);
+Edit.prototype.getCaption = function(field) {
+  var column;
 
-      this.editfield = this.editfield.toString().trim();
-      if (this.editfields[this.editfield]) {
-        field = this.editfield;
-        this.editfield = this.editfields[this.editfield].toString().trim();
-      }
-      this.editfield = this.editfield.toLowerCase();
-      
+  if (field == null) {
+    field = this.field;
+  }
+  
+  column = _.findWhere(this.columns, {
+    field: field
+  });  
+
+  caption = column.caption || '';
+  this.caption = caption;
+  return caption;
+};
+
+Edit.prototype.init = function(field, type, line, fields) {
+
+  this.line =           line;
+  this.value =          line[field];  
+  this.fieldInfo =      fields[field];
+  this.field =          field.toString().trim();
+  this.caption =        this.getCaption();
+
+};
+
+Edit.prototype.editor = function(e) {
+  var _this = this;
+  var sid, conf, initOptions, select, groupEdit, groups, control;
+
+  var id = guid();
+  var operation_id = guid();
+
+  this.init(e.field, e.type, e.line, e.fields);
+
+  if (this.checkEditField()) {
+
+    if (this.checkPrivilegies()) {
+
+      this.$header.html(template_edit_header({
+        caption: this.caption
+      }));
+
+      this.$footer.html(template_edit_footer({
+        operation_id: operation_id
+      }));
+
+      this.$bottom.empty();
+
+      this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
+        _this.request();
+      });
+
+        
       if (this.editfield.match(/^WDICTS\./i)) {
         sid = this.editfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
-        id = "edit_" + this.sid + "_" + sid;
         conf = window[sid + '_data'];
-        this.$header.html(jade.templates.edit_header({
-          caption: caption
-        }));
-        this.$body.html(jade.templates.edit_select({
+        initOptions = this.editfield.toString().replace(/WDICTS\./i, '').replace(/.*\(/i, '').replace(/\)/i, '').trim() || '';
+        if (initOptions === sid) {
+          initOptions = '';
+        }
+        // this.$header.html(template_edit_header({
+        //   caption: this.caption
+        // }));
+        this.$body.html(template_edit_select({
           id:   id,
           conf: conf
         }));
         select = new Select({
-          el:   "[data-control=\"" + id + "\"]",
-          type: 'select',
-          conf: conf
+          el:           "[data-control=\"" + id + "\"]",
+          type:         'select',
+          conf:         conf,
+          initOptions:  initOptions,
+          line:         e.line
         });
         this.controls = {
-          field:      field,
-          fieldInfo:  fieldInfo,
-          line:       line,
+          field:      this.field,
+          fieldInfo:  this.fieldInfo,
+          line:        e.line,
           type:       'select',
           val:  function() {
             return select.getValue();
           }
         };
-        showdefault = false;
+        this.showdefault = false;
         this.$el.modal('show');
       }
       
-      if ((this.editfield === 'strings') || (fieldInfo.mtype === 'blob')) {
-        id = "edit_" + this.sid + "_" + field;
-        this.$header.html(jade.templates.edit_header({
-          caption: caption
-        }));
-        this.$body.html(jade.templates.edit_text({
+      if ((this.editfield === 'strings') || (this.fieldInfo.mtype === 'blob')) {
+        // this.$header.html(template_edit_header({
+        //   caption: this.caption
+        // }));
+        this.$body.html(template_edit_text({
           id:         id,
-          fieldInfo:  fieldInfo,
-          value:      value
+          fieldInfo:  this.fieldInfo,
+          value:      this.value
         }));
         this.controls = {
-          field:      field,
-          fieldInfo:  fieldInfo,
-          line:       line,
-          type:       type,
+          field:      this.field,
+          fieldInfo:  this.fieldInfo,
+          line:       e.line,
+          type:       'blob',
           val:  function() {
             return $("[data-control=\"" + id + "\"]").val();
           }
         };
-        showdefault = false;
+        this.showdefault = false;
         this.$el.modal('show');
       }
 
-      if ((this.editfield === 'default') && (fieldInfo.mtype === 'timestamp')) {
-        id = "edit_" + this.sid + "_" + sid;
-        this.$header.html(jade.templates.edit_header({
-          caption: caption
-        }));
-        this.$body.html(jade.templates.edit_date({
+      if ((this.editfield === 'default') && (this.fieldInfo.mtype === 'timestamp')) {
+        // this.$header.html(template_edit_header({
+        //   caption: this.caption
+        // }));
+        this.$body.html(template_edit_date({
           id:         id,
-          fieldInfo:  fieldInfo,
-          value:      value
+          fieldInfo:  this.fieldInfo,
+          value:      this.value
         }));
         $("[data-control=\"" + id + "_date\"]").datepicker({
           format: 'dd.mm.yyyy'
@@ -1216,15 +2356,15 @@ Edit.prototype.open = function(field, type, line, fields) {
         });
         $("[data-control=\"" + id + "_time\"]").timepicker({
           showMeridian: false,
-          defaultTime:  moment(value).format('HH:mm')
+          defaultTime:  moment(this.value).format('HH:mm')
         });
         $('.icon-chevron-up').addClass('fa').addClass('fa-chevron-up').removeClass('icon-chevron-up');
         $('.icon-chevron-down').addClass('fa').addClass('fa-chevron-down').removeClass('icon-chevron-down');
         this.controls = {
-          field:      field,
-          fieldInfo:  fieldInfo,
-          line:       line,
-          type:       type,
+          field:      this.field,
+          fieldInfo:  this.fieldInfo,
+          line:       e.line,
+          type:       'timestamp',
           val:  function() {
             return $("[data-control=\"" + id + "_date\"]").val() + ' ' + $("[data-control=\"" + id + "_time\"]").val();
             // return new Date($("[data-control=\"" + id + "_date\"]").val() + ' ' + $("[data-control=\"" + id + "_time\"]").val());
@@ -1234,32 +2374,31 @@ Edit.prototype.open = function(field, type, line, fields) {
             // };
           }
         };
-        showdefault = false;
+        this.showdefault = false;
         this.$el.modal('show');
       }
 
-      if ((this.editfield === 'default') && (field === 'mmbsh')) {
-        id = "edit_" + this.sid + "_" + field;
-        groups = this.conf.groups || [];
-        this.$header.html(jade.templates.edit_header({
-          caption: caption
-        }));
-        this.$body.html(jade.templates.edit_groups({
+      if ((this.editfield === 'default') && (this.field === 'mmbsh')) {
+        groups = this.options.conf.groups || [];
+        // this.$header.html(template_edit_header({
+        //   caption: this.caption
+        // }));
+        this.$body.html(template_edit_groups({
           id:         id,
-          fieldInfo:  fieldInfo,
-          value:      value,
+          fieldInfo:  this.fieldInfo,
+          value:      this.value,
           groups:     groups
         }));
         groupEdit = new GroupEdit({
-          el:   "[data-control=\"" + id + "\"]",
-          value:       value,
-          groups:      groups
+          el:         "[data-control=\"" + id + "\"]",
+          value:      this.value,
+          groups:     groups
         });
         this.controls = {
-          field:      field,
-          fieldInfo:  fieldInfo,
-          line:       line,
-          type:       type,
+          field:      this.field,
+          fieldInfo:  this.fieldInfo,
+          line:       e.line,
+          type:       'mmbsh',
           val:  function() {
             return groupEdit.result();
           }
@@ -1267,21 +2406,20 @@ Edit.prototype.open = function(field, type, line, fields) {
         this.$el.modal('show');
       }
 
-      if ((this.editfield === 'default') && (showdefault)) {
-        id = "edit_" + this.sid + "_" + field;
-        this.$header.html(jade.templates.edit_header({
-          caption: caption
-        }));
-        this.$body.html(jade.templates.edit_default({
+      if ((this.editfield === 'default') && (this.field !== 'mmbsh') && (this.fieldInfo.mtype !== 'timestamp')) {
+        // this.$header.html(template_edit_header({
+        //   caption: this.caption
+        // }));
+        this.$body.html(template_edit_default({
           id:         id,
-          fieldInfo:  fieldInfo,
-          value:      value
+          fieldInfo:  this.fieldInfo,
+          value:      this.value
         }));
         this.controls = {
-          field:      field,
-          fieldInfo:  fieldInfo,
-          line:       line,
-          type:       type,
+          field:      this.field,
+          fieldInfo:  this.fieldInfo,
+          line:       e.line,
+          type:       'default',
           input:      this.$body.find("[data-control=\"" + id + "\"]"),
           val:  function() {
             return $("[data-control=\"" + id + "\"]").val();
@@ -1292,13 +2430,41 @@ Edit.prototype.open = function(field, type, line, fields) {
 
     } else {
 
-      $.noty({
-        text:         'Данное поле запрещено для редактирования!',
-        layout:       'topCenter',
-        type:         'error',
-        closeButton:  false,
-        timeout:      500
-      });
+      // if (fieldInfo.mtype === 'blob') {
+      
+      //   id = "edit_" + this.sid + "_" + field;
+      //   this.$header.html(template_edit_header({
+      //     caption: this.caption
+      //   }));
+      //   this.$body.html(template_edit_show({
+      //     id:         id,
+      //     fieldInfo:  this.fieldInfo,
+      //     value:      this.value
+      //   }));
+      //   this.$footer.hide();
+      //   // this.controls = {
+      //   //   field:      this.field,
+      //   //   fieldInfo:  this.fieldInfo,
+      //   //   line:       line,
+      //   //   type:       type,
+      //   //   val:  function() {
+      //   //     return $("[data-control=\"" + id + "\"]").val();
+      //   //   }
+      //   // };
+      //   // this.showdefault = false;
+      //   this.$el.modal('show');        
+      
+      // } else {
+
+      //   $.noty({
+      //     text:         'Данное поле запрещено для редактирования!',
+      //     layout:       'topCenter',
+      //     type:         'error',
+      //     closeButton:  false,
+      //     timeout:      500
+      //   });
+
+      // }
 
     }
 
@@ -1327,6 +2493,8 @@ Edit.prototype.checkCompleteFields = function() {
 
 Edit.prototype.request = function() {
   var _this = this;
+
+
   var controls = this.checkCompleteFields();
 
   if (controls) {
@@ -1337,7 +2505,7 @@ Edit.prototype.request = function() {
         _method: 'POST',
         controls: controls
       },
-      timeout: this.options.timeout || 1000,
+      timeout: 10000,
       success: function(res) {
         if (!res.err) {
           _this.$el.modal('hide');
@@ -1511,8 +2679,8 @@ module.exports = Folder;
 }),
 "groupedit": (function (require, exports, module) { /* wrapped by builder */
 
-var _ =        require('_');
-var Common =   require('common');
+var _ =       require('_');
+var Common =  require('common');
 
 var GroupEdit = Common.extend({
 
@@ -1547,7 +2715,7 @@ var GroupEdit = Common.extend({
       } else {
         _this.$allGroups.append(   _this.render("all",   groups, "default", true));
       }
-      _this.result();
+      // _this.result();
     });
 
   }
@@ -1589,27 +2757,29 @@ GroupEdit.prototype.render = function(type, ms, cl, colorize) {
   }
   _.each(ms, function(group, key) {
     group = _this.allGroups[key];
-    if ((type !== 'all') || (!$(_this.$checkGroups).find('[data-group-id=\"' + group.id + '\"]').length)) {
-      if (group.depth > 1) {
-        s += '<div class = "row", data-group-id = "#{group.id}", data-group-type = "#{type}">';
-        if (colorize) {
-          s +=   '<div class = "col-sm-1">';
-          s +=     '<span class = "badge-group", style = "color:#000; background-color:##{group.hex};">';
-          s +=       '&nbsp;';
-          s +=     '</span>';
+    if (group) {
+      if ((type !== 'all') || (!$(_this.$checkGroups).find('[data-group-id=\"' + group.id + '\"]').length)) {
+        if (group.depth > 1) {
+          s += '<div class = "row", data-group-id = "#{group.id}", data-group-type = "#{type}">';
+          if (colorize) {
+            s +=   '<div class = "col-sm-1">';
+            s +=     '<span class = "badge-group", style = "color:#000; background-color:##{group.hex};">';
+            s +=       '&nbsp;';
+            s +=     '</span>';
+            s +=   '</div>';
+          }
+          s +=   '<div class = "col-sm-10">';
+          s +=     '<a class = "btn btn-xs btn-#{class}", data-action = "group-edit", href = "#">';
+          s +=       '#{group.caption}';
+          s +=     '</a>';
           s +=   '</div>';
+          s += '</div>';
+          s = s.replace(/\#\{class}/g,           cl);
+          s = s.replace(/\#\{type}/g,            type);
+          s = s.replace(/\#\{group\.id\}/g,      group.id);
+          s = s.replace(/\#\{group\.hex\}/g,     group.hex);
+          s = s.replace(/\#\{group\.caption\}/g, group.caption);
         }
-        s +=   '<div class = "col-sm-10">';
-        s +=     '<a class = "btn btn-xs btn-#{class}", data-action = "group-edit", href = "#">';
-        s +=       '#{group.caption}';
-        s +=     '</a>';
-        s +=   '</div>';
-        s += '</div>';
-        s = s.replace(/\#\{class}/g,           cl);
-        s = s.replace(/\#\{type}/g,            type);
-        s = s.replace(/\#\{group\.id\}/g,      group.id);
-        s = s.replace(/\#\{group\.hex\}/g,     group.hex);
-        s = s.replace(/\#\{group\.caption\}/g, group.caption);
       }
     }
   });
@@ -1623,208 +2793,328 @@ module.exports = GroupEdit;
 "gsender": (function (require, exports, module) { /* wrapped by builder */
 
 var _ =          require('underscore');
-var Backbone =   require('backbone');
 var Common =     require('common');
 var Data =       require('data');
 var Dict =       require('dict');
 var Search =     require('search');
 var Insert =     require('insert');
+var Delete =     require('delete');
 var Edit =       require('edit');
 var Folder =     require('folder');
 var Filter =     require('filter');
+
+var template_line_data =        require('line_data.jade');
+var template_line_nothing =     require('line_nothing.jade');
+var template_line_error =       require('line_error.jade');
+var template_line_loading =     require('line_loading.jade');
 
 var Gsender = Common.extend({
 
   el: "[data-view=\"dict\"]",
 
   initialize: function() {
-    var model,
-      _this = this;
+    var _this = this;
 
-    this.dict = new Dict(this.options.conf || {});
+    this.initDict();
+    this.initElements();
+    this.initData();
+    this.initToolbar();
 
-    this.$caption =     $(document).find("[data-dict-caption=\"" + this.dict.get('sid') + "\"]");
-    this.$thead =       this.$el.find('thead');
-    this.$worksheet =   this.$el.find('tbody');
-    this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
-    this.$search =      this.$el.find("[data-view=\"search\"]");
-    this.$insert =      this.$el.find("[data-view=\"insert\"]");
-    this.$edit =        this.$el.find("[data-view=\"edit\"]");
-    this.$folders =     this.$el.find("[data-view=\"folders\"]");
-    this.$filters =     this.$el.find("[data-view=\"filters\"]");
+    this.initTooltips();
+    this.initCursor();
 
-    this.dict.set('type', this.$el.data("dict-type") || 'parent');
-    this.dict.cleanVals();
+    this.initScroll();
 
-    this.toolbar = this.dict.get('toolbar');
+    this.editing();
 
-    this.data = new Data();
-    this.data.setIdAttribute(this.dict.get('keyfieldname'));
-    this.data.url = '/api/dict/' + this.dict.get('sid');
 
-    if (this.toolbar.search === true) {
-      this.search = new Search({
-        el:    this.$search,
-        conf:  this.options.conf || {}
-      });
+    // this.$el.on('click', "[data-action=\"delete\"]", function() {
+    //   var $tr = $(this).parent().parent();
+    //   _this.dict.set('selectRowUUID', $tr.data('uuid'));
+    //   _this.sendRequest('remove', _this.getSelectLine());
+    // });
 
-      this.data.on('add', function(data) {
-        _this.search.select.addOption(data.toJSON());
-      });
 
-      this.search.on('search', function(query) {
-        _this.dict.set({
-          query: query
-        });
-        _this.sendRequest('search');
-      });
-    }
+    this.afterInit();
+  
+    this.begin();
 
-    if (this.toolbar.folders === true) {
+  }
+});
 
-      this.folders = new Folder({
-        el:    this.$folders,
-        conf:  this.options.conf
-      });
+Gsender.prototype.initTooltips = function() {
+  this.$toolbar.find("[data-toggle=\"tooltip\"]").tooltip({
+    container: 'body',
+    placement: 'top'
+  });
 
-      if (store.get(this.dict.get('sid') + '#folder_id')) {
-          this.dict.set('folder_id', store.get(this.dict.get('sid') + '#folder_id'));
-      } else {
-        if (this.options.conf.initfolder_id) {
-          this.dict.set('folder_id', this.options.conf.initfolder_id);
-        }
+  this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
+    container: 'body'
+    // placement: 'top'
+  });
+};
+
+Gsender.prototype.initCursor = function() {
+  this.$el.on('mouseover', function() {
+    $(this).css({
+      'cursor': 'pointer'
+    });
+  });
+};
+
+Gsender.prototype.afterInit = function() {
+  if (this.dict.get('type') === 'parent') {
+    this.sendRequest('onload');
+  }
+};
+
+Gsender.prototype.initDict = function() {
+  this.dict = new Dict(this.options.conf || {});
+  this.dict.set('type', this.$el.data("dict-type") || 'parent');
+  this.dict.cleanVals();
+};
+
+Gsender.prototype.initData = function() {
+  var _this = this;
+
+  this.data = new Data();
+  this.data.setIdAttribute(this.dict.get('keyfieldname'));
+  this.data.url = '/api/dict/' + this.dict.get('sid');
+
+  this.data.on('add', function(line) {
+    _this.onDataAdd(line);
+  });
+
+  this.data.on('remove', function(line) {
+    _this.onDataRemove(line);
+  });
+};
+
+Gsender.prototype.onDataAdd = function(line) {
+  var keyfieldname = this.dict.get('keyfieldname');
+  
+  this.$worksheet.append(template_line_data({
+    keyfieldname: keyfieldname,
+    columns:      this.dict.get('columns'),
+    line:         line.toJSON()
+  }));
+  
+  this.$worksheet.find("[data-uuid=\"" + line.get(keyfieldname) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
+    container: 'body',
+    placement: 'top'
+  });
+
+  this.onCustomDrawCell({
+    keyfieldname: keyfieldname,
+    line:         line.toJSON()
+  });
+};
+
+Gsender.prototype.onDataRemove = function(line) {
+  var keyfieldname = _this.dict.get('keyfieldname');
+  _this.$worksheet.find("[data-uuid=\"" + line.get(keyfieldname) + "\"]").remove();  
+};
+
+Gsender.prototype.editing = function() {
+  var _this = this;
+
+  this.edit = new Edit({
+    el:    this.$edit,
+    conf:  this.options.conf
+  });
+
+  this.$edit.on('update', function() {
+    _this.sendRequest('search');
+  });
+
+  this.$el.on('click', 'td', function() {
+    var $tr =      $(this).parent();
+    var uuid =     $tr.data('uuid');
+    var field =    $(this).data('col-field');
+    var type =     $(this).data('col-type');
+    var line =     _this.data.get(uuid).toJSON();
+    var fields =   _this.dict.get('fields');
+    var cancel =   false;
+    if (!$tr.hasClass('active')) {
+      _this.unColorActiveLine();
+      _this.dict.set('selectRowUUID', uuid);
+      _this.colorActiveLine();
+      _this.updateChilds();
+    } else {
+      if (_this.onEdit({
+        field:  field, 
+        type:   type, 
+        line:   line, 
+        fields: fields
+      })) {
+        cancel = true;
       }
 
-      this.folders.on('select', function(folder_id) {
-        _this.dict.set({
-          folder_id: folder_id
+      if (!cancel) {
+        _this.edit.editor({
+          field:  field, 
+          type:   type, 
+          line:   line, 
+          fields: fields
         });
-        store.set(_this.dict.get('sid') + '#folder_id', folder_id);
-        _this.sendRequest('search');
-      });
-    }
-
-    if (this.toolbar.filters === true) {
-
-      this.filters = new Filter({
-        el:    this.$filters,
-        conf:  this.options.conf
-      });
-
-      if (store.get(this.dict.get('sid') + '#filter_id')) {
-        this.dict.set('filter_id', store.get(this.dict.get('sid') + '#filter_id'));
-      } else {
-        if (this.options.conf.initfilter_id) {
-          this.dict.set('filter_id', this.options.conf.initfilter_id);
-        } else {
-          this.dict.set('filter_id', -1);
-        }
       }
-
-      this.filters.on('select', function(filter_id) {
-        _this.dict.set({
-          filter_id: filter_id
-        });
-        store.set(_this.dict.get('sid') + '#filter_id', filter_id);
-        _this.sendRequest('search');
-      });
     }
+  });
+};
 
-    if (this.toolbar.insert === true) {
+Gsender.prototype.initElements = function() {
+  this.$caption =     $(document).find("[data-dict-caption=\"" + this.dict.get('sid') + "\"]");
+  this.$thead =       this.$el.find('thead');
+  this.$worksheet =   this.$el.find('tbody');
+  this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
+  this.$search =      this.$el.find("[data-view=\"search\"]");
+  this.$insert =      this.$el.find("[data-view=\"insert\"]");
+  this.$delete =      this.$el.find("[data-view=\"delete\"]");
+  this.$edit =        this.$el.find("[data-view=\"edit\"]");
+  this.$folders =     this.$el.find("[data-view=\"folders\"]");
+  this.$filters =     this.$el.find("[data-view=\"filters\"]");
+};
 
-      this.insert = new Insert({
-        el:         this.$insert,
-        conf:       this.options.conf
+Gsender.prototype.initToolbar = function() {
+  var _this = this;
+
+  this.toolbar = this.dict.get('toolbar');
+
+  if (this.toolbar.search === true) {
+    this.search = new Search({
+      el:    this.$search,
+      conf:  this.options.conf || {}
+    });
+
+    this.data.on('add', function(data) {
+      _this.search.select.addOption(data.toJSON());
+    });
+
+    this.search.on('search', function(query) {
+      _this.dict.set({
+        query: query
       });
+      _this.sendRequest('search');
+    });
+  }
 
-      this.$el.on('click', "[data-action=\"insert\"]", function(e) {
-        e.preventDefault();
-        _this.insert.open();
-      });
+  if (this.toolbar.folders === true) {
 
-      this.$insert.on('update', function() {
-        _this.sendRequest('search');
-      });
-    }
-
-    this.edit = new Edit({
-      el:    this.$edit,
+    this.folders = new Folder({
+      el:    this.$folders,
       conf:  this.options.conf
     });
 
-    this.$edit.on('update', function() {
+    if (store.get(this.dict.get('sid') + '#folder_id')) {
+        this.dict.set('folder_id', store.get(this.dict.get('sid') + '#folder_id'));
+    } else {
+      if (this.options.conf.initfolder_id) {
+        this.dict.set('folder_id', this.options.conf.initfolder_id);
+      }
+    }
+
+    this.folders.on('select', function(folder_id) {
+      _this.dict.set({
+        folder_id: folder_id
+      });
+      store.set(_this.dict.get('sid') + '#folder_id', folder_id);
+      _this.sendRequest('search');
+    });
+  }
+
+  if (this.toolbar.filters === true) {
+
+    this.filters = new Filter({
+      el:    this.$filters,
+      conf:  this.options.conf
+    });
+
+    if (store.get(this.dict.get('sid') + '#filter_id')) {
+      this.dict.set('filter_id', store.get(this.dict.get('sid') + '#filter_id'));
+    } else {
+      if (this.options.conf.initfilter_id) {
+        this.dict.set('filter_id', this.options.conf.initfilter_id);
+      } else {
+        this.dict.set('filter_id', -1);
+      }
+    }
+
+    this.filters.on('select', function(filter_id) {
+      _this.dict.set({
+        filter_id: filter_id
+      });
+      store.set(_this.dict.get('sid') + '#filter_id', filter_id);
+      _this.sendRequest('search');
+    });
+  }
+
+  if (this.toolbar.insert === true) {
+
+    this.insert = new Insert({
+      el:         this.$insert,
+      conf:       this.options.conf
+    });
+
+    this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+      e.preventDefault();
+      _this.insert.open();
+    });
+
+    this.$insert.on('update', function() {
+      _this.sendRequest('search');
+    });
+  }
+
+  if (this.toolbar.remove === true) {
+
+    this.delete = new Delete({
+      el:         this.$delete,
+      conf:       this.options.conf
+    });
+
+    this.$el.on('click', "[data-action=\"delete\"]", function(e) {
+      e.preventDefault();
+      _this.delete.open(_this, {
+        line: _this.getSelectLine().toJSON()
+      });
+    });
+
+    this.$delete.on('update', function() {
       _this.sendRequest('search');
     });
 
-    this.$toolbar.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body',
-      placement: 'top'
-    });
+  }
+};
 
-    this.$thead.find("[data-toggle=\"tooltip\"]").tooltip({
-      container: 'body'
-      // placement: 'top'
-    });
+Gsender.prototype.initScroll = function() {
+  var _this = this;
 
-    this.$el.on('mouseover', function() {
-      $(this).css({
-        'cursor': 'pointer'
-      });
-    });
+  this.on('scroll.end', function() {
+    _this.onScrollEnd();
+  });
+};
 
-    this.$el.on('click', 'td', function() {
-      var $tr = $(this).parent();
-      var uuid = $tr.data('uuid');
-      if (!$tr.hasClass('active')) {
-        _this.unColorActiveLine();
-        _this.dict.set('selectRowUUID', uuid);
-        _this.colorActiveLine();
-        _this.updateChilds();
-      } else {
-        _this.edit.open($(this).data('col-field'), $(this).data('col-type'), _this.data.get(uuid).toJSON(), _this.dict.get('fields'));
-      }
-    });
-
-    this.$el.on('click', "[data-action=\"delete\"]", function() {
-      var $tr = $(this).parent().parent();
-      _this.dict.set('selectRowUUID', $tr.data('uuid'));
-      _this.sendRequest('remove', _this.getSelectLine());
-    });
-
-    this.data.on('add', function(line) {
-      var key = _this.dict.get('keyfieldname');
-      _this.$worksheet.append(jade.templates.line_data({
-        keyfieldname: key,
-        columns:      _this.dict.get('columns'),
-        line:         line.toJSON()
-      }));
-      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
-        container: 'body',
-        placement: 'top'
-      });
-      // _this.$el.trigger('add.line', line.toJSON());
-    });
-
-    this.data.on('remove', function(line) {
-      var key = _this.dict.get('keyfieldname');
-      _this.$worksheet.find("[data-uuid=\"" + line.get(key) + "\"]").remove();
-      // _this.$el.trigger('remove.line', line.toJSON());
-    });
-
-    this.on('scroll.end', function() {
-      if (_this.isActiveDict()) {
-        if (!_this.isScrolling) {
-          _this.dict.set('limit', _this.data.length + _this.dict.get('step'));
-          _this.sendRequest('scroll');
-        }
-      }
-    });
-
-    if (_this.dict.get('type') === 'parent') {
-      _this.sendRequest('onload');
+Gsender.prototype.onScrollEnd = function() {
+  if (this.isActiveDict()) {
+    if (!this.isScrolling) {
+      this.dict.set('limit', this.data.length + this.dict.get('step'));
+      this.sendRequest('scroll');
     }
   }
-});
+};
+
+Gsender.prototype.begin = function() {
+
+};
+
+Gsender.prototype.onCustomDrawCell = function(e) {
+
+};
+
+Gsender.prototype.onEdit = function(e) {
+  return false;
+};
+
 
 Gsender.prototype.update = function(vals) {
   if (this.dict.get('type') === 'child') {
@@ -1895,7 +3185,7 @@ Gsender.prototype.colorActiveLine = function(classname) {
 };
 
 Gsender.prototype.showInformationNotFound = function() {
-  this.$worksheet.html(jade.templates.line_nothing({
+  this.$worksheet.html(template_line_nothing({
     columns: this.dict.get('columns') || {}
   }));
 };
@@ -1905,7 +3195,7 @@ Gsender.prototype.hideInformationNotFound = function() {
 };
 
 Gsender.prototype.showErrorOnServer = function() {
-  this.$worksheet.html(jade.templates.line_error({
+  this.$worksheet.html(template_line_error({
     columns: this.dict.get('columns') || {}
   }));
 };
@@ -1923,17 +3213,17 @@ Gsender.prototype.showLoading = function(type) {
   if (!this.$worksheet.find("[data-type=\"loading\"]").length) {
     switch (type) {
       case 'replace':
-        this.$worksheet.html(jade.templates.line_loading({
+        this.$worksheet.html(template_line_loading({
           columns: this.dict.get('columns') || {}
         }));
       break;
       case 'after':
-        this.$worksheet.append(jade.templates.line_loading({
+        this.$worksheet.append(template_line_loading({
           columns: this.dict.get('columns') || {}
         }));
       break;
       case 'before':
-        this.$worksheet.prepend(jade.templates.line_loading({
+        this.$worksheet.prepend(template_line_loading({
           columns: this.dict.get('columns') || {}
         }));
       break;
@@ -1976,7 +3266,7 @@ Gsender.prototype.sendRequest = function(type, model) {
       method = "fetch";
       this.isScrolling = true;
       this.showLoading('after');
-      this.updateScrollTime();
+      // this.updateScrollTime();
     break;
     case 'remove':
       method = "remove";
@@ -2056,6 +3346,22 @@ Gsender.prototype.sendRequest = function(type, model) {
     });
   }
   
+};
+
+Gsender.prototype.checkPrivilegies = function() {
+  var privileges =      this.options.conf.privileges || {};
+  var A =               privileges.A                 || false;
+  var S =               privileges.S                 || [];
+
+  if (A) {
+    return true;
+  } else {
+    if (S === true) {
+      return true;
+    } else {
+      return false;
+    }
+  }  
 };
 
 Gsender.prototype.checkResponse = function(type) {
@@ -2147,11 +3453,14 @@ module.exports = Gsender;
 "insert": (function (require, exports, module) { /* wrapped by builder */
 
 var _ =        require('underscore');
-var Common =   require('common');
+var Modal =    require('modal');
 var Select =   require('select');
 // var noty =     require('noty');
 
-var Insert = Common.extend({
+var template_insert_select =    require('insert_select.jade');
+var template_insert_default =   require('insert_default.jade');
+
+var Insert = Modal.extend({
 
   el: "[data-view=\"insert\"]",
 
@@ -2177,15 +3486,40 @@ var Insert = Common.extend({
     this.$button.on('click', function() {
       if (_this.checkCompleteFields()) {
         _this.request();
+      } else {
+        $.noty({
+          text:         'Вы заполнили не все поля!',
+          layout:       'topCenter',
+          type:         'error',
+          closeButton:  false,
+          timeout:      10000
+        });
       }
     });
   }
 });
 
+
+Insert.prototype.checkPrivilegies = function() {
+  var privileges =      this.conf.privileges || {};
+  var A =               privileges.A         || false;
+  var I =               privileges.I         || [];
+
+  if (A) {
+    return true;
+  } else {
+    if (I === true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+};
+
 Insert.prototype.open = function() {
-  var privileges =  this.conf.privileges || {};
-  var I =           privileges.I         || [];
-  if (I === true) {
+
+  if (this.checkPrivilegies()) {
     if (this.autoinsert === true) {
       this.request();
     } else {
@@ -2206,15 +3540,17 @@ Insert.prototype.checkFields = function() {
   var _this = this;
 
   _.each(this.addfields, function(addfield, key) {
-    var id, sid, conf, select, caption, field;
+    var sid, conf, select, caption, field;
+
+    var id = guid();
+
     _this.controls[key] = 'none';
     addfield = addfield.toString().trim();
     if (addfield.match(/^WDICTS\./i)) {
       _this.autoinsert = false;
       sid = addfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
-      id = "insert_" + _this.sid + "_" + sid;
       conf = window[sid + '_data'];
-      _this.$form.append(jade.templates.insert_select({
+      _this.$form.append(template_insert_select({
         id:   id,
         conf: conf
       }));
@@ -2223,9 +3559,9 @@ Insert.prototype.checkFields = function() {
         type: 'select',
         conf: conf
       });
-      select.on('select', function(addfield) {
-        _this.checkCompleteFields();
-      });
+      // select.on('select', function(addfield) {
+      //   _this.checkCompleteFields();
+      // });
       _this.controls[key] = {
         type:   'select',
         select: select,
@@ -2234,12 +3570,11 @@ Insert.prototype.checkFields = function() {
     }
     if (addfield === 'default') {
       _this.autoinsert = false;
-      id = "insert_" + _this.sid + "_" + key;
       field = _.findWhere(_this.columns, {
         field: key
       });
       caption = field.caption || '';
-      _this.$form.append(jade.templates.insert_default({
+      _this.$form.append(template_insert_default({
         id:       id,
         caption:  caption
       }));
@@ -2267,7 +3602,7 @@ Insert.prototype.request = function() {
       _method: 'PUT',
       controls: this.vals
     },
-    timeout: this.options.timeout || 1000,
+    timeout: 10000,
     success: function(res) {
       if (!res.err) {
         _this.$el.modal('hide');
@@ -2323,16 +3658,31 @@ Insert.prototype.checkCompleteFields = function() {
       result = false;
     }
   });
-  if (!result) {
-    _this.$button.attr('disabled', 'disabled');
-  } else {
-    _this.$button.removeAttr('disabled');
-  }
+  // if (!result) {
+  //   _this.$button.attr('disabled', 'disabled');
+  // } else {
+  //   _this.$button.removeAttr('disabled');
+  // }
   return result;
 };
 
 module.exports = Insert;
 
+
+}),
+"modal": (function (require, exports, module) { /* wrapped by builder */
+
+var _ =      require('_');
+var Common = require('common');
+
+var Modal = Common.extend({
+
+  initialize: function() {}
+
+});
+
+
+module.exports = Modal;
 
 }),
 "search": (function (require, exports, module) { /* wrapped by builder */
@@ -2404,6 +3754,18 @@ var Select = Common.extend({
 
     // this.dict = new Dict(this.options.conf || {});
     this.conf = this.options.conf || {};
+
+    this.firstload = true;
+    this.initvalue = false;
+    this.initOptions = this.parseDictOptions(this.options.initOptions || {});
+
+    if (this.initOptions.initvalue) {
+      if (this.options.line) {
+        if (this.options.line[this.initOptions.initvalue]) {
+          this.initvalue = this.options.line[this.initOptions.initvalue];
+        }
+      }
+    }
 
     // this.data = new Data();
     // this.data.url = '/api/dict/' + this.conf.sid;
@@ -2491,6 +3853,13 @@ var Select = Common.extend({
         this.selectize.on('change', function(value) {
           _this.trigger('select', value);
         });
+
+        this.selectize.on('load', function(value) {
+          if ((_this.initvalue) && (_this.firstload)) {
+            _this.firstload = false;
+            _this.addItem(_this.initvalue, true);            
+          }
+        });
       }
 
       if (this.options.type === 'search') {
@@ -2503,6 +3872,7 @@ var Select = Common.extend({
         });
       }
     }
+
   }
 });
 
@@ -2511,6 +3881,7 @@ Select.prototype.getSearchfields = function() {
   _.each(this.fields, function(value, key) {
     var re1 = new RegExp("^" + value, 'ig');
     var re2 = new RegExp("\\W" + value, 'ig');
+    // var re2 = new RegExp(value, 'ig');
     if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
       if (!_this.searchfields.value) {
         _this.searchfields.push(value);
@@ -2689,15 +4060,20 @@ Select.prototype.load = function(_this) {
       type: "GET",
       url: '/api/dict/' + _this.conf.sid,
       dataType: 'json',
-      timeout: _this.options.timeout       || 1000,
+      timeout: 10000,
       data: {
-        query: query                       || '',
-        limit: _this.options.limit         || 20,
-        keys:  _this.conf.keys             || {},
-        vals:  _this.conf.vals             || {}
+        query:       query                       || '',
+        line:        _this.options.line          || {},
+        limit:       _this.options.limit         || 20,
+        keys:        _this.conf.keys             || {},
+        vals:        _this.conf.vals             || {},
+        initOptions: _this.initOptions           || {}
       },
       success: function(res) {
         if (!res.err) {
+          if (res.initData) {
+            res.data = res.data.concat(res.initData);
+          }
           fn(_this.checkData(res.data));
         }
       },
@@ -3024,7 +4400,7 @@ with (locals || {}) {
 var interp;
 buf.push('<tr');
 buf.push(attrs({ 'data-uuid':("" + (line[keyfieldname]) + "") }, {"data-uuid":true}));
-buf.push('><td><label><input type="checkbox"/></label></td>');
+buf.push('>');
 // iterate columns
 ;(function(){
   if ('number' == typeof columns.length) {
@@ -3032,13 +4408,15 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
     for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
       var column = columns[$index];
 
+ if (column.field)
+{
  var value = line[column.field] || ''
  if (column.visible === true)
 {
  if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
 buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
@@ -3048,7 +4426,7 @@ buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == nul
  if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  var groups = window.parseGroupLine(value);
 // iterate groups
@@ -3081,19 +4459,26 @@ buf.push('</td>');
  else
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  if (value.length > 103)
 {
 buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
- else              
+ else
 {
 buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
 }
 }
+}
+}
+ else             
+{
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-col-field":true,"data-col-type":true}));
+buf.push('></td>');
 }
     }
 
@@ -3102,13 +4487,15 @@ buf.push('</td>');
     for (var $index in columns) {
       $$l++;      var column = columns[$index];
 
+ if (column.field)
+{
  var value = line[column.field] || ''
  if (column.visible === true)
 {
  if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
 buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
@@ -3118,7 +4505,7 @@ buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == nul
  if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  var groups = window.parseGroupLine(value);
 // iterate groups
@@ -3151,19 +4538,26 @@ buf.push('</td>');
  else
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  if (value.length > 103)
 {
 buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
- else              
+ else
 {
 buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
 }
 }
+}
+}
+ else             
+{
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-col-field":true,"data-col-type":true}));
+buf.push('></td>');
 }
     }
 
@@ -3183,7 +4577,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="error"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <h4>' + escape((interp = gettext('Error on server')) == null ? '' : interp) + '</h4></td></tr>');
 }
 return buf.join("");
@@ -3197,7 +4591,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="loading"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <div class="progress progress-striped active"><div style="width:100%;" class="progress-bar"></div></div></td></tr>');
 }
 return buf.join("");
@@ -3211,7 +4605,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="nothing"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <h4>' + escape((interp = gettext('Information not found')) == null ? '' : interp) + '</h4></td></tr>');
 }
 return buf.join("");
@@ -3247,6 +4641,20 @@ buf.push('/></div></div></form>');
 return buf.join("");
 };
 }),
+"edit_footer.jade": (function (require, exports, module) { /* wrapped by builder */
+
+module.exports = function (locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<button');
+buf.push(attrs({ 'data-view':("button"), 'type':("button"), 'data-request':("" + (operation_id) + ""), "class": ('btn') + ' ' + ('btn-success') }, {"data-view":true,"type":true,"data-request":true}));
+buf.push('>' + escape((interp = gettext('Save edit record')) == null ? '' : interp) + '</button><button type="button" data-dismiss="modal" class="btn btn-default">' + escape((interp = gettext('Cancel edit record')) == null ? '' : interp) + '</button>');
+}
+return buf.join("");
+};
+}),
 "edit_groups.jade": (function (require, exports, module) { /* wrapped by builder */
 
 module.exports = function (locals, attrs, escape, rethrow, merge) {
@@ -3257,81 +4665,6 @@ var interp;
 buf.push('<form role="form" data-view="form" class="form-horizontal"><div');
 buf.push(attrs({ 'data-control':("" + (id) + ""), "class": ('form-group') }, {"data-control":true}));
 buf.push('><div class="col-sm-6"><h4>Выбранные группы</h4><div data-view="check-groups"></div></div><div class="col-sm-6"><h4>Все группы</h4><div data-view="all-groups"></div></div></div></form>');
-}
-return buf.join("");
-};
-}),
-"edit_groups_1.jade": (function (require, exports, module) { /* wrapped by builder */
-
-module.exports = function (locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<form role="form" data-view="form" class="form-horizontal"><div class="form-group"><div class="col-sm-6"><h4>Выбранные группы</h4>');
- var groups_active = window.parseGroupLine(value);
-// iterate groups_active
-;(function(){
-  if ('number' == typeof groups_active.length) {
-
-    for (var $index = 0, $$l = groups_active.length; $index < $$l; $index++) {
-      var group = groups_active[$index];
-
-buf.push('<div class="row">       <div class="col-sm-1"><span');
-buf.push(attrs({ 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"style":true}));
-buf.push('>&nbsp;</span></div><div class="col-sm-10"><a href="#" class="btn btn-xs btn-success">' + escape((interp = group.title) == null ? '' : interp) + '</a></div></div>');
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in groups_active) {
-      $$l++;      var group = groups_active[$index];
-
-buf.push('<div class="row">       <div class="col-sm-1"><span');
-buf.push(attrs({ 'style':("color:#000; background-color:#" + (group.color) + ";"), "class": ('badge-group') }, {"style":true}));
-buf.push('>&nbsp;</span></div><div class="col-sm-10"><a href="#" class="btn btn-xs btn-success">' + escape((interp = group.title) == null ? '' : interp) + '</a></div></div>');
-    }
-
-  }
-}).call(this);
-
-buf.push('</div><div class="col-sm-6"><h4>Все группы</h4>');
-// iterate groups
-;(function(){
-  if ('number' == typeof groups.length) {
-
-    for (var $index = 0, $$l = groups.length; $index < $$l; $index++) {
-      var group = groups[$index];
-
- if (group.depth > 1)
-{
-buf.push('<div class="row">       <div class="col-sm-1"><span');
-buf.push(attrs({ 'style':("color:#000; background-color:#" + (window.colorToHex(group.color)) + ";"), "class": ('badge-group') }, {"style":true}));
-buf.push('>&nbsp;</span></div><div class="col-sm-10"><a');
-buf.push(attrs({ 'href':("#" + (group.id) + "_" + (group.depth) + "_" + (group.caption) + ""), "class": ('btn') + ' ' + ('btn-xs') + ' ' + ('btn-default') }, {"href":true}));
-buf.push('>' + escape((interp = group.caption) == null ? '' : interp) + '</a></div></div>');
-}
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in groups) {
-      $$l++;      var group = groups[$index];
-
- if (group.depth > 1)
-{
-buf.push('<div class="row">       <div class="col-sm-1"><span');
-buf.push(attrs({ 'style':("color:#000; background-color:#" + (window.colorToHex(group.color)) + ";"), "class": ('badge-group') }, {"style":true}));
-buf.push('>&nbsp;</span></div><div class="col-sm-10"><a');
-buf.push(attrs({ 'href':("#" + (group.id) + "_" + (group.depth) + "_" + (group.caption) + ""), "class": ('btn') + ' ' + ('btn-xs') + ' ' + ('btn-default') }, {"href":true}));
-buf.push('>' + escape((interp = group.caption) == null ? '' : interp) + '</a></div></div>');
-}
-    }
-
-  }
-}).call(this);
-
-buf.push('</div><' + (value) + '></' + (value) + '></div></form>');
 }
 return buf.join("");
 };

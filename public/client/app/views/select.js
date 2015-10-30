@@ -19,6 +19,18 @@ var Select = Common.extend({
     // this.dict = new Dict(this.options.conf || {});
     this.conf = this.options.conf || {};
 
+    this.firstload = true;
+    this.initvalue = false;
+    this.initOptions = this.parseDictOptions(this.options.initOptions || {});
+
+    if (this.initOptions.initvalue) {
+      if (this.options.line) {
+        if (this.options.line[this.initOptions.initvalue]) {
+          this.initvalue = this.options.line[this.initOptions.initvalue];
+        }
+      }
+    }
+
     // this.data = new Data();
     // this.data.url = '/api/dict/' + this.conf.sid;
 
@@ -105,6 +117,13 @@ var Select = Common.extend({
         this.selectize.on('change', function(value) {
           _this.trigger('select', value);
         });
+
+        this.selectize.on('load', function(value) {
+          if ((_this.initvalue) && (_this.firstload)) {
+            _this.firstload = false;
+            _this.addItem(_this.initvalue, true);            
+          }
+        });
       }
 
       if (this.options.type === 'search') {
@@ -117,6 +136,7 @@ var Select = Common.extend({
         });
       }
     }
+
   }
 });
 
@@ -125,6 +145,7 @@ Select.prototype.getSearchfields = function() {
   _.each(this.fields, function(value, key) {
     var re1 = new RegExp("^" + value, 'ig');
     var re2 = new RegExp("\\W" + value, 'ig');
+    // var re2 = new RegExp(value, 'ig');
     if ((_this.selectfield.match(re1)) || (_this.selectfield.match(re2))) {
       if (!_this.searchfields.value) {
         _this.searchfields.push(value);
@@ -303,15 +324,20 @@ Select.prototype.load = function(_this) {
       type: "GET",
       url: '/api/dict/' + _this.conf.sid,
       dataType: 'json',
-      timeout: _this.options.timeout       || 1000,
+      timeout: 10000,
       data: {
-        query: query                       || '',
-        limit: _this.options.limit         || 20,
-        keys:  _this.conf.keys             || {},
-        vals:  _this.conf.vals             || {}
+        query:       query                       || '',
+        line:        _this.options.line          || {},
+        limit:       _this.options.limit         || 20,
+        keys:        _this.conf.keys             || {},
+        vals:        _this.conf.vals             || {},
+        initOptions: _this.initOptions           || {}
       },
       success: function(res) {
         if (!res.err) {
+          if (res.initData) {
+            res.data = res.data.concat(res.initData);
+          }
           fn(_this.checkData(res.data));
         }
       },

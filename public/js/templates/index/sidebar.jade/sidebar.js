@@ -12,7 +12,12 @@ buf.push('<div id="sidebar-left" class="col-lg-2 col-sm-1"><div class="sidebar-n
     for (var $index = 0, $$l = webDicts.dicts.length; $index < $$l; $index++) {
       var dict = webDicts.dicts[$index];
 
- if (dict.sid == webDicts.active)
+ var caption = dict.caption
+ if (caption.length > 20)
+{
+ caption = caption.slice(0,20) + '...'
+}
+ if (dict.sid == webDicts.active)        
 {
 buf.push('<li class="active"><a href="#"><div class="visible-sm">');
  if (dict.settings.main.fa_icon !== undefined) {
@@ -26,7 +31,7 @@ buf.push('></i>');
 buf.push('<i class="fa fa-power-off"></i>');
 }
  }
-buf.push('</div><small class="hidden-sm">' + escape((interp = dict.caption) == null ? '' : interp) + '</small></a></li>');
+buf.push('</div><small class="hidden-sm">' + escape((interp = caption) == null ? '' : interp) + '</small></a></li>');
 }
  else
 {
@@ -44,7 +49,7 @@ buf.push('></i>');
 buf.push('<i class="fa fa-table"></i>');
 }
  }
-buf.push('</div><small class="hidden-sm">' + escape((interp = dict.caption) == null ? '' : interp) + '</small></a></li>');
+buf.push('</div><small class="hidden-sm">' + escape((interp = caption) == null ? '' : interp) + '</small></a></li>');
 }
     }
 
@@ -53,7 +58,12 @@ buf.push('</div><small class="hidden-sm">' + escape((interp = dict.caption) == n
     for (var $index in webDicts.dicts) {
       $$l++;      var dict = webDicts.dicts[$index];
 
- if (dict.sid == webDicts.active)
+ var caption = dict.caption
+ if (caption.length > 20)
+{
+ caption = caption.slice(0,20) + '...'
+}
+ if (dict.sid == webDicts.active)        
 {
 buf.push('<li class="active"><a href="#"><div class="visible-sm">');
  if (dict.settings.main.fa_icon !== undefined) {
@@ -67,7 +77,7 @@ buf.push('></i>');
 buf.push('<i class="fa fa-power-off"></i>');
 }
  }
-buf.push('</div><small class="hidden-sm">' + escape((interp = dict.caption) == null ? '' : interp) + '</small></a></li>');
+buf.push('</div><small class="hidden-sm">' + escape((interp = caption) == null ? '' : interp) + '</small></a></li>');
 }
  else
 {
@@ -85,7 +95,7 @@ buf.push('></i>');
 buf.push('<i class="fa fa-table"></i>');
 }
  }
-buf.push('</div><small class="hidden-sm">' + escape((interp = dict.caption) == null ? '' : interp) + '</small></a></li>');
+buf.push('</div><small class="hidden-sm">' + escape((interp = caption) == null ? '' : interp) + '</small></a></li>');
 }
     }
 

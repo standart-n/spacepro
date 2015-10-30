@@ -11,16 +11,18 @@
             .hidden-xs.hidden-sm(data-dict-caption = "#{parentDict.sid}") #{parentDict.showcaption}
         - each childInfo in parentDict.childsInfo
           - var child = wdicts_data[childInfo.wdict]
-          li
-            a(href = "##{child.sid}", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{child.sid}") 
-              i(class = "fa fa-fw fa-lg #{child.faIcon}")
-              .hidden-xs.hidden-sm(data-dict-caption = "#{child.sid}") #{child.showcaption}
+          - if (child != null)
+            li
+              a(href = "##{child.sid}", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{child.sid}") 
+                i(class = "fa fa-fw fa-lg #{child.faIcon}")
+                .hidden-xs.hidden-sm(data-dict-caption = "#{child.sid}") #{child.showcaption}
 
       .tab-content
         .tab-pane.active(id = "dddd", data-view = "dict", data-dict-type = "parent", data-dict-sid = "#{parentDict.sid}")
 
           include insert
           include edit
+          include delete
 
           br
           .row
@@ -35,21 +37,23 @@
                 - if (parentDict.toolbar.filters === true)
                   .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "filters")
                     select.form-control(placeholder = "#{gettext('Toolbar filters')}")
-                .form-group.col-xs-12.col-md-3.col-lg-2
+                .form-group.col-xs-6.col-md-3.col-lg-2
                   - if (parentDict.toolbar.insert === true)
                     a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}") 
                       i.fa.fa-plus
                     &nbsp;
                   - if (parentDict.toolbar.remove === true)
-                    a.btn.btn-danger(href = "#", data-action = "delete_many", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
+                    a.btn.btn-danger(href = "#", data-action = "delete", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
                       i.fa.fa-minus
+                .form-group.col-xs-12.col-md-3.col-lg-2
+                  div(data-view = "toolbar-units")
 
           .row
             .col-md-12
               table.table.table-condensed.table-striped.table-hover.dict
                 thead
                   tr
-                    th
+                    //- th
                     - each column in parentDict.columns
                       - if (column.visible === true)
                         th(class = "#{column.hidden_class}")
@@ -60,45 +64,47 @@
 
         - each childInfo in parentDict.childsInfo
           - var child = wdicts_data[childInfo.wdict]
-          .tab-pane(id = "#{child.sid}", data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
+          - if (child != null)
+            .tab-pane(id = "#{child.sid}", data-view = "dict", data-dict-type = "child", data-dict-sid = "#{child.sid}")
 
-            include insert
-            include edit
+              include insert
+              include edit
+              include delete
 
-            br
-            .row
-              .col-md-12
-                form.form-inline(data-view = "toolbar")
-                  - if (child.toolbar.search === true)
-                    .form-group.col-xs-12.col-md-6.col-lg-4(data-view = "search")
-                      input.form-control(width = "100%", type = "search", placeholder = "#{gettext('Toolbar search')}")
-                  - if (child.toolbar.folders === true)
-                    .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "folders")
-                      select.form-control(placeholder = "#{gettext('Toolbar folders')}")
-                  - if (child.toolbar.filters === true)
-                    .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "filters")
-                      select.form-control(placeholder = "#{gettext('Toolbar filters')}")
-                  .form-group.col-xs-12.col-md-3.col-lg-2
-                    - if (child.toolbar.insert === true)
-                      a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}")
-                        i.fa.fa-plus
-                      &nbsp;
-                    - if (child.toolbar.remove === true)
-                      a.btn.btn-danger(href = "#", data-action = "delete_many", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
-                        i.fa.fa-minus
+              br
+              .row
+                .col-md-12
+                  form.form-inline(data-view = "toolbar")
+                    - if (child.toolbar.search === true)
+                      .form-group.col-xs-12.col-md-6.col-lg-4(data-view = "search")
+                        input.form-control(width = "100%", type = "search", placeholder = "#{gettext('Toolbar search')}")
+                    - if (child.toolbar.folders === true)
+                      .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "folders")
+                        select.form-control(placeholder = "#{gettext('Toolbar folders')}")
+                    - if (child.toolbar.filters === true)
+                      .form-group.col-xs-12.col-md-3.col-lg-2(data-view = "filters")
+                        select.form-control(placeholder = "#{gettext('Toolbar filters')}")
+                    .form-group.col-xs-12.col-md-3.col-lg-2
+                      - if (child.toolbar.insert === true)
+                        a.btn.btn-success(href = "#", data-action = "insert", data-toggle = "tooltip", title = "#{gettext('Toolbar insert')}")
+                          i.fa.fa-plus
+                        &nbsp;
+                      - if (child.toolbar.remove === true)
+                        a.btn.btn-danger(href = "#", data-action = "delete", data-toggle = "tooltip", title = "#{gettext('Toolbar remove')}")
+                          i.fa.fa-minus
 
-            .row
+              .row
 
-              .col-md-12
+                .col-md-12
 
-                table.table.table-condensed.table-striped.table-hover.dict
-                  thead
-                    tr
-                      th
-                      -   each column in child.columns
-                        - if (column.visible === true)
-                          th(class = "#{column.hidden_class}")
-                            span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
-                      //- th
+                  table.table.table-condensed.table-striped.table-hover.dict
+                    thead
+                      tr
+                        //- th
+                        -   each column in child.columns
+                          - if (column.visible === true)
+                            th(class = "#{column.hidden_class}")
+                              span(data-toggle = "tooltip", title = "#{column.field}") #{column.caption}
+                        //- th
 
-                  tbody
+                    tbody

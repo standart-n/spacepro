@@ -6,7 +6,7 @@ with (locals || {}) {
 var interp;
 buf.push('<tr');
 buf.push(attrs({ 'data-uuid':("" + (line[keyfieldname]) + "") }, {"data-uuid":true}));
-buf.push('><td><label><input type="checkbox"/></label></td>');
+buf.push('>');
 // iterate columns
 ;(function(){
   if ('number' == typeof columns.length) {
@@ -14,13 +14,15 @@ buf.push('><td><label><input type="checkbox"/></label></td>');
     for (var $index = 0, $$l = columns.length; $index < $$l; $index++) {
       var column = columns[$index];
 
+ if (column.field)
+{
  var value = line[column.field] || ''
  if (column.visible === true)
 {
  if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
 buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
@@ -30,7 +32,7 @@ buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == nul
  if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  var groups = window.parseGroupLine(value);
 // iterate groups
@@ -63,19 +65,26 @@ buf.push('</td>');
  else
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  if (value.length > 103)
 {
 buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
- else              
+ else
 {
 buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
 }
 }
+}
+}
+ else             
+{
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-col-field":true,"data-col-type":true}));
+buf.push('></td>');
 }
     }
 
@@ -84,13 +93,15 @@ buf.push('</td>');
     for (var $index in columns) {
       $$l++;      var column = columns[$index];
 
+ if (column.field)
+{
  var value = line[column.field] || ''
  if (column.visible === true)
 {
  if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
 buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
@@ -100,7 +111,7 @@ buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == nul
  if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  var groups = window.parseGroupLine(value);
 // iterate groups
@@ -133,19 +144,26 @@ buf.push('</td>');
  else
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.hidden_class) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  if (value.length > 103)
 {
 buf.push('<span>' + escape((interp = value.slice(0, 100)) == null ? '' : interp) + '<b>...</b></span>');
 }
- else              
+ else
 {
 buf.push('' + escape((interp = value) == null ? '' : interp) + '');
 }
 buf.push('</td>');
 }
 }
+}
+}
+ else             
+{
+buf.push('<td');
+buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-col-field":true,"data-col-type":true}));
+buf.push('></td>');
 }
     }
 

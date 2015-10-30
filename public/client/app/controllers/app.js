@@ -13,18 +13,31 @@ module.exports = Backbone.Router.extend({
   initialize: function() {
     var _this = this;
     var dicts = [];
+    var units = window.units || {};
 
     this.sidebar = new Sidebar();
     
     $('[data-view=\"dict\"]').each(function(i, el) {
+      var unit;
+      var resource;
 
       var sid = $(el).data("dict-sid") || '';
       var conf = window[sid + '_data'] || {};
 
-      window[sid] = new Gsender({
-        el:   conf.el,
-        conf: conf
-      });
+      if (units[sid]) {
+        unit = units[sid];
+        resource = require(unit);
+        
+        window[sid] = new resource({
+          el:   conf.el,
+          conf: conf
+        });
+      } else {
+        window[sid] = new Gsender({
+          el:   conf.el,
+          conf: conf
+        });
+      }
 
       dicts.push(sid);
     });
@@ -54,6 +67,9 @@ module.exports = Backbone.Router.extend({
         if (textStatus === 'success') {
           var res = JSON.parse(xhr.responseText);
           if (!res.err) {
+            $.removeCookie('user_id');
+            $.removeCookie('session_id');
+            $.removeCookie('workstation_id');
             window.location.href = "/";    
           }
         }

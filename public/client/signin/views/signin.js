@@ -61,9 +61,15 @@ module.exports = Backbone.View.extend({
         this.$password.focus();
       } else {
         if (res.session_success === 1) {
+          $.cookie('user_id',        res.user_id);
+          $.cookie('session_id',     res.session_id);
+          $.cookie('workstation_id', res.workstation_id);
           window.location.href = "/";
         } else {
-          window.app.navigate('signin/resolve', {
+          // window.app.navigate('signin/resolve', {
+          //   trigger: true
+          // });
+          window.app.navigate('signin/force', {
             trigger: true
           });
         }

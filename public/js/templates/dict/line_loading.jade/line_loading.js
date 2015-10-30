@@ -5,7 +5,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="loading"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <div class="progress progress-striped active"><div style="width:100%;" class="progress-bar"></div></div></td></tr>');
 }
 return buf.join("");

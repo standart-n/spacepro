@@ -27,5 +27,5 @@
     "datepicker": "public/lib/datepicker/datepicker.min.js",
     "timepicker": "public/lib/timepicker/timepicker.min.js"
   },
-  "main": "main"
+  "main":       "main"
 }

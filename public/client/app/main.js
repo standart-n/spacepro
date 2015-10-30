@@ -2,6 +2,7 @@
 window.JSON = require('json2');
 window.jade = require('runtime');
 
+require('units');
 require('jquery');
 // require('jquery-ui');
 require('bootstrap');
@@ -11,23 +12,12 @@ require('store');
 require('datepicker');
 require('timepicker');
 require('noty');
-
-window.jade.templates = {};
-window.jade.templates.line_data =        require('line_data.jade');
-window.jade.templates.line_nothing =     require('line_nothing.jade');
-window.jade.templates.line_error =       require('line_error.jade');
-window.jade.templates.line_loading =     require('line_loading.jade');
-window.jade.templates.insert_select =    require('insert_select.jade');
-window.jade.templates.insert_default =   require('insert_default.jade');
-window.jade.templates.edit_default =     require('edit_default.jade');
-window.jade.templates.edit_header =      require('edit_header.jade');
-window.jade.templates.edit_select =      require('edit_select.jade');
-window.jade.templates.edit_groups =      require('edit_groups.jade');
-window.jade.templates.edit_text =        require('edit_text.jade');
-window.jade.templates.edit_date =        require('edit_date.jade');
+require('cookie');
 
 var Backbone =    require('backbone');
 var App =         require('app');
+
+// console.log('user_id', $.cookie('user_id'));
 
 $(function() {
 
@@ -89,6 +79,13 @@ $(function() {
       });
     });
     return groups;
+  };
+
+  window.guid = function() {
+    var s4 = function() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
   };
 
   window.aid = function() {

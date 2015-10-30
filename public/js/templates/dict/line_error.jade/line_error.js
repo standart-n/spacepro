@@ -5,7 +5,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr data-type="error"><td');
-buf.push(attrs({ 'colspan':("" + (columns.length + 1) + ""), 'align':("center") }, {"colspan":true,"align":true}));
+buf.push(attrs({ 'colspan':("" + (columns.length) + ""), 'align':("center") }, {"colspan":true,"align":true}));
 buf.push('> <h4>' + escape((interp = gettext('Error on server')) == null ? '' : interp) + '</h4></td></tr>');
 }
 return buf.join("");

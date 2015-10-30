@@ -1,6 +1,7 @@
-var Backbone;
 
-Backbone = require('backbone');
+
+var Backbone = require('backbone');
+var template_resolve = require('resolve.jade');
 
 module.exports = Backbone.View.extend({
 
@@ -12,7 +13,7 @@ module.exports = Backbone.View.extend({
 
     this.on('resolve', function() {
       if (_this.model.get('session_success') === 0) {
-        _this.$el.html(jade.templates.resolve(_this.model.toJSON()));
+        _this.$el.html(template_resolve(_this.model.toJSON()));
         _this.$modal = this.$el.find("[data-type=\"modal\"]");
         _this.$force = this.$el.find("[data-type=\"force\"]");
         _this.$modal.modal('show');

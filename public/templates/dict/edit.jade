@@ -2,13 +2,15 @@
 .modal.fade.dict-edit(data-view = "edit", data-type = "modal", role = "dialog", tabindex = "-1")
   .modal-dialog
     .modal-content
-      .modal-header
+      .modal-header(data-view = "modal-header")
         button.close(type = "button", data-dismiss = "modal", aria-hidden = "true") &times;     
         h4.modal-title #{gettext('Edit record')}
 
-      .modal-body(data-type = "modal-body")
-        form.form-horizontal(role = "form", data-view = "form")
+      .modal-body(data-view = "modal-body")
+        form.form-horizontal(role = "form", data-view = "modal-form")
           
-      .modal-footer
-        button.btn.btn-success(data-type = "button", type = "button") #{gettext('Save edit record')}
+      .modal-footer(data-view = "modal-footer")
+        button.btn.btn-success(data-view = "button", type = "button") #{gettext('Save edit record')}
         button.btn.btn-default(type = "button", data-dismiss = "modal") #{gettext('Cancel edit record')}
+
+      .modal-body(data-view = "modal-bottom")

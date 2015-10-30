@@ -10,6 +10,8 @@ lib-cov
 pids
 logs
 results
+units
+materials
 
 npm-debug.log
 node_modules
@@ -21,4 +23,5 @@ node-firebird-libfbclient
 /dicts
 /grids
 /users
+/materials
 /test/conf

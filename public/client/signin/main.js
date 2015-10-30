@@ -1,20 +1,16 @@
 
-var App, Backbone, User;
-
 window.JSON = require('json2');
 window.jade = require('runtime');
 
-window.jade.templates = {};
 
 require('jquery');
 require('bootstrap');
 require('moment');
+require('cookie');
 
-require('resolve.jade');
-
-Backbone =  require('backbone');
-App =       require('app');
-User =      require('user');
+var Backbone =  require('backbone');
+var App =       require('app');
+var User =      require('user');
 
 $(function() {
 

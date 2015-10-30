@@ -4,7 +4,10 @@
     ul.nav.nav-tabs.nav-stacked.main-menu
 
       - each dict in webDicts.dicts
-        - if (dict.sid == webDicts.active)
+        - var caption = dict.caption
+        - if (caption.length > 20)
+          - caption = caption.slice(0,20) + '...'
+        - if (dict.sid == webDicts.active)        
           li.active
             a(href = "#")
               .visible-sm
@@ -13,7 +16,7 @@
                 - } else {
                   i.fa.fa-power-off
                 - }
-              small.hidden-sm #{dict.caption}
+              small.hidden-sm #{caption}
         - else
           li
             a(href = "/dict/#{dict.sid}")
@@ -23,5 +26,5 @@
                 - } else {
                   i.fa.fa-table
                 - }
-              small.hidden-sm #{dict.caption}
+              small.hidden-sm #{caption}
 
