@@ -393,6 +393,25 @@ var Uchet = Gsender.extend({
 
 });
 
+Uchet.prototype.onCustomDrawCell = function(e) {
+  var keyfieldname = e.keyfieldname || '';
+  var line =  e.line  || {};
+  var $line = e.$line || null;
+
+  if ($line) {
+    if ((moment(line.obj_date) > moment()) && (line.status_id.toString() !== '1')) {
+      $line.addClass('danger');
+    } else {
+      if (this.options.conf.sid === 'uchet') {
+        if (line.status_id.toString() === '1') {
+          $line.addClass('success');
+        }
+      }
+    }
+  }
+
+};
+
 Uchet.prototype.begin = function() {
 
   this.peredal = new Peredal({
@@ -413,26 +432,85 @@ Uchet.prototype.begin = function() {
     conf:  this.options.conf
   });
 
-}
+};
 
 Uchet.prototype.onEdit = function(e) {  
   var cancel = false;
+
+  if (e.field === 'problem') {
+    if (e.line.mmbsh.toString().match(/Не обслуживаем/i)) {
+      $.noty({
+        text:         'Внимание! У данного клиента статус не обслуживаем!',
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      3000
+      });
+    }
+  }
+
   if ((e.field === 'problem') || (e.field === 'solution')) {
     cancel = true;
     this.solution.editor(e);
   }
+
+  if (e.field === 'status') {
+    if (e.line.project_id == 0) {
+      $.noty({
+        text:         'Пожалуйста, укажите проект!',
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      1000
+      });
+      cancel = true;
+    }
+  }
+
   if (e.field === 'speredal') {
     cancel = true;
     this.peredal.editor(e);
   }
+
   if (e.field === 'tel2') {
     cancel = true;
     this.tel.editor(e);
   }
+
   return cancel;
 };
 
 module.exports = Uchet;
+
+}),
+"users": (function (require, exports, module) { /* wrapped by builder */
+
+var Gsender = require('gsender');
+
+var Users = Gsender.extend({
+
+  el: "[data-view=\"dict\"]",
+
+});
+
+Users.prototype.begin = function() {
+  var _this = this;
+
+  this.on('select.line', function(e) {
+    var $tab = $(document).find("[data-target-tab=\"uchet_user\"]");
+    if ($tab) {
+      $tab.tab('show');
+    }
+  });
+
+};
+
+Gsender.prototype.getUUIDbyFirstRecord = function() {
+  return $.cookie('user_id') || this.$worksheet.find("[data-view=\"line\"]").first().data('uuid') || '';
+};
+
+
+module.exports = Users;
 
 }),
 "srq": (function (require, exports, module) { /* wrapped by builder */
@@ -452,10 +530,13 @@ var Srq = Gsender.extend({
 
 Srq.prototype.onCustomDrawCell = function(e) {
   var keyfieldname = e.keyfieldname || '';
-  var line = e.line || {};
+  var line =  e.line  || {};
+  var $line = e.$line || null;
 
-  if (parseInt(line.uchet_id) > 0) {
-    this.$el.find("[data-uuid=\"" + line[keyfieldname] + "\"]").addClass('success');
+  if ($line) {
+    if (parseInt(line.uchet_id) > 0) {
+      $line.addClass('success');
+    }
   }
 
 };
@@ -602,6 +683,45 @@ Srq.prototype.request = function() {
 module.exports = Srq;
 
 }),
+"helpInfo": (function (require, exports, module) { /* wrapped by builder */
+
+var Gsender = require('gsender');
+
+var HelpInfo = Gsender.extend({
+
+  el: "[data-view=\"dict\"]",
+
+});
+
+HelpInfo.prototype.begin = function() {
+  // console.log('HelpInfo.prototype.onEdit');
+};
+
+HelpInfo.prototype.onEdit = function(e) {  
+  var cancel = false;
+  var line = e.line || {};
+  var file_path = line.file_path || '';
+  var a;
+
+  if (e.field === 'file_name') {    
+    if (file_path !== '') {
+      file_path = file_path.toString().replace(/\\/g, '/').replace(/\/\/supa\/standartn\/html/i, 'http://standart-n.ru');
+      console.log('file_path', file_path);
+      a = document.createElement('a');
+      a.href = file_path;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      // window.location.href = file_path;
+    }
+  }
+
+  return cancel;
+};
+
+module.exports = HelpInfo;
+
+}),
 "peredal": (function (require, exports, module) { /* wrapped by builder */
 
 var Edit = require('edit');
@@ -668,15 +788,26 @@ Peredal.prototype.editor = function(e) {
       this.$header.html(template_edit_header({
         caption: this.caption
       }));
+
       this.$body.html(template_edit_users({
         id: id
       }));
+
       this.$footer.html(template_edit_footer({
         operation_id: operation_id
       }));
 
+      this.$bottom.empty();
+
       this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
         _this.request();
+      });
+
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
       });
 
       this.$el.modal('show');
@@ -763,12 +894,9 @@ Peredal.prototype.request = function() {
   var _this = this;
   var controls = {};
 
-
   controls = this.result();
 
   if (controls) {
-
-    console.log('ajax speredal');
 
     $.ajax({
       url: '/api/units/uchet/users/list/' + this.uchet_id,
@@ -867,6 +995,17 @@ Solution.prototype.editor = function(e) {
         _this.request();
       });
 
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
+      });
+
+      this.$el.on('shown.bs.modal', function() {
+        $("[data-control=\"" + id + "\"]").focus();
+      });
+
       // this.$history =  this.$el.find("[data-view=\"history\"]");
       this.$history =  this.$el.find("[data-view=\"modal-bottom\"]");
       this.$solution = this.$el.find("[data-view=\"solution\"]");
@@ -938,12 +1077,9 @@ Solution.prototype.request = function() {
   var _this = this;
   var controls = {};
 
-
   controls = this.result();
 
   if (controls) {
-
-    console.log('ajax solution');
 
     $.ajax({
       url: '/api/units/uchet/messages/save/' + this.uchet_id,
@@ -1034,8 +1170,21 @@ Tel.prototype.editor = function(e) {
         operation_id: operation_id
       }));
 
+      this.$bottom.empty();
+
       this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
         _this.request();
+      });
+
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
+      });
+
+      this.$el.on('shown.bs.modal', function() {
+        $("[data-control=\"" + id + "\"]").focus();
       });
 
       this.$tel = this.$el.find("[data-view=\"tel\"]");
@@ -1580,9 +1729,12 @@ var jQuery = require("$");
 
 
 window.units = {
+  'users':      'users',
   'uchet_user': 'uchet',
   'uchet':      'uchet',
-  'srq_list':   'srq'
+  'proverka':   'uchet',
+  'srq_list':   'srq',
+  'help_info':  'helpInfo'
 };
 
 

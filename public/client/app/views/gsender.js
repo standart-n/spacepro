@@ -25,7 +25,6 @@ var Gsender = Common.extend({
     this.initDict();
     
     this.initElements();
-    this.afterInitElements();
 
     this.initData();
     this.initToolbar();
@@ -37,17 +36,11 @@ var Gsender = Common.extend({
 
     this.editing();
 
-
-    // this.$el.on('click', "[data-action=\"delete\"]", function() {
-    //   var $tr = $(this).parent().parent();
-    //   _this.dict.set('selectRowUUID', $tr.data('uuid'));
-    //   _this.sendRequest('remove', _this.getSelectLine());
-    // });
-
-
-    this.afterInit();
+    this.onLoad();
   
     this.begin();
+
+    this.trigger('init');
 
   }
 });
@@ -72,7 +65,7 @@ Gsender.prototype.initCursor = function() {
   });
 };
 
-Gsender.prototype.afterInit = function() {
+Gsender.prototype.onLoad = function() {
   if (this.dict.get('type') === 'parent') {
     this.sendRequest('onload');
   }
@@ -108,14 +101,17 @@ Gsender.prototype.onDataAdd = function(line) {
     columns:      this.dict.get('columns'),
     line:         line.toJSON()
   }));
-  
-  this.$worksheet.find("[data-uuid=\"" + line.get(keyfieldname) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
+
+  var $line = this.$worksheet.find("[data-uuid=\"" + line.get(keyfieldname) + "\"]");
+
+  $line.find("[data-toggle=\"tooltip\"]").tooltip({
     container: 'body',
     placement: 'top'
   });
 
-  this.onCustomDrawCell({
+  this.onCustomDrawCell({    
     keyfieldname: keyfieldname,
+    $line:        $line,
     line:         line.toJSON()
   });
 };
@@ -134,23 +130,23 @@ Gsender.prototype.editing = function() {
   });
 
   this.$edit.on('update', function() {
+    console.log('trigger update');
     _this.sendRequest('search');
   });
 
-  this.$el.on('click', 'td', function() {
-    var $tr =      $(this).parent();
-    var uuid =     $tr.data('uuid');
+  this.$el.on('click', "[data-view=\"column\"]", function() {
+    var uuid =     $(this).data('col-uuid');
     var field =    $(this).data('col-field');
     var type =     $(this).data('col-type');
+    var $line =    _this.$el.find("[data-uuid=\"" + uuid + "\"]");
     var line =     _this.data.get(uuid).toJSON();
     var fields =   _this.dict.get('fields');
     var cancel =   false;
 
-    if (!$tr.hasClass('active')) {
-      _this.unColorActiveLine();
-      _this.dict.set('selectRowUUID', uuid);
-      _this.colorActiveLine();
-      _this.updateChilds();
+    if (!$line.hasClass('active')) {
+      _this.onSelectLine({
+        uuid:   uuid
+      });
     } else {
       if (_this.onEdit({
         field:  field, 
@@ -177,6 +173,7 @@ Gsender.prototype.initElements = function() {
   this.$caption =     $(document).find("[data-dict-caption=\"" + this.dict.get('sid') + "\"]");
   this.$thead =       this.$el.find('thead');
   this.$worksheet =   this.$el.find('tbody');
+  this.$tabs =        this.$el.find("[data-view=\"tabs\"]");
   this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
   this.$search =      this.$el.find("[data-view=\"search\"]");
   this.$insert =      this.$el.find("[data-view=\"insert\"]");
@@ -184,10 +181,7 @@ Gsender.prototype.initElements = function() {
   this.$edit =        this.$el.find("[data-view=\"edit\"]");
   this.$folders =     this.$el.find("[data-view=\"folders\"]");
   this.$filters =     this.$el.find("[data-view=\"filters\"]");
-};
-
-Gsender.prototype.afterInitElements = function() {
-
+  this.trigger('init.elements');
 };
 
 Gsender.prototype.initToolbar = function() {
@@ -201,9 +195,9 @@ Gsender.prototype.initToolbar = function() {
       conf:  this.options.conf || {}
     });
 
-    this.data.on('add', function(data) {
-      _this.search.select.addOption(data.toJSON());
-    });
+    // this.data.on('add', function(data) {
+    //   _this.search.select.addOption(data.toJSON());
+    // });
 
     this.search.on('search', function(query) {
       _this.dict.set({
@@ -271,8 +265,17 @@ Gsender.prototype.initToolbar = function() {
     });
 
     this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+      var cancel = false;
       e.preventDefault();
-      _this.insert.open();
+
+      if (_this.newrow({
+      })) {
+        cancel = true;
+      }
+
+      if (!cancel) {        
+        _this.insert.open();
+      }
     });
 
     this.$insert.on('update', function() {
@@ -330,19 +333,31 @@ Gsender.prototype.onEdit = function(e) {
   return false;
 };
 
+Gsender.prototype.newrow = function(e) {
+  return false;
+};
+
+Gsender.prototype.onSelectLine = function(e) {
+  var uuid = e.uuid || '';
+  this.unColorActiveLine();
+  this.dict.set('selectRowUUID', uuid);
+  this.colorActiveLine();
+  this.updateChilds();
+  this.trigger('select.line', e);
+};
 
 Gsender.prototype.update = function(vals) {
   if (this.dict.get('type') === 'child') {
     this.dict.set('limit', 50);
     this.dict.cleanVals(vals);
-    var vals = this.dict.get('vals');
+    vals = this.dict.get('vals');
     var keys = this.dict.get('keys');
     var controls = this.compareKeyVals(keys, vals);
     this.updateCaption(controls);
-    if (this.search != null) {
-      this.search.select.conf.keys = keys;
-      this.search.select.conf.vals = vals;
-    }
+    // if (this.search != null) {
+    //   this.search.select.conf.keys = keys;
+    //   this.search.select.conf.vals = vals;
+    // }
     if (this.insert != null) {
       this.insert.vals = _.extend(this.insert.vals, controls);
     }
@@ -356,7 +371,7 @@ Gsender.prototype.updateChilds = function() {
   if (this.data !== null) {
     _.each(this.dict.get('childsInfo'), function(childInfo) {
       if (window[childInfo.wdict] !== undefined) {
-        if (line != null) {
+        if ((line != null) && (typeof(line.toJSON) == 'function')) {
           window[childInfo.wdict].update(line.toJSON() || {});
           if (window[childInfo.wdict].search != null) {
             if (window[childInfo.wdict].search.select != null) {
@@ -372,7 +387,7 @@ Gsender.prototype.updateChilds = function() {
 };
 
 Gsender.prototype.getUUIDbyFirstRecord = function() {
-  return this.$worksheet.find('tr:first').data('uuid') || '';
+  return this.$worksheet.find("[data-view=\"line\"]").data('uuid') || '';
 };
 
 Gsender.prototype.getSelectLine = function() {
@@ -505,6 +520,9 @@ Gsender.prototype.sendRequest = function(type, model) {
     _this.hideErrorOnServer();
     _this.hideInformationNotFound();
     _this.checkResponse(type);
+    _this.trigger('data.load', {
+      type: type
+    });
   };
 
   var error = function(e) {
@@ -609,7 +627,7 @@ Gsender.prototype.checkResponse = function(type) {
     this.showInformationNotFound();
   }
 
-  this.$el.trigger('response:' + type);
+  this.trigger('response:' + type);
 };
 
 Gsender.prototype.isActiveDict = function() {

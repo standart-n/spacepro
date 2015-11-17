@@ -19,6 +19,7 @@ var Edit = Modal.extend({
   initialize: function() {
     var _this;
 
+    this.$dialog =      this.$el.find("[data-view=\"modal-dialog\"]");
     this.$header =      this.$el.find("[data-view=\"modal-header\"]");
     this.$body =        this.$el.find("[data-view=\"modal-body\"]");
     this.$form =        this.$el.find("[data-view=\"modal-form\"]");
@@ -33,6 +34,10 @@ var Edit = Modal.extend({
     this.controls =     {};
     this.vals =         {};
     this.showdefault =  true;
+
+    // this.$el.on('shown.bs.modal', function() {
+    //   console.log('show');
+    // });
     
     // this.$button.on('click', function() {
     //   _this.request();
@@ -141,6 +146,16 @@ Edit.prototype.editor = function(e) {
         _this.request();
       });
 
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
+      });
+
+      this.$el.on('shown.bs.modal', function() {
+        $("[data-control=\"" + id + "\"]").focus();
+      });
         
       if (this.editfield.match(/^WDICTS\./i)) {
         sid = this.editfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
@@ -264,10 +279,13 @@ Edit.prototype.editor = function(e) {
         this.$el.modal('show');
       }
 
-      if ((this.editfield === 'default') && (this.field !== 'mmbsh') && (this.fieldInfo.mtype !== 'timestamp')) {
+      if ((this.editfield === 'default') && (this.field !== 'mmbsh') && (this.fieldInfo.mtype !== 'blob') && (this.fieldInfo.mtype !== 'timestamp')) {
         // this.$header.html(template_edit_header({
         //   caption: this.caption
         // }));
+        if (this.value == null) {
+          this.value = '';
+        }
         this.$body.html(template_edit_default({
           id:         id,
           fieldInfo:  this.fieldInfo,
@@ -285,6 +303,10 @@ Edit.prototype.editor = function(e) {
         };
         this.$el.modal('show');
       }
+
+      // setTimeout(function() {
+      //   $("[data-control=\"" + id + "\"]").focus();
+      // }, 1000);
 
     } else {
 

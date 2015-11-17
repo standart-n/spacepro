@@ -7,21 +7,28 @@ var Search = Common.extend({
   el: "[data-view=\"search\"]",
 
   initialize: function() {
-    var def, _this;
+    var _this = this;
 
     this.$select = this.$el.find('input');
 
-    this.select = new Select({
-      el:   this.$select,
-      type: 'search',
-      conf: this.options.conf || {}
+    this.$select.on('keyup', function(e) {
+      e.preventDefault();
+      if (e.keyCode === 13) {
+        _this.trigger('search', _this.$select.val());
+      }
     });
 
-    _this = this;
+    // this.select = new Select({
+    //   el:   this.$select,
+    //   type: 'search',
+    //   conf: this.options.conf || {}
+    // });
 
-    this.select.on('search', function(query) {
-      _this.search(query);
-    });    
+    // _this = this;
+
+    // this.select.on('search', function(query) {
+    //   _this.search(query);
+    // });    
   }
 });
 

@@ -116,6 +116,7 @@ Insert.prototype.checkFields = function() {
       };
     }
     if (addfield === 'default') {
+      // console.log('_this.columns', _this.columns);
       _this.autoinsert = false;
       field = _.findWhere(_this.columns, {
         field: key

@@ -1,5 +1,5 @@
 
-tr(data-uuid = "#{line[keyfieldname]}")
+tr(data-view = "line", data-uuid = "#{line[keyfieldname]}")
   //- td
   //-   label
   //-     input(type = "checkbox")
@@ -8,19 +8,20 @@ tr(data-uuid = "#{line[keyfieldname]}")
       - var value = line[column.field] || ''
       - if (column.visible === true)
         - if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
-          td(class = "#{column.class_properties}", data-col-field = "#{column.field}", data-col-type = "date")
+          td(class = "#{column.class_properties}", data-view = "column", data-col-uuid = "#{line[keyfieldname]}", data-col-field = "#{column.field}", data-col-type = "date")
             span(data-toggle = "tooltip", title = "#{moment(value).fromNow()}")
               span #{moment(value).format('DD.MM.YYYY')}
               &nbsp;
               small #{moment(value).format('HH:mm')}
         - else
-          - if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
-            td(class = "#{column.class_properties}", data-col-field = "#{column.field}", data-col-type = "groups")
+          //- - if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+          - if (column.field === 'mmbsh')
+            td(class = "#{column.class_properties}", data-view = "column", data-col-uuid = "#{line[keyfieldname]}" , data-col-field = "#{column.field}", data-col-type = "groups")
               - var groups = window.parseGroupLine(value);
               - each group in groups
                 span.badge-group(data-toggle = "tooltip", title = "#{group.caption}", style = "color:#000; background-color:##{group.hex};") &nbsp;
           - else
-            td(class = "#{column.class_properties}", data-col-field = "#{column.field}", data-col-type = "text")
+            td(class = "#{column.class_properties}", data-view = "column", data-col-uuid = "#{line[keyfieldname]}", data-col-field = "#{column.field}", data-col-type = "text")
               - if (value.length > 103)
                 //- span(data-toggle = "tooltip", title = "#{value}") #{value.slice(0, 100)}
                 span #{value.slice(0, 100)}
@@ -28,7 +29,7 @@ tr(data-uuid = "#{line[keyfieldname]}")
               - else
                 | #{value}
     - else             
-      td(data-col-field = "#{column.field}", data-col-type = "text")
+      td(data-view = "column", data-col-uuid = "#{line[keyfieldname]}", data-col-field = "#{column.field}", data-col-type = "text")
 
 
   //-td

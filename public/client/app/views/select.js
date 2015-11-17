@@ -35,8 +35,8 @@ var Select = Common.extend({
     // this.data.url = '/api/dict/' + this.conf.sid;
 
     this.searchfields = [];
-    this.columns =      this.conf.columns || {};
-    this.fields =       _.pluck(this.columns, 'field') || [];
+    // this.columns =      this.conf.columns || {};
+    this.fields =  _.pluck(this.conf.viewfields || [], 'rdb$field_name') || [];
 
     this.cfselect = this.conf.cfselect || {};
     this.selectfield = this.cfselect.selectfieldexpression || '';
@@ -57,7 +57,8 @@ var Select = Common.extend({
 
     switch (this.options.type) {
       case 'search':
-        plugins =        ['restore_on_backspace'];
+        // plugins =        ['restore_on_backspace'];
+        plugins =        [];
         valuefield =     'value';
         create =         this.create();
         selectOnTab =    true;
@@ -218,6 +219,7 @@ Select.prototype.getValue = function() {
 Select.prototype.create = function() {
   return function(input) {
     return {
+      item:          input,
       value:         input,
       text:          input,
       selectcaption: input
@@ -260,6 +262,7 @@ Select.prototype.renderOption = function() {
   var _this = this;
   var result;
   return function (item, escape) {
+    // console.log('Select.prototype.renderItem', item);
     switch (_this.options.type) {
       case 'folders':
         result = '<div>' + _this.renderFolder(item, escape) + '</div>';
@@ -282,6 +285,7 @@ Select.prototype.renderOption = function() {
           result = '<div>' + escape(item.value) + '</div>';
         }
     }
+    // console.log('Select.prototype.renderItem', result);
     return result;
   };
 };
@@ -380,6 +384,7 @@ Select.prototype.checkDataItem = function(item) {
       break;
       default: 
         str = this.setSearchFields(this.searchfields, item);
+        // console.log(this.options.conf.sid, 'this.options.type', this.options.type, this.searchfields, item, str);
         item.value = str;
         item.text = str;
     }

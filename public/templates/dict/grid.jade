@@ -4,16 +4,16 @@
 
   .row
     .col-md-12
-      ul.nav.nav-pills
+      ul.nav.nav-pills(data-view = "tabs")
         li.active
-          a(href = "#dddd", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{parentDict.sid}") 
+          a(href = "#dddd", data-target-tab = "#{parentDict.sid}", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{parentDict.sid}") 
             i(class = "fa fa-fw fa-lg #{parentDict.faIcon}")
             .hidden-xs.hidden-sm(data-dict-caption = "#{parentDict.sid}") #{parentDict.showcaption}
         - each childInfo in parentDict.childsInfo
           - var child = wdicts_data[childInfo.wdict]
           - if (child != null)
             li
-              a(href = "##{child.sid}", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{child.sid}") 
+              a(href = "##{child.sid}", data-target-tab = "#{child.sid}", data-toggle = "tab", data-toggle-tab = "tooltip", title = "#{child.sid}") 
                 i(class = "fa fa-fw fa-lg #{child.faIcon}")
                 .hidden-xs.hidden-sm(data-dict-caption = "#{child.sid}") #{child.showcaption}
 

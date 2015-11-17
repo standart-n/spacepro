@@ -433,6 +433,25 @@ var Uchet = Gsender.extend({
 
 });
 
+Uchet.prototype.onCustomDrawCell = function(e) {
+  var keyfieldname = e.keyfieldname || '';
+  var line =  e.line  || {};
+  var $line = e.$line || null;
+
+  if ($line) {
+    if ((moment(line.obj_date) > moment()) && (line.status_id.toString() !== '1')) {
+      $line.addClass('danger');
+    } else {
+      if (this.options.conf.sid === 'uchet') {
+        if (line.status_id.toString() === '1') {
+          $line.addClass('success');
+        }
+      }
+    }
+  }
+
+};
+
 Uchet.prototype.begin = function() {
 
   this.peredal = new Peredal({
@@ -453,26 +472,85 @@ Uchet.prototype.begin = function() {
     conf:  this.options.conf
   });
 
-}
+};
 
 Uchet.prototype.onEdit = function(e) {  
   var cancel = false;
+
+  if (e.field === 'problem') {
+    if (e.line.mmbsh.toString().match(/Не обслуживаем/i)) {
+      $.noty({
+        text:         'Внимание! У данного клиента статус не обслуживаем!',
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      3000
+      });
+    }
+  }
+
   if ((e.field === 'problem') || (e.field === 'solution')) {
     cancel = true;
     this.solution.editor(e);
   }
+
+  if (e.field === 'status') {
+    if (e.line.project_id == 0) {
+      $.noty({
+        text:         'Пожалуйста, укажите проект!',
+        layout:       'topCenter',
+        type:         'error',
+        closeButton:  false,
+        timeout:      1000
+      });
+      cancel = true;
+    }
+  }
+
   if (e.field === 'speredal') {
     cancel = true;
     this.peredal.editor(e);
   }
+
   if (e.field === 'tel2') {
     cancel = true;
     this.tel.editor(e);
   }
+
   return cancel;
 };
 
 module.exports = Uchet;
+
+}),
+"users": (function (require, exports, module) { /* wrapped by builder */
+
+var Gsender = require('gsender');
+
+var Users = Gsender.extend({
+
+  el: "[data-view=\"dict\"]",
+
+});
+
+Users.prototype.begin = function() {
+  var _this = this;
+
+  this.on('select.line', function(e) {
+    var $tab = $(document).find("[data-target-tab=\"uchet_user\"]");
+    if ($tab) {
+      $tab.tab('show');
+    }
+  });
+
+};
+
+Gsender.prototype.getUUIDbyFirstRecord = function() {
+  return $.cookie('user_id') || this.$worksheet.find("[data-view=\"line\"]").first().data('uuid') || '';
+};
+
+
+module.exports = Users;
 
 }),
 "srq": (function (require, exports, module) { /* wrapped by builder */
@@ -492,10 +570,13 @@ var Srq = Gsender.extend({
 
 Srq.prototype.onCustomDrawCell = function(e) {
   var keyfieldname = e.keyfieldname || '';
-  var line = e.line || {};
+  var line =  e.line  || {};
+  var $line = e.$line || null;
 
-  if (parseInt(line.uchet_id) > 0) {
-    this.$el.find("[data-uuid=\"" + line[keyfieldname] + "\"]").addClass('success');
+  if ($line) {
+    if (parseInt(line.uchet_id) > 0) {
+      $line.addClass('success');
+    }
   }
 
 };
@@ -642,6 +723,45 @@ Srq.prototype.request = function() {
 module.exports = Srq;
 
 }),
+"helpInfo": (function (require, exports, module) { /* wrapped by builder */
+
+var Gsender = require('gsender');
+
+var HelpInfo = Gsender.extend({
+
+  el: "[data-view=\"dict\"]",
+
+});
+
+HelpInfo.prototype.begin = function() {
+  // console.log('HelpInfo.prototype.onEdit');
+};
+
+HelpInfo.prototype.onEdit = function(e) {  
+  var cancel = false;
+  var line = e.line || {};
+  var file_path = line.file_path || '';
+  var a;
+
+  if (e.field === 'file_name') {    
+    if (file_path !== '') {
+      file_path = file_path.toString().replace(/\\/g, '/').replace(/\/\/supa\/standartn\/html/i, 'http://standart-n.ru');
+      console.log('file_path', file_path);
+      a = document.createElement('a');
+      a.href = file_path;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      // window.location.href = file_path;
+    }
+  }
+
+  return cancel;
+};
+
+module.exports = HelpInfo;
+
+}),
 "peredal": (function (require, exports, module) { /* wrapped by builder */
 
 var Edit = require('edit');
@@ -708,15 +828,26 @@ Peredal.prototype.editor = function(e) {
       this.$header.html(template_edit_header({
         caption: this.caption
       }));
+
       this.$body.html(template_edit_users({
         id: id
       }));
+
       this.$footer.html(template_edit_footer({
         operation_id: operation_id
       }));
 
+      this.$bottom.empty();
+
       this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
         _this.request();
+      });
+
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
       });
 
       this.$el.modal('show');
@@ -803,12 +934,9 @@ Peredal.prototype.request = function() {
   var _this = this;
   var controls = {};
 
-
   controls = this.result();
 
   if (controls) {
-
-    console.log('ajax speredal');
 
     $.ajax({
       url: '/api/units/uchet/users/list/' + this.uchet_id,
@@ -907,6 +1035,17 @@ Solution.prototype.editor = function(e) {
         _this.request();
       });
 
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
+      });
+
+      this.$el.on('shown.bs.modal', function() {
+        $("[data-control=\"" + id + "\"]").focus();
+      });
+
       // this.$history =  this.$el.find("[data-view=\"history\"]");
       this.$history =  this.$el.find("[data-view=\"modal-bottom\"]");
       this.$solution = this.$el.find("[data-view=\"solution\"]");
@@ -978,12 +1117,9 @@ Solution.prototype.request = function() {
   var _this = this;
   var controls = {};
 
-
   controls = this.result();
 
   if (controls) {
-
-    console.log('ajax solution');
 
     $.ajax({
       url: '/api/units/uchet/messages/save/' + this.uchet_id,
@@ -1074,8 +1210,21 @@ Tel.prototype.editor = function(e) {
         operation_id: operation_id
       }));
 
+      this.$bottom.empty();
+
       this.$el.on('click', '[data-request=\"' + operation_id + '\"]', function(e) {
         _this.request();
+      });
+
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
+      });
+
+      this.$el.on('shown.bs.modal', function() {
+        $("[data-control=\"" + id + "\"]").focus();
       });
 
       this.$tel = this.$el.find("[data-view=\"tel\"]");
@@ -1620,9 +1769,12 @@ var jQuery = require("$");
 
 
 window.units = {
+  'users':      'users',
   'uchet_user': 'uchet',
   'uchet':      'uchet',
-  'srq_list':   'srq'
+  'proverka':   'uchet',
+  'srq_list':   'srq',
+  'help_info':  'helpInfo'
 };
 
 
@@ -1723,9 +1875,10 @@ module.exports = Backbone.Router.extend({
 }),
 "data": (function (require, exports, module) { /* wrapped by builder */
 
-var Backbone =    require('backbone');
-var Line_id =     require('line_id');
-var Line_d$uuid = require('line_d$uuid');
+var Backbone =       require('backbone');
+var Line_id =        require('line_id');
+var Line_d$uuid =    require('line_d$uuid');
+var Line_global_id = require('line_global_id');
 
 var Data = Backbone.Collection.extend({
 
@@ -1739,6 +1892,10 @@ Data.prototype.setIdAttribute = function(attr) {
 
   if (attr === 'd$uuid') {
     this.model = Line_d$uuid;
+  }
+
+  if (attr === 'global_id') {
+    this.model = Line_global_id;
   }
 
 };
@@ -1878,6 +2035,19 @@ var Line_d$uuid = Line.extend({
 module.exports = Line_d$uuid;
 
 }),
+"line_global_id": (function (require, exports, module) { /* wrapped by builder */
+
+var Line = require('line');
+
+var Line_global_id = Line.extend({
+
+  idAttribute: "global_id",
+
+});
+
+module.exports = Line_global_id;
+
+}),
 "line_id": (function (require, exports, module) { /* wrapped by builder */
 
 var Line = require('line');
@@ -2010,6 +2180,37 @@ Common.prototype.setLineVals = function(str, line, escape) {
 
   return str;
 };
+
+Common.prototype.setCaptionVals = function(str, line) {
+
+  if (str == null) {
+    str = '';
+  }
+
+  if (line == null) {
+    line = {};
+  }
+
+  _.each(line, function(value, key) {
+    var re, pattern;
+    value =    value.toString().trim();
+    key =      key.replace(/\$/gi, "\\$");
+    pattern =  ':' + key + ':';
+    re =       new RegExp(pattern, 'ig');
+    if (str.match(re)) {
+      if (value.length > 10) {
+        value = '<b>' + value.slice(0, 10) + '</b>...';
+      } else {
+        value = '<b>' + value + '</b>';
+      }
+      str = str.replace(re, value);
+    }
+  });
+  str = str.replace(/\"\"/g, '"');
+  str = str.replace(/\"<b>\"/g, '"<b>');
+  return str;
+};
+
 
 module.exports = Common;
 
@@ -2161,6 +2362,7 @@ var Edit = Modal.extend({
   initialize: function() {
     var _this;
 
+    this.$dialog =      this.$el.find("[data-view=\"modal-dialog\"]");
     this.$header =      this.$el.find("[data-view=\"modal-header\"]");
     this.$body =        this.$el.find("[data-view=\"modal-body\"]");
     this.$form =        this.$el.find("[data-view=\"modal-form\"]");
@@ -2175,6 +2377,10 @@ var Edit = Modal.extend({
     this.controls =     {};
     this.vals =         {};
     this.showdefault =  true;
+
+    // this.$el.on('shown.bs.modal', function() {
+    //   console.log('show');
+    // });
     
     // this.$button.on('click', function() {
     //   _this.request();
@@ -2283,6 +2489,16 @@ Edit.prototype.editor = function(e) {
         _this.request();
       });
 
+      this.$el.on('keyup', "[data-control=\"" + id + "\"]", function(e) {
+        e.preventDefault();
+        if ((e.keyCode === 13) && (e.ctrlKey)) {
+          _this.request();
+        }
+      });
+
+      this.$el.on('shown.bs.modal', function() {
+        $("[data-control=\"" + id + "\"]").focus();
+      });
         
       if (this.editfield.match(/^WDICTS\./i)) {
         sid = this.editfield.toString().replace(/WDICTS\./i, '').replace(/\(.*\)/i, '').trim();
@@ -2406,10 +2622,13 @@ Edit.prototype.editor = function(e) {
         this.$el.modal('show');
       }
 
-      if ((this.editfield === 'default') && (this.field !== 'mmbsh') && (this.fieldInfo.mtype !== 'timestamp')) {
+      if ((this.editfield === 'default') && (this.field !== 'mmbsh') && (this.fieldInfo.mtype !== 'blob') && (this.fieldInfo.mtype !== 'timestamp')) {
         // this.$header.html(template_edit_header({
         //   caption: this.caption
         // }));
+        if (this.value == null) {
+          this.value = '';
+        }
         this.$body.html(template_edit_default({
           id:         id,
           fieldInfo:  this.fieldInfo,
@@ -2427,6 +2646,10 @@ Edit.prototype.editor = function(e) {
         };
         this.$el.modal('show');
       }
+
+      // setTimeout(function() {
+      //   $("[data-control=\"" + id + "\"]").focus();
+      // }, 1000);
 
     } else {
 
@@ -2816,7 +3039,9 @@ var Gsender = Common.extend({
     var _this = this;
 
     this.initDict();
+    
     this.initElements();
+
     this.initData();
     this.initToolbar();
 
@@ -2827,17 +3052,11 @@ var Gsender = Common.extend({
 
     this.editing();
 
-
-    // this.$el.on('click', "[data-action=\"delete\"]", function() {
-    //   var $tr = $(this).parent().parent();
-    //   _this.dict.set('selectRowUUID', $tr.data('uuid'));
-    //   _this.sendRequest('remove', _this.getSelectLine());
-    // });
-
-
-    this.afterInit();
+    this.onLoad();
   
     this.begin();
+
+    this.trigger('init');
 
   }
 });
@@ -2862,7 +3081,7 @@ Gsender.prototype.initCursor = function() {
   });
 };
 
-Gsender.prototype.afterInit = function() {
+Gsender.prototype.onLoad = function() {
   if (this.dict.get('type') === 'parent') {
     this.sendRequest('onload');
   }
@@ -2898,14 +3117,17 @@ Gsender.prototype.onDataAdd = function(line) {
     columns:      this.dict.get('columns'),
     line:         line.toJSON()
   }));
-  
-  this.$worksheet.find("[data-uuid=\"" + line.get(keyfieldname) + "\"]").find("[data-toggle=\"tooltip\"]").tooltip({
+
+  var $line = this.$worksheet.find("[data-uuid=\"" + line.get(keyfieldname) + "\"]");
+
+  $line.find("[data-toggle=\"tooltip\"]").tooltip({
     container: 'body',
     placement: 'top'
   });
 
-  this.onCustomDrawCell({
+  this.onCustomDrawCell({    
     keyfieldname: keyfieldname,
+    $line:        $line,
     line:         line.toJSON()
   });
 };
@@ -2924,22 +3146,23 @@ Gsender.prototype.editing = function() {
   });
 
   this.$edit.on('update', function() {
+    console.log('trigger update');
     _this.sendRequest('search');
   });
 
-  this.$el.on('click', 'td', function() {
-    var $tr =      $(this).parent();
-    var uuid =     $tr.data('uuid');
+  this.$el.on('click', "[data-view=\"column\"]", function() {
+    var uuid =     $(this).data('col-uuid');
     var field =    $(this).data('col-field');
     var type =     $(this).data('col-type');
+    var $line =    _this.$el.find("[data-uuid=\"" + uuid + "\"]");
     var line =     _this.data.get(uuid).toJSON();
     var fields =   _this.dict.get('fields');
     var cancel =   false;
-    if (!$tr.hasClass('active')) {
-      _this.unColorActiveLine();
-      _this.dict.set('selectRowUUID', uuid);
-      _this.colorActiveLine();
-      _this.updateChilds();
+
+    if (!$line.hasClass('active')) {
+      _this.onSelectLine({
+        uuid:   uuid
+      });
     } else {
       if (_this.onEdit({
         field:  field, 
@@ -2966,6 +3189,7 @@ Gsender.prototype.initElements = function() {
   this.$caption =     $(document).find("[data-dict-caption=\"" + this.dict.get('sid') + "\"]");
   this.$thead =       this.$el.find('thead');
   this.$worksheet =   this.$el.find('tbody');
+  this.$tabs =        this.$el.find("[data-view=\"tabs\"]");
   this.$toolbar =     this.$el.find("[data-view=\"toolbar\"]");
   this.$search =      this.$el.find("[data-view=\"search\"]");
   this.$insert =      this.$el.find("[data-view=\"insert\"]");
@@ -2973,6 +3197,7 @@ Gsender.prototype.initElements = function() {
   this.$edit =        this.$el.find("[data-view=\"edit\"]");
   this.$folders =     this.$el.find("[data-view=\"folders\"]");
   this.$filters =     this.$el.find("[data-view=\"filters\"]");
+  this.trigger('init.elements');
 };
 
 Gsender.prototype.initToolbar = function() {
@@ -2986,9 +3211,9 @@ Gsender.prototype.initToolbar = function() {
       conf:  this.options.conf || {}
     });
 
-    this.data.on('add', function(data) {
-      _this.search.select.addOption(data.toJSON());
-    });
+    // this.data.on('add', function(data) {
+    //   _this.search.select.addOption(data.toJSON());
+    // });
 
     this.search.on('search', function(query) {
       _this.dict.set({
@@ -3056,8 +3281,17 @@ Gsender.prototype.initToolbar = function() {
     });
 
     this.$el.on('click', "[data-action=\"insert\"]", function(e) {
+      var cancel = false;
       e.preventDefault();
-      _this.insert.open();
+
+      if (_this.newrow({
+      })) {
+        cancel = true;
+      }
+
+      if (!cancel) {        
+        _this.insert.open();
+      }
     });
 
     this.$insert.on('update', function() {
@@ -3115,6 +3349,18 @@ Gsender.prototype.onEdit = function(e) {
   return false;
 };
 
+Gsender.prototype.newrow = function(e) {
+  return false;
+};
+
+Gsender.prototype.onSelectLine = function(e) {
+  var uuid = e.uuid || '';
+  this.unColorActiveLine();
+  this.dict.set('selectRowUUID', uuid);
+  this.colorActiveLine();
+  this.updateChilds();
+  this.trigger('select.line', e);
+};
 
 Gsender.prototype.update = function(vals) {
   if (this.dict.get('type') === 'child') {
@@ -3124,10 +3370,10 @@ Gsender.prototype.update = function(vals) {
     var keys = this.dict.get('keys');
     var controls = this.compareKeyVals(keys, vals);
     this.updateCaption(controls);
-    if (this.search != null) {
-      this.search.select.conf.keys = keys;
-      this.search.select.conf.vals = vals;
-    }
+    // if (this.search != null) {
+    //   this.search.select.conf.keys = keys;
+    //   this.search.select.conf.vals = vals;
+    // }
     if (this.insert != null) {
       this.insert.vals = _.extend(this.insert.vals, controls);
     }
@@ -3141,7 +3387,7 @@ Gsender.prototype.updateChilds = function() {
   if (this.data !== null) {
     _.each(this.dict.get('childsInfo'), function(childInfo) {
       if (window[childInfo.wdict] !== undefined) {
-        if (line != null) {
+        if ((line != null) && (typeof(line.toJSON) == 'function')) {
           window[childInfo.wdict].update(line.toJSON() || {});
           if (window[childInfo.wdict].search != null) {
             if (window[childInfo.wdict].search.select != null) {
@@ -3157,21 +3403,11 @@ Gsender.prototype.updateChilds = function() {
 };
 
 Gsender.prototype.getUUIDbyFirstRecord = function() {
-  return this.$worksheet.find('tr:first').data('uuid') || '';
+  return this.$worksheet.find("[data-view=\"line\"]").data('uuid') || '';
 };
 
 Gsender.prototype.getSelectLine = function() {
   return this.data.get(this.dict.get('selectRowUUID')) || {};
-};
-
-Gsender.prototype.unColorActiveLine = function(classname) {
-  if (classname == null) {
-    classname = 'active';
-  }
-  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
-  if (this.$activeLine != null) {
-    this.$activeLine.removeClass(classname);
-  }
 };
 
 Gsender.prototype.colorActiveLine = function(classname) {
@@ -3181,6 +3417,16 @@ Gsender.prototype.colorActiveLine = function(classname) {
   this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
   if (this.$activeLine != null) {
     this.$activeLine.addClass(classname);
+  }
+};
+
+Gsender.prototype.unColorActiveLine = function(classname) {
+  if (classname == null) {
+    classname = 'active';
+  }
+  this.$activeLine = this.$worksheet.find("[data-uuid=\"" + this.dict.get('selectRowUUID') + "\"]").first();
+  if (this.$activeLine != null) {
+    this.$activeLine.removeClass(classname);
   }
 };
 
@@ -3290,6 +3536,9 @@ Gsender.prototype.sendRequest = function(type, model) {
     _this.hideErrorOnServer();
     _this.hideInformationNotFound();
     _this.checkResponse(type);
+    _this.trigger('data.load', {
+      type: type
+    });
   };
 
   var error = function(e) {
@@ -3394,7 +3643,7 @@ Gsender.prototype.checkResponse = function(type) {
     this.showInformationNotFound();
   }
 
-  this.$el.trigger('response:' + type);
+  this.trigger('response:' + type);
 };
 
 Gsender.prototype.isActiveDict = function() {
@@ -3415,36 +3664,6 @@ Gsender.prototype.compareKeyVals = function(keys, vals) {
     }
   });
   return controls;
-};
-
-Gsender.prototype.setCaptionVals = function(str, line) {
-
-  if (str == null) {
-    str = '';
-  }
-
-  if (line == null) {
-    line = {};
-  }
-
-  _.each(line, function(value, key) {
-    var re, pattern;
-    value =    value.toString().trim();
-    key =      key.replace(/\$/gi, "\\$");
-    pattern =  ':' + key + ':';
-    re =       new RegExp(pattern, 'ig');
-    if (str.match(re)) {
-      if (value.length > 10) {
-        value = '<b>' + value.slice(0, 10) + '</b>...';
-      } else {
-        value = '<b>' + value + '</b>';
-      }
-      str = str.replace(re, value);
-    }
-  });
-  str = str.replace(/\"\"/g, '"');
-  str = str.replace(/\"<b>\"/g, '"<b>');
-  return str;
 };
 
 module.exports = Gsender;
@@ -3569,6 +3788,7 @@ Insert.prototype.checkFields = function() {
       };
     }
     if (addfield === 'default') {
+      // console.log('_this.columns', _this.columns);
       _this.autoinsert = false;
       field = _.findWhere(_this.columns, {
         field: key
@@ -3695,21 +3915,28 @@ var Search = Common.extend({
   el: "[data-view=\"search\"]",
 
   initialize: function() {
-    var def, _this;
+    var _this = this;
 
     this.$select = this.$el.find('input');
 
-    this.select = new Select({
-      el:   this.$select,
-      type: 'search',
-      conf: this.options.conf || {}
+    this.$select.on('keyup', function(e) {
+      e.preventDefault();
+      if (e.keyCode === 13) {
+        _this.trigger('search', _this.$select.val());
+      }
     });
 
-    _this = this;
+    // this.select = new Select({
+    //   el:   this.$select,
+    //   type: 'search',
+    //   conf: this.options.conf || {}
+    // });
 
-    this.select.on('search', function(query) {
-      _this.search(query);
-    });    
+    // _this = this;
+
+    // this.select.on('search', function(query) {
+    //   _this.search(query);
+    // });    
   }
 });
 
@@ -3771,8 +3998,8 @@ var Select = Common.extend({
     // this.data.url = '/api/dict/' + this.conf.sid;
 
     this.searchfields = [];
-    this.columns =      this.conf.columns || {};
-    this.fields =       _.pluck(this.columns, 'field') || [];
+    // this.columns =      this.conf.columns || {};
+    this.fields =  _.pluck(this.conf.viewfields || [], 'rdb$field_name') || [];
 
     this.cfselect = this.conf.cfselect || {};
     this.selectfield = this.cfselect.selectfieldexpression || '';
@@ -3793,7 +4020,8 @@ var Select = Common.extend({
 
     switch (this.options.type) {
       case 'search':
-        plugins =        ['restore_on_backspace'];
+        // plugins =        ['restore_on_backspace'];
+        plugins =        [];
         valuefield =     'value';
         create =         this.create();
         selectOnTab =    true;
@@ -3954,6 +4182,7 @@ Select.prototype.getValue = function() {
 Select.prototype.create = function() {
   return function(input) {
     return {
+      item:          input,
       value:         input,
       text:          input,
       selectcaption: input
@@ -3996,6 +4225,7 @@ Select.prototype.renderOption = function() {
   var _this = this;
   var result;
   return function (item, escape) {
+    // console.log('Select.prototype.renderItem', item);
     switch (_this.options.type) {
       case 'folders':
         result = '<div>' + _this.renderFolder(item, escape) + '</div>';
@@ -4018,6 +4248,7 @@ Select.prototype.renderOption = function() {
           result = '<div>' + escape(item.value) + '</div>';
         }
     }
+    // console.log('Select.prototype.renderItem', result);
     return result;
   };
 };
@@ -4116,6 +4347,7 @@ Select.prototype.checkDataItem = function(item) {
       break;
       default: 
         str = this.setSearchFields(this.searchfields, item);
+        // console.log(this.options.conf.sid, 'this.options.type', this.options.type, this.searchfields, item, str);
         item.value = str;
         item.text = str;
     }
@@ -4130,7 +4362,6 @@ Select.prototype.clearOptions = function() {
 };
 
 module.exports = Select;
-
 }),
 "sidebar": (function (require, exports, module) { /* wrapped by builder */
 
@@ -4399,7 +4630,7 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<tr');
-buf.push(attrs({ 'data-uuid':("" + (line[keyfieldname]) + "") }, {"data-uuid":true}));
+buf.push(attrs({ 'data-view':("line"), 'data-uuid':("" + (line[keyfieldname]) + "") }, {"data-view":true,"data-uuid":true}));
 buf.push('>');
 // iterate columns
 ;(function(){
@@ -4416,17 +4647,17 @@ buf.push('>');
  if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
 buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
 }
  else
 {
- if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+ if (column.field === 'mmbsh')
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  var groups = window.parseGroupLine(value);
 // iterate groups
@@ -4459,7 +4690,7 @@ buf.push('</td>');
  else
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  if (value.length > 103)
 {
@@ -4477,7 +4708,7 @@ buf.push('</td>');
  else             
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('></td>');
 }
     }
@@ -4495,17 +4726,17 @@ buf.push('></td>');
  if (value.toString().match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/))
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("date"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('><span');
 buf.push(attrs({ 'data-toggle':("tooltip"), 'title':("" + (moment(value).fromNow()) + "") }, {"data-toggle":true,"title":true}));
 buf.push('><span>' + escape((interp = moment(value).format('DD.MM.YYYY')) == null ? '' : interp) + '</span>&nbsp;<small>' + escape((interp = moment(value).format('HH:mm')) == null ? '' : interp) + '</small></span></td>');
 }
  else
 {
- if (value.toString().match(/-?\d+\=\{\d+\|-?\d+\}[а-яА-Я\w ]*/i))
+ if (column.field === 'mmbsh')
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("groups"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  var groups = window.parseGroupLine(value);
 // iterate groups
@@ -4538,7 +4769,7 @@ buf.push('</td>');
  else
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text"), "class": ("" + (column.class_properties) + "") }, {"class":true,"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('>');
  if (value.length > 103)
 {
@@ -4556,7 +4787,7 @@ buf.push('</td>');
  else             
 {
 buf.push('<td');
-buf.push(attrs({ 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-col-field":true,"data-col-type":true}));
+buf.push(attrs({ 'data-view':("column"), 'data-col-uuid':("" + (line[keyfieldname]) + ""), 'data-col-field':("" + (column.field) + ""), 'data-col-type':("text") }, {"data-view":true,"data-col-uuid":true,"data-col-field":true,"data-col-type":true}));
 buf.push('></td>');
 }
     }
@@ -4634,9 +4865,9 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<form role="form" data-view="form" class="form-horizontal"><div class="form-group"><div class="col-sm-12"><input');
-buf.push(attrs({ 'data-control':("" + (id) + ""), 'value':("" + (value) + ""), 'type':("text"), "class": ('form-control') }, {"data-control":true,"value":true,"type":true}));
-buf.push('/></div></div></form>');
+buf.push('<div class="form-group"><div class="col-sm-12"><input');
+buf.push(attrs({ 'data-control':("" + (id) + ""), 'value':("" + (value) + ""), 'type':("text"), 'tabindex':("0"), "class": ('form-control') }, {"data-control":true,"value":true,"type":true,"tabindex":true}));
+buf.push('/></div></div>');
 }
 return buf.join("");
 };

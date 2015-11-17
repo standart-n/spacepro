@@ -117,7 +117,7 @@ Common.prototype.setLineVals = function(str, line, escape) {
   return str;
 };
 
-Gsender.prototype.setCaptionVals = function(str, line) {
+Common.prototype.setCaptionVals = function(str, line) {
 
   if (str == null) {
     str = '';
